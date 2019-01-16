@@ -20,8 +20,8 @@ func TestFindEtablissementsByS3IC(t *testing.T) {
 	defer server.Close()
 
 	initTestDB(db, assert)
-
-	e := httpexpect.New(t, "http://localhost:8080")
+	url := "http://" + config.Http.Host + ":" + config.Http.Port + "/"
+	e := httpexpect.New(t, url)
 
 	e.GET("/etablissements").WithQuery("s3ic", "23").
 		Expect().

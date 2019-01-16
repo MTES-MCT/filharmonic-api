@@ -14,11 +14,16 @@ func main() {
 	// chargement config
 	config := app.LoadConfig()
 	db, server := app.Bootstrap(config)
-	defer db.Close()
+	defer func() {
+		err := db.Close()
+		if err != nil {
+			log.Fatal("Unable to close DB", err)
+		}
+	}()
 
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	log.Println("Shutdown Server ...")

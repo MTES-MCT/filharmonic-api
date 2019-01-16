@@ -34,7 +34,7 @@ func Bootstrap(c Config) (*database.Database, *http.Server) {
 
 	repo := database.NewRepository(db)
 	service := domain.New(repo)
-	httpsrv := httpserver.New(service)
+	httpsrv := httpserver.New(c.Http, service)
 	server := httpsrv.Start()
 	return db, server
 }

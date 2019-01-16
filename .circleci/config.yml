@@ -1,0 +1,108 @@
+version: 2.1
+
+executors:
+  go:
+    docker:
+      - image: circleci/golang:1.11
+      - image: circleci/postgres:11.1-alpine
+        environment:
+          POSTGRES_USER: filharmonic
+          POSTGRES_PASS: filharmonic
+          POSTGRES_DB: filharmonic
+    working_directory: /go/src/github.com/MTES-MCT/filharmonic-api
+  gotest:
+    docker:
+      - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/MTES-MCT/filharmonic-api
+  gometalinter:
+    docker:
+      - image: mozgiii/gometalinter-docker:v2
+    working_directory: /go/src/github.com/MTES-MCT/filharmonic-api
+
+jobs:
+  install-dependencies:
+    executor: go
+    steps:
+      - checkout
+      # - restore_cache:
+      #     keys:
+      #       - v3-cache-{{ checksum "Gopkg.lock" }}
+      #       # fallback to using the latest cache if no exact match is found
+      #       - v3-cache-
+      - run: dep ensure
+      # - save_cache:
+      #     key: v3-cache-{{ checksum "yarn.lock" }}
+      #     paths:
+      #       - vendor/
+      - persist_to_workspace:
+          root: '.'
+          paths:
+            - vendor/
+
+  lint:
+    executor: gometalinter
+    steps:
+      - attach_workspace:
+          at: '.'
+      - run:
+          command: gometalinter --deadline 5m --vendor --disable=golint ./...
+
+  test:
+    executor: gotest
+    steps:
+      - attach_workspace:
+          at: '.'
+      - run: go test -cover -race -p 1 ./...
+
+  build:
+    executor: go
+    steps:
+      - attach_workspace:
+          at: '.'
+      - run: CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-extldflags '-static'" -o filharmonic-api
+      - persist_to_workspace:
+          root: '.'
+          paths:
+            - filharmonic-api
+
+  build-docker:
+    executor: go
+    steps:
+      - attach_workspace:
+          at: '.'
+      - setup_remote_docker
+      - run: |
+          if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
+            echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
+            exit 1
+          fi
+          docker build -t betagouv/filharmonic-api:$CIRCLE_SHA1 .
+
+          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
+          docker push betagouv/filharmonic-api:$CIRCLE_SHA1
+          if [[ "$CIRCLE_BRANCH" = "master" ]]; then
+            docker tag betagouv/filharmonic-api:$CIRCLE_SHA1 betagouv/filharmonic-api:latest
+            docker push betagouv/filharmonic-api:latest
+          fi
+
+workflows:
+  commit:
+    jobs:
+      - install-dependencies:
+          requires: []
+
+      - lint:
+          requires:
+            - install-dependencies
+      - test:
+          requires:
+            - install-dependencies
+
+      - build:
+          requires:
+            - lint
+            - test
+
+      - build-docker:
+          requires:
+            - build
