@@ -27,7 +27,7 @@ func TestFindEtablissementsByS3IC(t *testing.T) {
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array().
-		Element(0).Object().ValueEqual("s3ic", "1234")
+		Element(0).Object().ValueEqual("S3IC", "1234")
 }
 
 func initTestDB(db *database.Database, assert *require.Assertions) {
