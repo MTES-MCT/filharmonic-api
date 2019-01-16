@@ -83,7 +83,6 @@ jobs:
           at: '/go/src/github.com/MTES-MCT'
       - setup_remote_docker
       - run: |
-          cd filharmonic-api
           if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
             echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
             exit 1
