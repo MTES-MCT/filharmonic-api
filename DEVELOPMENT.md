@@ -26,7 +26,9 @@ go run main.go
 
 - database/ : couche d'accès à la base de données
 - httpserver/ : serveur HTTP
-- service/ : services métiers
+- domain/ : services métier
+- models/ : entités métier
+- app/ : config et bootstrap application
 - tests/e2e/ : tests end-to-end
 - vendor/ : contient les dépendances
 - main.go : point d'entrée
