@@ -69,19 +69,21 @@ jobs:
     steps:
       - attach_workspace:
           at: '/go/src/github.com/MTES-MCT'
-      - run: CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-extldflags '-static'" -o dist/filharmonic-api
+      - run: CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-extldflags '-static'" -o filharmonic-api
       - persist_to_workspace:
           root: '/go/src/github.com/MTES-MCT'
           paths:
-            - filharmonic-api/dist/filharmonic-api
+            - filharmonic-api/Dockerfile
+            - filharmonic-api/filharmonic-api
 
   build-docker:
     executor: go
     steps:
       - attach_workspace:
-          at: '/go/src/github.com/MTES-MCT/filharmonic-api/dist'
+          at: '/go/src/github.com/MTES-MCT'
       - setup_remote_docker
       - run: |
+          cd filharmonic-api
           if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
             echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
             exit 1
