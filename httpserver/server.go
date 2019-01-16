@@ -19,6 +19,7 @@ func New(service *domain.Service) *HttpServer {
 }
 
 func (s *HttpServer) Start() *http.Server {
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
 	router.GET("/etablissements", s.listEtablissements)

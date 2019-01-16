@@ -181,6 +181,19 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:a073c2dd83aa92060bd5b551e3a19a40f8e24d4aaa7e7da767ee9c69f07b533a"
+  name = "github.com/rs/zerolog"
+  packages = [
+    ".",
+    "internal/cbor",
+    "internal/json",
+    "log",
+  ]
+  pruneopts = "UT"
+  revision = "8747b7b3a51b5d08ee7ac50eaf4869edaf9f714a"
+  version = "v1.11.0"
+
+[[projects]]
   digest = "1:d917313f309bda80d27274d53985bc65651f81a5b66b820749ac7f8ef061fd04"
   name = "github.com/sergi/go-diff"
   packages = ["diffmatchpatch"]
@@ -368,6 +381,8 @@
     "github.com/go-pg/pg",
     "github.com/go-pg/pg/orm",
     "github.com/kelseyhightower/envconfig",
+    "github.com/rs/zerolog",
+    "github.com/rs/zerolog/log",
     "github.com/stretchr/testify/require",
     "gopkg.in/gavv/httpexpect.v1",
   ]

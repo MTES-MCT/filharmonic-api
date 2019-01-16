@@ -8,6 +8,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/rs/zerolog"
 )
 
 func LoadConfig() Config {
@@ -20,6 +21,12 @@ func LoadConfig() Config {
 }
 
 func Bootstrap(c Config) (*database.Database, *http.Server) {
+	logLevel, err := zerolog.ParseLevel(c.LogLevel)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	zerolog.SetGlobalLevel(logLevel)
+
 	db, err := database.New(c.Database)
 	if err != nil {
 		log.Fatal("Database error:", err)
