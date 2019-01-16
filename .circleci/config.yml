@@ -35,9 +35,9 @@ jobs:
       #     paths:
       #       - vendor/
       - persist_to_workspace:
-          root: '.'
+          root: '/go/src/github.com/MTES-MCT'
           paths:
-            - vendor/
+            - filharmonic-api/
 
   lint:
     executor: gometalinter
@@ -51,25 +51,25 @@ jobs:
     executor: gotest
     steps:
       - attach_workspace:
-          at: '.'
+          at: '/go/src/github.com/MTES-MCT'
       - run: go test -cover -race -p 1 ./...
 
   build:
     executor: go
     steps:
       - attach_workspace:
-          at: '.'
-      - run: CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-extldflags '-static'" -o filharmonic-api
+          at: '/go/src/github.com/MTES-MCT'
+      - run: CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags "-extldflags '-static'" -o dist/filharmonic-api
       - persist_to_workspace:
-          root: '.'
+          root: '/go/src/github.com/MTES-MCT'
           paths:
-            - filharmonic-api
+            - filharmonic-api/dist/filharmonic-api
 
   build-docker:
     executor: go
     steps:
       - attach_workspace:
-          at: '.'
+          at: '/go/src/github.com/MTES-MCT/filharmonic-api/dist'
       - setup_remote_docker
       - run: |
           if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
