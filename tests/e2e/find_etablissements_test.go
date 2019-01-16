@@ -16,6 +16,7 @@ func TestFindEtablissementsByS3IC(t *testing.T) {
 
 	config := app.LoadConfig()
 	config.Database.InitSchema = true
+	config.Http.Host = "localhost"
 	db, server := app.Bootstrap(config)
 	defer server.Close()
 

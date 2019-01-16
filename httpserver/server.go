@@ -10,7 +10,7 @@ import (
 )
 
 type Config struct {
-	Host string `default:"localhost"`
+	Host string `default:"0.0.0.0"`
 	Port string `default:"5000"`
 }
 
