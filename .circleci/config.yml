@@ -4,15 +4,15 @@ executors:
   go:
     docker:
       - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/MTES-MCT/filharmonic-api
+  gotest:
+    docker:
+      - image: circleci/golang:1.11
       - image: circleci/postgres:11.1-alpine
         environment:
           POSTGRES_USER: filharmonic
           POSTGRES_PASS: filharmonic
           POSTGRES_DB: filharmonic
-    working_directory: /go/src/github.com/MTES-MCT/filharmonic-api
-  gotest:
-    docker:
-      - image: circleci/golang:1.11
     working_directory: /go/src/github.com/MTES-MCT/filharmonic-api
   gometalinter:
     docker:
@@ -43,7 +43,7 @@ jobs:
     executor: gometalinter
     steps:
       - attach_workspace:
-          at: '.'
+          at: '/go/src/github.com/MTES-MCT'
       - run:
           command: gometalinter --deadline 5m --vendor --disable=golint ./...
 
@@ -52,6 +52,16 @@ jobs:
     steps:
       - attach_workspace:
           at: '/go/src/github.com/MTES-MCT'
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
       - run: go test -cover -race -p 1 ./...
 
   build:
