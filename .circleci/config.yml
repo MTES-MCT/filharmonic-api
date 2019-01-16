@@ -73,7 +73,6 @@ jobs:
       - persist_to_workspace:
           root: '/go/src/github.com/MTES-MCT'
           paths:
-            - filharmonic-api/Dockerfile
             - filharmonic-api/filharmonic-api
 
   build-docker:
