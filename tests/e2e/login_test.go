@@ -12,7 +12,7 @@ func TestLoginSuccessful(t *testing.T) {
 	e, close := tests.Init(t, nil)
 	defer close()
 
-	e.POST("/login").WithJSON(&httpserver.Credentials{Email: "existing-user@filharmonic.com", Password: "password"}).
+	e.POST("/login").WithJSON(&httpserver.Credentials{Email: "exploitant1@filharmonic.com", Password: "password1"}).
 		Expect().Status(http.StatusOK).JSON().Object().ContainsKey("token")
 
 }

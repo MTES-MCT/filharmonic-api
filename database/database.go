@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/MTES-MCT/filharmonic-api/models"
@@ -15,6 +16,7 @@ type Config struct {
 	Password   string `default:"filharmonic"`
 	Name       string `default:"filharmonic"`
 	InitSchema bool   `default:"false"`
+	LogSQL     bool   `default:"false"`
 }
 
 type Database struct {
@@ -29,6 +31,9 @@ func New(config Config) (*Database, error) {
 		Addr:     config.Host + ":" + strconv.Itoa(config.Port),
 		Database: config.Name,
 	})
+	if config.LogSQL {
+		client.AddQueryHook(dbLogger{})
+	}
 	_, err := client.ExecOne("select 1")
 	if err != nil {
 		return nil, err
@@ -47,6 +52,7 @@ func (d *Database) createSchema() error {
 	tables := []interface{}{
 		&models.Etablissement{},
 		&models.User{},
+		&models.EtablissementToExploitant{},
 	}
 	for _, table := range tables {
 		err := d.client.DropTable(table, &orm.DropTableOptions{
@@ -57,7 +63,6 @@ func (d *Database) createSchema() error {
 			return err
 		}
 	}
-
 	for _, table := range tables {
 		err := d.client.CreateTable(table, &orm.CreateTableOptions{
 			FKConstraints: true,
@@ -75,4 +80,12 @@ func (d *Database) Close() error {
 
 func (d *Database) Insert(model ...interface{}) error {
 	return d.client.Insert(model...)
+}
+
+type dbLogger struct{}
+
+func (d dbLogger) BeforeQuery(q *pg.QueryEvent) {}
+
+func (d dbLogger) AfterQuery(q *pg.QueryEvent) {
+	fmt.Println(q.FormattedQuery())
 }

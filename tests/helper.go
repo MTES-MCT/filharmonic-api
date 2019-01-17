@@ -40,13 +40,37 @@ func Init(t *testing.T, initDbFunc func(db *database.Database, assert *require.A
 }
 
 func initTestUsersDB(db *database.Database, assert *require.Assertions) {
-	encodedpassword, err := hash.GenerateFromPassword("password")
+	encodedpassword1, err := hash.GenerateFromPassword("password1")
 	assert.NoError(err)
-	user := &models.User{
-		Email:    "existing-user@filharmonic.com",
-		Password: encodedpassword,
+	encodedpassword2, err := hash.GenerateFromPassword("password2")
+	assert.NoError(err)
+	users := []interface{}{
+		&models.User{
+			Id:       1,
+			Email:    "exploitant1@filharmonic.com",
+			Password: encodedpassword1,
+			Profile:  models.ProfilExploitant,
+		},
+		&models.User{
+			Id:       2,
+			Email:    "exploitant2@filharmonic.com",
+			Password: encodedpassword2,
+			Profile:  models.ProfilExploitant,
+		},
+		&models.User{
+			Id:       3,
+			Email:    "inspecteur1@filharmonic.com",
+			Password: encodedpassword1,
+			Profile:  models.ProfilInspecteur,
+		},
+		&models.User{
+			Id:       4,
+			Email:    "inspecteur2@filharmonic.com",
+			Password: encodedpassword2,
+			Profile:  models.ProfilInspecteur,
+		},
 	}
-	err = db.Insert(user)
+	err = db.Insert(users...)
 	assert.NoError(err)
 }
 

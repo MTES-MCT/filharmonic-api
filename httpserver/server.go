@@ -39,6 +39,9 @@ func (s *HttpServer) Start() *http.Server {
 	}
 	router.Use(gin.Recovery())
 
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "server up"})
+	})
 	router.POST("/login", s.login)
 
 	authorized := router.Group("/")

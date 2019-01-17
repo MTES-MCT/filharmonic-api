@@ -14,6 +14,6 @@ func New(repo Repository) *Service {
 	}
 }
 
-func (s *Service) ListEtablissements(s3ic string) ([]models.Etablissement, error) {
-	return s.repo.FindEtablissementsByS3IC(s3ic)
+func (s *Service) ListEtablissements(ctx *UserContext, s3ic string) ([]models.Etablissement, error) {
+	return s.repo.FindEtablissementsByS3IC(ctx, s3ic)
 }

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/MTES-MCT/filharmonic-api/authentication/hash"
+	"github.com/MTES-MCT/filharmonic-api/domain"
 )
 
 var (
@@ -40,23 +41,23 @@ func (sso *Sso) Login(email string, password string) (string, error) {
 		return "", err
 	}
 	if checked {
-		return generateToken(user.ID), nil
+		return generateToken(user.Id), nil
 	}
 	return "", ErrUnauthorized
 }
 
-func (sso *Sso) ValidateToken(token string) (int64, error) {
+func (sso *Sso) ValidateToken(token string) (*domain.UserContext, error) {
 	userIdStr := strings.TrimLeft(token, "token-")
 	userId, err := strconv.ParseInt(userIdStr, 10, 64)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	user, err := sso.repo.GetUserByID(userId)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if user == nil {
-		return 0, ErrMissingUser
+		return nil, ErrMissingUser
 	}
-	return user.ID, nil
+	return &domain.UserContext{User: user}, nil
 }

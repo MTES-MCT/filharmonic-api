@@ -3,10 +3,11 @@ package httpserver
 import (
 	"net/http"
 
+	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/gin-gonic/gin"
 )
 
-const authUserKey = "authUserKey"
+const userContextKey = "userContextKey"
 const AuthorizationHeader = "Authorization"
 
 func (server *HttpServer) authRequired(c *gin.Context) {
@@ -14,10 +15,15 @@ func (server *HttpServer) authRequired(c *gin.Context) {
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
 	}
-	userId, err := server.sso.ValidateToken(token)
+	userContext, err := server.sso.ValidateToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
 	}
-	c.Set(authUserKey, userId)
+	c.Set(userContextKey, userContext)
 	c.Next()
+}
+
+func (server *HttpServer) retrieveUserContext(c *gin.Context) *domain.UserContext {
+	ctx, _ := c.Get(userContextKey)
+	return ctx.(*domain.UserContext)
 }

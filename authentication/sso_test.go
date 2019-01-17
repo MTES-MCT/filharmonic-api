@@ -14,12 +14,12 @@ func TestValidToken(t *testing.T) {
 	sso := New(repository)
 
 	repository.On("GetUserByID", int64(123)).Return(&models.User{
-		ID: 123,
+		Id: 123,
 	}, nil)
 
-	id, err := sso.ValidateToken("token-123")
+	userCtx, err := sso.ValidateToken("token-123")
 	assert.NoError(err)
-	assert.Equal(int64(123), id)
+	assert.Equal(int64(123), userCtx.User.Id)
 }
 
 func TestInvalidToken(t *testing.T) {
@@ -29,7 +29,7 @@ func TestInvalidToken(t *testing.T) {
 
 	repository.On("GetUserByID", int64(123)).Return(nil, nil)
 
-	id, err := sso.ValidateToken("token-123")
+	userCtx, err := sso.ValidateToken("token-123")
 	assert.Equal(err, ErrMissingUser)
-	assert.Equal(int64(0), id)
+	assert.Nil(userCtx)
 }
