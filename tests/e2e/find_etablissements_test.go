@@ -14,7 +14,7 @@ func TestFindEtablissementsByS3IC(t *testing.T) {
 	e, close := tests.Init(t, initTestEtablissementsDB)
 	defer close()
 
-	e.GET("/etablissements").WithQuery("s3ic", "23").
+	tests.Auth(e.GET("/etablissements")).WithQuery("s3ic", "23").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array().

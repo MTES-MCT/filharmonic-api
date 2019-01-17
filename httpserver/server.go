@@ -12,8 +12,9 @@ import (
 )
 
 type Config struct {
-	Host string `default:"0.0.0.0"`
-	Port string `default:"5000"`
+	Host   string `default:"0.0.0.0"`
+	Port   string `default:"5000"`
+	Logger bool   `default:"true"`
 }
 
 type HttpServer struct {
@@ -32,10 +33,22 @@ func New(config Config, service *domain.Service, sso *authentication.Sso) *HttpS
 
 func (s *HttpServer) Start() *http.Server {
 	gin.SetMode(gin.ReleaseMode)
-	router := gin.Default()
+	router := gin.New()
+	if s.config.Logger {
+		router.Use(gin.Logger())
+	}
+	router.Use(gin.Recovery())
 
-	router.GET("/etablissements", s.listEtablissements)
 	router.POST("/login", s.login)
+
+	authorized := router.Group("/")
+	authorized.Use(s.authRequired)
+	{
+		authorized.GET("/ping", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"message": "authenticated"})
+		})
+		authorized.GET("/etablissements", s.listEtablissements)
+	}
 
 	server := &http.Server{
 		Addr:    s.config.Host + ":" + s.config.Port,

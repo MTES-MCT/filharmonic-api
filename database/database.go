@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/MTES-MCT/filharmonic-api/models"
@@ -67,17 +66,7 @@ func (d *Database) createSchema() error {
 			return err
 		}
 	}
-	var info []struct {
-		ColumnName string
-		DataType   string
-	}
-	_, err := d.client.Query(&info, `
-		SELECT column_name, data_type
-		FROM information_schema.columns
-		WHERE table_name = 'model2'
-	`)
-	fmt.Println(info)
-	return err
+	return nil
 }
 
 func (d *Database) Close() error {

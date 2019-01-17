@@ -3,9 +3,9 @@ package authentication
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/MTES-MCT/filharmonic-api/authentication/hash"
-	"github.com/MTES-MCT/filharmonic-api/database"
 )
 
 var (
@@ -14,10 +14,10 @@ var (
 )
 
 type Sso struct {
-	repo *database.Repository
+	repo Repository
 }
 
-func New(repo *database.Repository) *Sso {
+func New(repo Repository) *Sso {
 	return &Sso{
 		repo: repo,
 	}
@@ -28,7 +28,7 @@ func generateToken(id int64) string {
 }
 
 func (sso *Sso) Login(email string, password string) (string, error) {
-	user, err := sso.repo.GetUser(email)
+	user, err := sso.repo.GetUserByEmail(email)
 	if err != nil {
 		return "", err
 	}
@@ -43,4 +43,20 @@ func (sso *Sso) Login(email string, password string) (string, error) {
 		return generateToken(user.ID), nil
 	}
 	return "", ErrUnauthorized
+}
+
+func (sso *Sso) ValidateToken(token string) (int64, error) {
+	userIdStr := strings.TrimLeft(token, "token-")
+	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	user, err := sso.repo.GetUserByID(userId)
+	if err != nil {
+		return 0, err
+	}
+	if user == nil {
+		return 0, ErrMissingUser
+	}
+	return user.ID, nil
 }

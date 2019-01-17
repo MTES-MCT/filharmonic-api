@@ -5,6 +5,7 @@
 Prérequis :
 - [go](https://golang.org/) (testé avec 1.11)
 - [dep](https://github.com/golang/dep)
+- [mockery](https://github.com/vektra/mockery)
 - [docker-compose](https://docs.docker.com/compose/install/) (testé avec 1.19.0)
 
 Il faut d'abord installer les dépendances.
@@ -32,3 +33,10 @@ go run main.go
 - tests/e2e/ : tests end-to-end
 - vendor/ : contient les dépendances
 - main.go : point d'entrée
+
+
+### Mise à jour des mocks
+
+```
+go generate ./...
+```
