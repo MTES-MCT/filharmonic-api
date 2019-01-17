@@ -6,3 +6,9 @@ type Etablissement struct {
 	Raison  string
 	Adresse string
 }
+type User struct {
+	ID       int64
+	Email    string
+	Password string
+	Profile  string
+}

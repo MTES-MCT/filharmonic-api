@@ -45,16 +45,22 @@ func New(config Config) (*Database, error) {
 }
 
 func (d *Database) createSchema() error {
-	err := d.client.DropTable(&models.Etablissement{}, &orm.DropTableOptions{
-		Cascade:  true,
-		IfExists: true,
-	})
-	if err != nil {
-		return err
+	tables := []interface{}{
+		&models.Etablissement{},
+		&models.User{},
+	}
+	for _, table := range tables {
+		err := d.client.DropTable(table, &orm.DropTableOptions{
+			Cascade:  true,
+			IfExists: true,
+		})
+		if err != nil {
+			return err
+		}
 	}
 
-	for _, model := range []interface{}{&models.Etablissement{}} {
-		err = d.client.CreateTable(model, &orm.CreateTableOptions{
+	for _, table := range tables {
+		err := d.client.CreateTable(table, &orm.CreateTableOptions{
 			FKConstraints: true,
 		})
 		if err != nil {
@@ -65,7 +71,7 @@ func (d *Database) createSchema() error {
 		ColumnName string
 		DataType   string
 	}
-	_, err = d.client.Query(&info, `
+	_, err := d.client.Query(&info, `
 		SELECT column_name, data_type
 		FROM information_schema.columns
 		WHERE table_name = 'model2'

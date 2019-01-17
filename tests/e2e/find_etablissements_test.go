@@ -4,25 +4,15 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/MTES-MCT/filharmonic-api/app"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/MTES-MCT/filharmonic-api/tests"
 	"github.com/stretchr/testify/require"
-	httpexpect "gopkg.in/gavv/httpexpect.v1"
 )
 
 func TestFindEtablissementsByS3IC(t *testing.T) {
-	assert := require.New(t)
-
-	config := app.LoadConfig()
-	config.Database.InitSchema = true
-	config.Http.Host = "localhost"
-	db, server := app.Bootstrap(config)
-	defer server.Close()
-
-	initTestDB(db, assert)
-	url := "http://" + config.Http.Host + ":" + config.Http.Port + "/"
-	e := httpexpect.New(t, url)
+	e, close := tests.Init(t, initTestEtablissementsDB)
+	defer close()
 
 	e.GET("/etablissements").WithQuery("s3ic", "23").
 		Expect().
@@ -31,7 +21,7 @@ func TestFindEtablissementsByS3IC(t *testing.T) {
 		Element(0).Object().ValueEqual("S3IC", "1234")
 }
 
-func initTestDB(db *database.Database, assert *require.Assertions) {
+func initTestEtablissementsDB(db *database.Database, assert *require.Assertions) {
 	etablissement := &models.Etablissement{
 		S3IC:    "1234",
 		Raison:  "Raison sociale",

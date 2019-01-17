@@ -293,9 +293,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f92f6956e4059f6a3efc14924d2dd58ba90da25cc57fe07ae3779ef2f5e0c5f2"
+  digest = "1:cf7e15ad5363d964dd2e74f051fb0ad5a7cf41dcad8c5f0951833c778f4949c7"
   name = "golang.org/x/crypto"
-  packages = ["pbkdf2"]
+  packages = [
+    "argon2",
+    "blake2b",
+    "pbkdf2",
+  ]
   pruneopts = "UT"
   revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
 
@@ -312,9 +316,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d8e319d450f0e90df8dcf8c9934a878af800d0f4c692cb9657748f0cffff486e"
+  digest = "1:6cb22f5efb127548b9bcec294f549d4f1b9d28e81bda5b46110884b7adeb9ae7"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = [
+    "cpu",
+    "unix",
+  ]
   pruneopts = "UT"
   revision = "2be51725563103c17124a318f1745b66f2347acb"
 
@@ -384,6 +391,7 @@
     "github.com/rs/zerolog",
     "github.com/rs/zerolog/log",
     "github.com/stretchr/testify/require",
+    "golang.org/x/crypto/argon2",
     "gopkg.in/gavv/httpexpect.v1",
   ]
   solver-name = "gps-cdcl"

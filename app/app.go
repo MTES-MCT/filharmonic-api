@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/MTES-MCT/filharmonic-api/authentication"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
@@ -33,8 +34,9 @@ func Bootstrap(c Config) (*database.Database, *http.Server) {
 	}
 
 	repo := database.NewRepository(db)
+	sso := authentication.New(repo)
 	service := domain.New(repo)
-	httpsrv := httpserver.New(c.Http, service)
+	httpsrv := httpserver.New(c.Http, service, sso)
 	server := httpsrv.Start()
 	return db, server
 }
