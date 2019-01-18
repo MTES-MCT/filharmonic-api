@@ -40,8 +40,6 @@ jobs:
 
   test:
     executor: gotest
-    pre:
-      - go get github.com/mattn/goveralls
     steps:
       - attach_workspace:
           at: '/go/src/github.com/MTES-MCT'
@@ -55,10 +53,12 @@ jobs:
               sleep 1
             done
             echo Failed waiting for Postgres && exit 1
-      - run: go test -cover -race -coverpkg -coverprofile=coverage.out -p 1 ./...
-    post:
-      - sed -i '/mocks/d' coverage.out
-      - goveralls -coverprofile=coverage.out -service=circle-ci
+      - run:
+          command: |
+            go get github.com/mattn/goveralls
+            go test -cover -race -coverpkg -coverprofile=coverage.out -p 1 ./...
+            sed -i '/mocks/d' coverage.out
+            goveralls -coverprofile=coverage.out -service=circle-ci
 
   build:
     executor: go
