@@ -51,6 +51,7 @@ func (s *HttpServer) Start() *http.Server {
 			c.JSON(http.StatusOK, gin.H{"message": "authenticated"})
 		})
 		authorized.GET("/etablissements", s.listEtablissements)
+		authorized.GET("/etablissements/:id", s.getEtablissement)
 	}
 
 	server := &http.Server{

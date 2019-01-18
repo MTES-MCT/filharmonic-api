@@ -13,14 +13,15 @@ const AuthorizationHeader = "Authorization"
 func (server *HttpServer) authRequired(c *gin.Context) {
 	token := c.Request.Header.Get(AuthorizationHeader)
 	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
+		return
 	}
 	userContext, err := server.sso.ValidateToken(token)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
+		return
 	}
 	c.Set(userContextKey, userContext)
-	c.Next()
 }
 
 func (server *HttpServer) retrieveUserContext(c *gin.Context) *domain.UserContext {

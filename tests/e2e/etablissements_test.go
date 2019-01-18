@@ -33,6 +33,24 @@ func TestFindEtablissementsOwnedByExploitant(t *testing.T) {
 	results.First().Object().ValueEqual("s3ic", "1234")
 }
 
+func TestGetEtablissementsByIdOwnedByExploitant(t *testing.T) {
+	e, close := tests.Init(t, initTestEtablissementsDB)
+	defer close()
+
+	tests.Auth(e.GET("/etablissements/{id}")).WithPath("id", "1").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().ValueEqual("id", 1)
+}
+func TestGetEtablissementsByIdNotOwnedByExploitant(t *testing.T) {
+	e, close := tests.Init(t, initTestEtablissementsDB)
+	defer close()
+
+	tests.Auth(e.GET("/etablissements/{id}")).WithPath("id", "2").
+		Expect().
+		Status(http.StatusNotFound)
+}
+
 func initTestEtablissementsDB(db *database.Database, assert *require.Assertions) {
 	etablissements := []interface{}{
 		&models.Etablissement{
