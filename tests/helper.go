@@ -6,15 +6,14 @@ import (
 	httpexpect "gopkg.in/gavv/httpexpect.v1"
 
 	"github.com/MTES-MCT/filharmonic-api/app"
-	"github.com/MTES-MCT/filharmonic-api/authentication/hash"
+	"github.com/MTES-MCT/filharmonic-api/authentication"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
-	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
 
-func Init(t *testing.T, initDbFunc func(db *database.Database, assert *require.Assertions)) (*httpexpect.Expect, func()) {
+func InitFunc(t *testing.T, initDbFunc func(db *database.Database, assert *require.Assertions)) (*httpexpect.Expect, func()) {
 	assert := require.New(t)
 	config := app.LoadConfig()
 	config.Database.InitSchema = true
@@ -23,7 +22,7 @@ func Init(t *testing.T, initDbFunc func(db *database.Database, assert *require.A
 	config.LogLevel = ""
 	db, server := app.Bootstrap(config)
 
-	initTestUsersDB(db, assert)
+	initTestDB(db, assert)
 
 	if initDbFunc != nil {
 		initDbFunc(db, assert)
@@ -40,41 +39,22 @@ func Init(t *testing.T, initDbFunc func(db *database.Database, assert *require.A
 	}
 }
 
-func initTestUsersDB(db *database.Database, assert *require.Assertions) {
-	encodedpassword1, err := hash.GenerateFromPassword("password1")
-	assert.NoError(err)
-	encodedpassword2, err := hash.GenerateFromPassword("password2")
-	assert.NoError(err)
-	users := []interface{}{
-		&models.User{
-			Id:       1,
-			Email:    "exploitant1@filharmonic.com",
-			Password: encodedpassword1,
-			Profile:  models.ProfilExploitant,
-		},
-		&models.User{
-			Id:       2,
-			Email:    "exploitant2@filharmonic.com",
-			Password: encodedpassword2,
-			Profile:  models.ProfilExploitant,
-		},
-		&models.User{
-			Id:       3,
-			Email:    "inspecteur1@filharmonic.com",
-			Password: encodedpassword1,
-			Profile:  models.ProfilInspecteur,
-		},
-		&models.User{
-			Id:       4,
-			Email:    "inspecteur2@filharmonic.com",
-			Password: encodedpassword2,
-			Profile:  models.ProfilInspecteur,
-		},
-	}
-	err = db.Insert(users...)
-	assert.NoError(err)
+func Init(t *testing.T) (*httpexpect.Expect, func()) {
+	return InitFunc(t, nil)
 }
 
-func Auth(request *httpexpect.Request) *httpexpect.Request {
-	return request.WithHeader(httpserver.AuthorizationHeader, "token-1")
+func AuthInspecteur(request *httpexpect.Request) *httpexpect.Request {
+	return auth(request, 3)
+}
+
+func AuthExploitant(request *httpexpect.Request) *httpexpect.Request {
+	return auth(request, 1)
+}
+
+func AuthApprobateur(request *httpexpect.Request) *httpexpect.Request {
+	return auth(request, 6)
+}
+
+func auth(request *httpexpect.Request, userId int64) *httpexpect.Request {
+	return request.WithHeader(httpserver.AuthorizationHeader, authentication.GenerateToken(userId))
 }

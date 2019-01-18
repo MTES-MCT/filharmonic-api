@@ -8,10 +8,10 @@ import (
 )
 
 func TestAuthentication(t *testing.T) {
-	e, close := tests.Init(t, nil)
+	e, close := tests.Init(t)
 	defer close()
 
-	tests.Auth(e.GET("/ping")).
+	tests.AuthInspecteur(e.GET("/ping")).
 		Expect().
 		Status(http.StatusOK)
 }

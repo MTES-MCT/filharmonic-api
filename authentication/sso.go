@@ -24,7 +24,7 @@ func New(repo Repository) *Sso {
 	}
 }
 
-func generateToken(id int64) string {
+func GenerateToken(id int64) string {
 	return "token-" + strconv.FormatInt(id, 10)
 }
 
@@ -41,7 +41,7 @@ func (sso *Sso) Login(email string, password string) (string, error) {
 		return "", err
 	}
 	if checked {
-		return generateToken(user.Id), nil
+		return GenerateToken(user.Id), nil
 	}
 	return "", ErrUnauthorized
 }

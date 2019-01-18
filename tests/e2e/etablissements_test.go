@@ -4,17 +4,14 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/MTES-MCT/filharmonic-api/database"
-	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/tests"
-	"github.com/stretchr/testify/require"
 )
 
 func TestFindEtablissementsByS3IC(t *testing.T) {
-	e, close := tests.Init(t, initTestEtablissementsDB)
+	e, close := tests.Init(t)
 	defer close()
 
-	tests.Auth(e.GET("/etablissements")).WithQuery("s3ic", "23").
+	tests.AuthExploitant(e.GET("/etablissements")).WithQuery("s3ic", "23").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array().
@@ -22,58 +19,32 @@ func TestFindEtablissementsByS3IC(t *testing.T) {
 }
 
 func TestFindEtablissementsOwnedByExploitant(t *testing.T) {
-	e, close := tests.Init(t, initTestEtablissementsDB)
+	e, close := tests.Init(t)
 	defer close()
 
-	results := tests.Auth(e.GET("/etablissements")).
+	results := tests.AuthExploitant(e.GET("/etablissements")).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array()
-	results.Length().Equal(1)
+	results.Length().Equal(2)
 	results.First().Object().ValueEqual("s3ic", "1234")
+	results.Last().Object().ValueEqual("s3ic", "4567")
 }
 
 func TestGetEtablissementsByIdOwnedByExploitant(t *testing.T) {
-	e, close := tests.Init(t, initTestEtablissementsDB)
+	e, close := tests.Init(t)
 	defer close()
 
-	tests.Auth(e.GET("/etablissements/{id}")).WithPath("id", "1").
+	tests.AuthExploitant(e.GET("/etablissements/{id}")).WithPath("id", "1").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object().ValueEqual("id", 1)
 }
 func TestGetEtablissementsByIdNotOwnedByExploitant(t *testing.T) {
-	e, close := tests.Init(t, initTestEtablissementsDB)
+	e, close := tests.Init(t)
 	defer close()
 
-	tests.Auth(e.GET("/etablissements/{id}")).WithPath("id", "2").
+	tests.AuthExploitant(e.GET("/etablissements/{id}")).WithPath("id", "3").
 		Expect().
 		Status(http.StatusNotFound)
-}
-
-func initTestEtablissementsDB(db *database.Database, assert *require.Assertions) {
-	etablissements := []interface{}{
-		&models.Etablissement{
-			Id:      1,
-			S3IC:    "1234",
-			Raison:  "Raison sociale",
-			Adresse: "1 rue des fleurs 75000 Paris",
-		},
-		&models.Etablissement{
-			Id:      2,
-			S3IC:    "4567",
-			Raison:  "Raison sociale 2",
-			Adresse: "1 rue des plantes 44000 Nantes",
-		},
-	}
-
-	assert.NoError(db.Insert(etablissements...))
-	assert.NoError(db.Insert(&models.EtablissementToExploitant{
-		EtablissementId: 1,
-		UserId:          1,
-	}))
-	assert.NoError(db.Insert(&models.EtablissementToExploitant{
-		EtablissementId: 2,
-		UserId:          2,
-	}))
 }

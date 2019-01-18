@@ -9,7 +9,7 @@ import (
 )
 
 func TestLoginSuccessful(t *testing.T) {
-	e, close := tests.Init(t, nil)
+	e, close := tests.Init(t)
 	defer close()
 
 	e.POST("/login").WithJSON(&httpserver.Credentials{Email: "exploitant1@filharmonic.com", Password: "password1"}).
@@ -17,7 +17,7 @@ func TestLoginSuccessful(t *testing.T) {
 
 }
 func TestLoginFailed(t *testing.T) {
-	e, close := tests.Init(t, nil)
+	e, close := tests.Init(t)
 	defer close()
 
 	e.POST("/login").WithJSON(&httpserver.Credentials{Email: "missing-user@filharmonic.com", Password: "notpassword"}).
