@@ -29,3 +29,7 @@
 [[constraint]]
   branch = "master"
   name = "golang.org/x/crypto"
+
+[[constraint]]
+  name = "github.com/go-pg/migrations"
+  version = "6.6.3"

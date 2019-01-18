@@ -1,11 +1,11 @@
 package httpserver
 
 import (
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/authentication"
+	"github.com/rs/zerolog/log"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/gin-gonic/gin"
@@ -59,15 +59,14 @@ func (s *HttpServer) Start() *http.Server {
 	}
 
 	go func() {
-		// service connections
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
+			log.Fatal().Msgf("listen error: %s", err)
 		}
 	}()
 
 	tryCount := 100
 	for tryCount > 0 {
-		_, err := http.Get("http://" + s.config.Host + ":" + s.config.Port)
+		_, err := http.Get("http://" + server.Addr)
 		if err == nil {
 			break
 		}
@@ -75,8 +74,8 @@ func (s *HttpServer) Start() *http.Server {
 		tryCount--
 	}
 	if tryCount == 0 {
-		log.Fatalln("server did not start")
+		log.Fatal().Msg("server did not start")
 	}
-
+	log.Info().Msgf("server ready and listening on %s", server.Addr)
 	return server
 }

@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"log"
 	"testing"
 
 	httpexpect "gopkg.in/gavv/httpexpect.v1"
@@ -11,6 +10,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,6 +20,7 @@ func Init(t *testing.T, initDbFunc func(db *database.Database, assert *require.A
 	config.Database.InitSchema = true
 	config.Http.Host = "localhost"
 	config.Http.Logger = false
+	config.LogLevel = ""
 	db, server := app.Bootstrap(config)
 
 	initTestUsersDB(db, assert)
@@ -34,7 +35,7 @@ func Init(t *testing.T, initDbFunc func(db *database.Database, assert *require.A
 	return e, func() {
 		err := server.Close()
 		if err != nil {
-			log.Fatalln(err.Error())
+			log.Fatal().Msg(err.Error())
 		}
 	}
 }

@@ -55,6 +55,14 @@
   version = "v1.3.0"
 
 [[projects]]
+  digest = "1:4fc7ed80c2e257885c08d7ac2b1e5478084d1dfb7f0bd568d2fd4b8746d03c93"
+  name = "github.com/go-pg/migrations"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2c19ab5778da611268a99b809218d1c9a8eb3df3"
+  version = "v6.6.3"
+
+[[projects]]
   digest = "1:1eb6953835576e98ba19de75b65019d7cf86b2b8d6d458d27bc8d48689d3c5e6"
   name = "github.com/go-pg/pg"
   packages = [
@@ -202,10 +210,19 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:5da8ce674952566deae4dbc23d07c85caafc6cfa815b0b3e03e41979cedb8750"
+  digest = "1:ac83cf90d08b63ad5f7e020ef480d319ae890c208f8524622a2f3136e2686b02"
+  name = "github.com/stretchr/objx"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "477a77ecc69700c7cdeb1fa9e129548e1c1c393c"
+  version = "v0.1.1"
+
+[[projects]]
+  digest = "1:b762f96c1183763894e8dabbac5f8e8d5821754b6e2686a8c398a174b7a58ff5"
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
+    "mock",
     "require",
   ]
   pruneopts = "UT"
@@ -385,11 +402,13 @@
   analyzer-version = 1
   input-imports = [
     "github.com/gin-gonic/gin",
+    "github.com/go-pg/migrations",
     "github.com/go-pg/pg",
     "github.com/go-pg/pg/orm",
     "github.com/kelseyhightower/envconfig",
     "github.com/rs/zerolog",
     "github.com/rs/zerolog/log",
+    "github.com/stretchr/testify/mock",
     "github.com/stretchr/testify/require",
     "golang.org/x/crypto/argon2",
     "gopkg.in/gavv/httpexpect.v1",

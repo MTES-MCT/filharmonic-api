@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/MTES-MCT/filharmonic-api/database/migrations"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
@@ -44,6 +45,8 @@ func New(config Config) (*Database, error) {
 	}
 	if config.InitSchema {
 		err = db.createSchema()
+	} else {
+		err = migrations.MigrateDB(client)
 	}
 	return db, err
 }
