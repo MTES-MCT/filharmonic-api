@@ -1,3 +1,6 @@
+[![CircleCI](https://img.shields.io/circleci/project/github/MTES-MCT/filharmonic-api/master.svg?style=flat-square)](https://circleci.com/gh/MTES-MCT/filharmonic-api/tree/master)
+[![Coverage Status](https://img.shields.io/coveralls/github/MTES-MCT/filharmonic-api.svg?style=flat-square)](https://coveralls.io/github/MTES-MCT/filharmonic-api)
+
 # Fil'Harmonic API
 
 > Prévenir efficacement les risques industriels

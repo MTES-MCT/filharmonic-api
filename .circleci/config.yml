@@ -24,16 +24,7 @@ jobs:
     executor: go
     steps:
       - checkout
-      # - restore_cache:
-      #     keys:
-      #       - v3-cache-{{ checksum "Gopkg.lock" }}
-      #       # fallback to using the latest cache if no exact match is found
-      #       - v3-cache-
       - run: dep ensure
-      # - save_cache:
-      #     key: v3-cache-{{ checksum "yarn.lock" }}
-      #     paths:
-      #       - vendor/
       - persist_to_workspace:
           root: '/go/src/github.com/MTES-MCT'
           paths:
@@ -49,6 +40,8 @@ jobs:
 
   test:
     executor: gotest
+    pre:
+      - go get github.com/mattn/goveralls
     steps:
       - attach_workspace:
           at: '/go/src/github.com/MTES-MCT'
@@ -62,7 +55,10 @@ jobs:
               sleep 1
             done
             echo Failed waiting for Postgres && exit 1
-      - run: go test -cover -race -p 1 ./...
+      - run: go test -cover -race -coverpkg -coverprofile=coverage.out -p 1 ./...
+    post:
+      - sed -i '/mocks/d' coverage.out
+      - goveralls -coverprofile=coverage.out -service=circle-ci
 
   build:
     executor: go
