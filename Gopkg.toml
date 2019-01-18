@@ -45,3 +45,7 @@
 [[constraint]]
   name = "github.com/go-redis/redis"
   version = "6.15.1"
+
+[[constraint]]
+  name = "github.com/mailjet/mailjet-apiv3-go"
+  version = "2.4.5"

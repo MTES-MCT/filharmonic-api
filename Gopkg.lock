@@ -205,6 +205,18 @@
   version = "v1.0.1"
 
 [[projects]]
+  digest = "1:b640f196e31078d2ff78476ccb4487b5ac71c7a6f5be8ca2b7f5bb45cd215a07"
+  name = "github.com/mailjet/mailjet-apiv3-go"
+  packages = [
+    ".",
+    "fixtures",
+    "resources",
+  ]
+  pruneopts = "UT"
+  revision = "4597cb4aae1236575fcd3f7c09544191e1e0aa35"
+  version = "2.4.5"
+
+[[projects]]
   digest = "1:0981502f9816113c9c8c4ac301583841855c8cf4da8c72f696b3ebedf6d0e4e5"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
@@ -508,6 +520,7 @@
     "github.com/go-redis/redis",
     "github.com/gofrs/uuid",
     "github.com/kelseyhightower/envconfig",
+    "github.com/mailjet/mailjet-apiv3-go",
     "github.com/minio/minio-go",
     "github.com/pkg/errors",
     "github.com/rs/zerolog",
