@@ -41,3 +41,7 @@
 [[constraint]]
   name = "github.com/gofrs/uuid"
   version = "3.2.0"
+
+[[constraint]]
+  name = "github.com/mailjet/mailjet-apiv3-go"
+  version = "2.4.5"
