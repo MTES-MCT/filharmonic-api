@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type TypeInspection string
 
@@ -38,7 +41,7 @@ type Inspection struct {
 	Id                 int64                  `json:"id"`
 	Date               time.Time              `json:"date" sql:"type:date"`
 	Type               TypeInspection         `json:"type"`
-	Annonce            bool                   `json:"annonce"`
+	Annonce            bool                   `json:"annonce" sql:",notnull"`
 	Origine            OrigineInspection      `json:"origine"`
 	Circonstance       CirconstanceInspection `json:"circonstance"`
 	DetailCirconstance string                 `json:"detail_circonstance"`
@@ -46,9 +49,22 @@ type Inspection struct {
 	Etat               EtatInspection         `json:"etat"`
 	EtablissementId    int64                  `sql:",notnull" json:"etablissement_id"`
 
-	Etablissement *Etablissement    `json:"etablissement,omitempty"`
-	Themes        []ThemeInspection `json:"themes,omitempty"`
-	Inspecteurs   []User            `pg:"many2many:inspection_to_inspecteurs" json:"inspecteurs,omitempty"`
+	Commentaires     []Commentaire     `json:"commentaires,omitempty"`
+	Etablissement    *Etablissement    `json:"etablissement,omitempty"`
+	Themes           []string          `json:"themes,omitempty" sql:",array"`
+	Inspecteurs      []User            `pg:"many2many:inspection_to_inspecteurs" json:"inspecteurs,omitempty"`
+	PointsDeControle []PointDeControle `json:"points_de_controle,omitempty"`
+}
+
+func (i *Inspection) MarshalJSON() ([]byte, error) {
+	type Alias Inspection
+	return json.Marshal(&struct {
+		Date string `json:"date"`
+		*Alias
+	}{
+		Date:  i.Date.Format("2006-01-02"),
+		Alias: (*Alias)(i),
+	})
 }
 
 type InspectionToInspecteur struct {
@@ -59,10 +75,37 @@ type InspectionToInspecteur struct {
 	User       *User
 }
 
-type ThemeInspection struct {
-	Id           int64  `json:"id"`
-	Nom          string `json:"nom"`
-	InspectionId int64  `json:"-"`
+type PointDeControle struct {
+	Id                       int64    `json:"id"`
+	Sujet                    string   `json:"sujet"`
+	ReferencesReglementaires []string `json:"references_reglementaires" sql:",array"`
+	Publie                   bool     `json:"publie" sql:",notnull"`
+	InspectionId             int64    `json:"-" sql:",notnull"`
 
-	Inspection *Inspection
+	Inspection *Inspection `json:"-"`
+	Messages   []Message   `json:"messages,omitempty"`
+}
+
+type Commentaire struct {
+	Id           int64     `json:"id"`
+	Message      string    `json:"message"`
+	Date         time.Time `json:"date"`
+	AuteurId     int64     `json:"-" sql:",notnull"`
+	InspectionId int64     `json:"-" sql:",notnull"`
+
+	Auteur     *User       `json:"auteur,omitempty"`
+	Inspection *Inspection `json:"-"`
+}
+
+type Message struct {
+	Id                int64     `json:"id"`
+	Message           string    `json:"message"`
+	Date              time.Time `json:"date"`
+	Lu                bool      `json:"lu" sql:",notnull"`
+	Interne           bool      `json:"interne" sql:",notnull"`
+	AuteurId          int64     `json:"-" sql:",notnull"`
+	PointDeControleId int64     `json:"-" sql:",notnull"`
+
+	Auteur          *User            `json:"auteur,omitempty"`
+	PointDeControle *PointDeControle `json:"-"`
 }

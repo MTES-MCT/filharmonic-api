@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"os"
 	"testing"
 
 	httpexpect "gopkg.in/gavv/httpexpect.v1"
@@ -27,13 +28,16 @@ func InitFunc(t *testing.T, initDbFunc func(db *database.Database, assert *requi
 	if initDbFunc != nil {
 		initDbFunc(db, assert)
 	}
-	e := httpexpect.WithConfig(httpexpect.Config{
+	httpexpectConfig := httpexpect.Config{
 		BaseURL:  "http://" + config.Http.Host + ":" + config.Http.Port + "/",
 		Reporter: httpexpect.NewAssertReporter(t),
-		// Printers: []httpexpect.Printer{
-		// 	httpexpect.NewDebugPrinter(t, true),
-		// },
-	})
+	}
+	if os.Getenv("DEBUG_HTTP") != "" {
+		httpexpectConfig.Printers = []httpexpect.Printer{
+			httpexpect.NewDebugPrinter(t, true),
+		}
+	}
+	e := httpexpect.WithConfig(httpexpectConfig)
 	return e, func() {
 		err := server.Close()
 		if err != nil {

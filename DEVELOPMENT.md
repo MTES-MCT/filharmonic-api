@@ -40,3 +40,26 @@ go run main.go
 ```
 go generate ./...
 ```
+
+### Tests
+
+Lancement d'un test :
+```
+go test -p 1 -v tests/e2e/inspections_test.go
+```
+
+Lancement de tous les tests :
+```
+go test -p 1 -v ./...
+```
+
+- `DEBUG_HTTP=1` permet d'afficher les requêtes et réponses HTTP et leur body (JSON).
+- `FILHARMONIC_DATABASE_SQL_LOG=1` permet d'afficher les requêtes SQL.
+
+
+### Modifications du modèle
+
+Pour vérifier que le schéma des migrations correpond bien à celui des structures, lancer le script suivant :
+```
+./database/scripts/check_migrations.sh
+```

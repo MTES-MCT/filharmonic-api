@@ -13,6 +13,6 @@ type User struct {
 	Nom      string `json:"nom"`
 	Prenom   string `json:"prenom"`
 	Email    string `json:"email" sql:",unique"`
-	Password string `json:"password"`
+	Password string `json:"password,omitempty"`
 	Profile  Profil `json:"profile"`
 }

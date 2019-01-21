@@ -25,3 +25,7 @@ func (s *Service) GetEtablissement(ctx *UserContext, id int64) (*models.Etabliss
 func (s *Service) ListInspections(ctx *UserContext) ([]models.Inspection, error) {
 	return s.repo.ListInspections(ctx)
 }
+
+func (s *Service) GetInspection(ctx *UserContext, id int64) (*models.Inspection, error) {
+	return s.repo.GetInspectionByID(ctx, id)
+}
