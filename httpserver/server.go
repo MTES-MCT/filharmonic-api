@@ -52,6 +52,7 @@ func (s *HttpServer) Start() *http.Server {
 		})
 		authorized.GET("/etablissements", s.listEtablissements)
 		authorized.GET("/etablissements/:id", s.getEtablissement)
+		authorized.GET("/inspections", s.listInspections)
 	}
 
 	server := &http.Server{

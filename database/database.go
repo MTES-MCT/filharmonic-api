@@ -25,6 +25,16 @@ type Database struct {
 	client *pg.DB
 }
 
+var tables = []interface{}{
+	&models.Etablissement{},
+	&models.User{},
+	&models.EtablissementToExploitant{},
+	&models.Inspection{},
+	&models.ThemeInspection{},
+	&models.ThemeReferentiel{},
+	&models.InspectionToInspecteur{},
+}
+
 func New(config Config) (*Database, error) {
 	client := pg.Connect(&pg.Options{
 		User:     config.User,
@@ -52,11 +62,6 @@ func New(config Config) (*Database, error) {
 }
 
 func (d *Database) createSchema() error {
-	tables := []interface{}{
-		&models.Etablissement{},
-		&models.User{},
-		&models.EtablissementToExploitant{},
-	}
 	for _, table := range tables {
 		err := d.client.DropTable(table, &orm.DropTableOptions{
 			Cascade:  true,

@@ -1,9 +1,12 @@
 package tests
 
 import (
+	"time"
+
 	"github.com/MTES-MCT/filharmonic-api/authentication/hash"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
 
@@ -104,4 +107,48 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 		},
 	}
 	assert.NoError(db.Insert(etablissementToExploitants...))
+
+	inspections := []interface{}{
+		&models.Inspection{
+			Id:              1,
+			Date:            date("2018-09-01"),
+			Type:            models.TypeApprofondi,
+			Annonce:         true,
+			Origine:         models.OriginePlanControle,
+			Etat:            models.EtatEnCours,
+			Contexte:        "Emissions de NOx dépassant les seuils le 2/04/2005",
+			EtablissementId: 1,
+		},
+		&models.Inspection{
+			Id:              2,
+			Date:            date("2018-11-15"),
+			Type:            models.TypeCourant,
+			Annonce:         true,
+			Origine:         models.OriginePlanControle,
+			Etat:            models.EtatPreparation,
+			Contexte:        "Incident cuve gaz le 30/12/2017",
+			EtablissementId: 3,
+		},
+	}
+	assert.NoError(db.Insert(inspections...))
+
+	inspectionToInspecteurs := []interface{}{
+		&models.InspectionToInspecteur{
+			InspectionId: 1,
+			UserId:       3,
+		},
+		&models.InspectionToInspecteur{
+			InspectionId: 2,
+			UserId:       3,
+		},
+	}
+	assert.NoError(db.Insert(inspectionToInspecteurs...))
+}
+
+func date(datestr string) time.Time {
+	date, err := time.Parse("2006-01-02", datestr)
+	if err != nil {
+		log.Fatal().Msgf("unable to parse date: %v", err)
+	}
+	return date
 }

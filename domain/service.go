@@ -21,3 +21,7 @@ func (s *Service) ListEtablissements(ctx *UserContext, s3ic string) ([]models.Et
 func (s *Service) GetEtablissement(ctx *UserContext, id int64) (*models.Etablissement, error) {
 	return s.repo.GetEtablissementByID(ctx, id)
 }
+
+func (s *Service) ListInspections(ctx *UserContext) ([]models.Inspection, error) {
+	return s.repo.ListInspections(ctx)
+}

@@ -30,6 +30,9 @@ func InitFunc(t *testing.T, initDbFunc func(db *database.Database, assert *requi
 	e := httpexpect.WithConfig(httpexpect.Config{
 		BaseURL:  "http://" + config.Http.Host + ":" + config.Http.Port + "/",
 		Reporter: httpexpect.NewAssertReporter(t),
+		// Printers: []httpexpect.Printer{
+		// 	httpexpect.NewDebugPrinter(t, true),
+		// },
 	})
 	return e, func() {
 		err := server.Close()
