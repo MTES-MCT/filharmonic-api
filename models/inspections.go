@@ -48,10 +48,10 @@ type Inspection struct {
 	Contexte           string                 `json:"contexte"`
 	Etat               EtatInspection         `json:"etat"`
 	EtablissementId    int64                  `sql:",notnull" json:"etablissement_id"`
+	Themes             []string               `json:"themes" sql:",array"`
 
 	Commentaires     []Commentaire     `json:"commentaires,omitempty"`
 	Etablissement    *Etablissement    `json:"etablissement,omitempty"`
-	Themes           []string          `json:"themes,omitempty" sql:",array"`
 	Inspecteurs      []User            `pg:"many2many:inspection_to_inspecteurs" json:"inspecteurs,omitempty"`
 	PointsDeControle []PointDeControle `json:"points_de_controle,omitempty"`
 }

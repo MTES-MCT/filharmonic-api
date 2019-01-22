@@ -23,6 +23,26 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext) ([]models.Inspe
 	return inspections, err
 }
 
+func (repo *Repository) CreateInspection(ctx *domain.UserContext, inspection models.Inspection) (int64, error) {
+	inspection.Id = 0
+	inspection.Etat = models.EtatPreparation
+	err := repo.db.client.Insert(&inspection)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, inspecteur := range inspection.Inspecteurs {
+		err = repo.db.client.Insert(&models.InspectionToInspecteur{
+			InspectionId: inspection.Id,
+			UserId:       inspecteur.Id,
+		})
+		if err != nil {
+			return 0, err
+		}
+	}
+	return inspection.Id, nil
+}
+
 func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*models.Inspection, error) {
 	var inspection models.Inspection
 	query := repo.db.client.Model(&inspection).

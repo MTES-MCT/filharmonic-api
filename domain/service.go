@@ -26,6 +26,24 @@ func (s *Service) ListInspections(ctx *UserContext) ([]models.Inspection, error)
 	return s.repo.ListInspections(ctx)
 }
 
+func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error) {
+	if ctx.IsExploitant() {
+		return 0, ErrBesoinProfilInspecteur
+	}
+	inspecteursIds := make([]int64, 0)
+	for _, inspecteur := range inspection.Inspecteurs {
+		inspecteursIds = append(inspecteursIds, inspecteur.Id)
+	}
+	ok, err := s.repo.CheckUsersInspecteurs(inspecteursIds)
+	if err != nil {
+		return 0, err
+	}
+	if !ok {
+		return 0, ErrInvalidInput
+	}
+	return s.repo.CreateInspection(ctx, inspection)
+}
+
 func (s *Service) GetInspection(ctx *UserContext, id int64) (*models.Inspection, error) {
 	return s.repo.GetInspectionByID(ctx, id)
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
@@ -43,4 +44,25 @@ func (server *HttpServer) getInspection(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, inspection)
+}
+
+func (server *HttpServer) createInspection(c *gin.Context) {
+	var inspection models.Inspection
+	if err := c.ShouldBindJSON(&inspection); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	inspectionId, err := server.service.CreateInspection(server.retrieveUserContext(c), inspection)
+	if err != nil {
+		log.Error().Err(err).Msg("Bad service response")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"id": inspectionId,
+	})
 }

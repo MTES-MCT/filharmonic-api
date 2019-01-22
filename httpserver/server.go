@@ -53,6 +53,7 @@ func (s *HttpServer) Start() *http.Server {
 		authorized.GET("/etablissements", s.listEtablissements)
 		authorized.GET("/etablissements/:id", s.getEtablissement)
 		authorized.GET("/inspections", s.listInspections)
+		authorized.POST("/inspections", s.createInspection)
 		authorized.GET("/inspections/:id", s.getInspection)
 	}
 

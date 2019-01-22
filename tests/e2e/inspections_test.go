@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/tests"
 )
 
@@ -99,4 +100,48 @@ func TestGetInspectionAsExploitantAllowed(t *testing.T) {
 	lastMessage.Value("auteur").Object().ValueEqual("email", "exploitant1@filharmonic.com")
 	lastMessage.Value("auteur").Object().NotContainsKey("password")
 	inspection.NotContainsKey("commentaires")
+}
+
+func TestSaveInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	inspectionInput := models.Inspection{
+		Date:            tests.Date("2019-01-22"),
+		Type:            models.TypeCourant,
+		Annonce:         true,
+		Origine:         models.OriginePlanControle,
+		EtablissementId: 1,
+		Inspecteurs: []models.User{
+			models.User{
+				Id: 3,
+			},
+			models.User{
+				Id: 4,
+			},
+		},
+		Themes: []string{
+			"Incendie",
+			"Produits chimiques",
+		},
+		Contexte: "Contrôles de début d'année",
+	}
+
+	inspectionId := tests.AuthInspecteur(e.POST("/inspections")).WithJSON(inspectionInput).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().Value("id").Raw()
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", inspectionId).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	inspection.ValueEqual("id", inspectionId)
+	inspection.ValueEqual("etat", models.EtatPreparation)
+	inspecteurs := inspection.Value("inspecteurs").Array()
+	inspecteurs.Length().Equal(2)
+	inspecteurs.First().Object().ValueEqual("id", 3)
+	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
+	inspecteurs.Last().Object().ValueEqual("id", 4)
+	inspecteurs.Last().Object().ValueEqual("email", "inspecteur2@filharmonic.com")
 }

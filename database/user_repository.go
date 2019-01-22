@@ -22,3 +22,11 @@ func (repo *Repository) GetUserByID(id int64) (*models.User, error) {
 	}
 	return &user, err
 }
+
+func (repo *Repository) CheckUsersInspecteurs(ids []int64) (bool, error) {
+	badProfileCount, err := repo.db.client.Model(&models.User{}).
+		Where("id IN (?)", pg.In(ids)).
+		Where("profile <> ?", models.ProfilInspecteur).
+		Count()
+	return badProfileCount == 0, err
+}

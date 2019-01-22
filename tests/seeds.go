@@ -1,15 +1,17 @@
 package tests
 
 import (
-	"time"
-
 	"github.com/MTES-MCT/filharmonic-api/authentication/hash"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/models"
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
 
+/*
+Initialise la base de données avec un jeu de test minimal, utilisable dans les tests.
+
+Attention à ne pas préciser les Id sans quoi les séquences de clés primaires ne sont pas incrémentées.
+*/
 func initTestDB(db *database.Database, assert *require.Assertions) {
 	encodedpassword1, err := hash.GenerateFromPassword("password1")
 	assert.NoError(err)
@@ -124,8 +126,8 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 
 	inspections := []interface{}{
 		&models.Inspection{
-			Id:   1,
-			Date: date("2018-09-01"),
+			// Id:   1,
+			Date: Date("2018-09-01"),
 			Type: models.TypeApprofondi,
 			Themes: []string{
 				"Produits chimiques",
@@ -137,8 +139,8 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 			EtablissementId: 1,
 		},
 		&models.Inspection{
-			Id:   2,
-			Date: date("2018-11-15"),
+			// Id:   2,
+			Date: Date("2018-11-15"),
 			Type: models.TypeCourant,
 			Themes: []string{
 				"Rejets dans l'eau",
@@ -202,21 +204,21 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 		&models.Commentaire{
 			Id:           1,
 			Message:      "Attention à l'article 243.",
-			Date:         dateTime("2018-11-14T08:50:00"),
+			Date:         DateTime("2018-11-14T08:50:00"),
 			AuteurId:     3,
 			InspectionId: 1,
 		},
 		&models.Commentaire{
 			Id:           2,
 			Message:      "L'article 843 s'applique également.",
-			Date:         dateTime("2018-11-16T16:50:00"),
+			Date:         DateTime("2018-11-16T16:50:00"),
 			AuteurId:     4,
 			InspectionId: 1,
 		},
 		&models.Commentaire{
 			Id:           3,
 			Message:      "Attention au précédent contrôle.",
-			Date:         dateTime("2018-11-18T16:50:00"),
+			Date:         DateTime("2018-11-18T16:50:00"),
 			AuteurId:     3,
 			InspectionId: 2,
 		},
@@ -227,7 +229,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 		&models.Message{
 			Id:                1,
 			Message:           "Auriez-vous l'obligeance de me fournir le document approprié ?",
-			Date:              dateTime("2018-11-14T08:50:00"),
+			Date:              DateTime("2018-11-14T08:50:00"),
 			Lu:                true,
 			Interne:           false,
 			AuteurId:          3,
@@ -236,7 +238,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 		&models.Message{
 			Id:                2,
 			Message:           "Voici le document.",
-			Date:              dateTime("2018-11-16T16:50:00"),
+			Date:              DateTime("2018-11-16T16:50:00"),
 			Lu:                true,
 			Interne:           false,
 			AuteurId:          1,
@@ -245,7 +247,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 		&models.Message{
 			Id:                3,
 			Message:           "Attention au précédent contrôle.",
-			Date:              dateTime("2018-11-20T16:50:00"),
+			Date:              DateTime("2018-11-20T16:50:00"),
 			Lu:                false,
 			Interne:           true,
 			AuteurId:          3,
@@ -254,7 +256,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 		&models.Message{
 			Id:                4,
 			Message:           "Merci de me fournir le document.",
-			Date:              dateTime("2018-11-21T16:50:00"),
+			Date:              DateTime("2018-11-21T16:50:00"),
 			Lu:                false,
 			Interne:           true,
 			AuteurId:          4,
@@ -263,7 +265,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 		&models.Message{
 			Id:                5,
 			Message:           "Auriez-vous l'obligeance de me fournir une photo de la cuve ?",
-			Date:              dateTime("2018-11-18T17:50:00"),
+			Date:              DateTime("2018-11-18T17:50:00"),
 			Lu:                true,
 			Interne:           false,
 			AuteurId:          3,
@@ -271,20 +273,4 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 		},
 	}
 	assert.NoError(db.Insert(messages...))
-}
-
-func date(datestr string) time.Time {
-	date, err := time.Parse("2006-01-02", datestr)
-	if err != nil {
-		log.Fatal().Msgf("unable to parse date: %v", err)
-	}
-	return date
-}
-
-func dateTime(datestr string) time.Time {
-	date, err := time.Parse("2006-01-02T15:04:05", datestr)
-	if err != nil {
-		log.Fatal().Msgf("unable to parse date: %v", err)
-	}
-	return date
 }
