@@ -60,6 +60,29 @@ jobs:
             sed -i '/mocks/d' coverage.out
             goveralls -coverprofile=coverage.out -service=circle-ci
 
+  check-migrations:
+    executor: gotest
+    steps:
+      - attach_workspace:
+          at: '/go/src/github.com/MTES-MCT'
+      - run: |
+          curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-11
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
+      - run:
+          command: ./database/scripts/check_migrations.sh
+
   build:
     executor: go
     steps:
@@ -103,11 +126,15 @@ workflows:
       - test:
           requires:
             - install-dependencies
+      - check-migrations:
+          requires:
+            - install-dependencies
 
       - build:
           requires:
             - lint
             - test
+            - check-migrations
 
       - build-docker:
           requires:

@@ -1,15 +1,16 @@
 #!/bin/bash -e
 
-docker-compose down
-docker-compose up -d
-sleep 5
-go run database/scripts/run_migrations/main.go
+cleanDatabase() {
+  echo 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' | PGPASSWORD=filharmonic psql -h localhost -p 5432 -U filharmonic filharmonic
+  sleep 5
+}
 mkdir -p database/scripts/.tmp
+
+cleanDatabase
+go run database/scripts/run_migrations/main.go
 ./database/scripts/dump_pg_schema.sh > database/scripts/.tmp/migrations.dump.sql
 
-docker-compose down
-docker-compose up -d
-sleep 5
+cleanDatabase
 go run database/scripts/init_schema/main.go
 ./database/scripts/dump_pg_schema.sh > database/scripts/.tmp/schema.dump.sql
 
