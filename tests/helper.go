@@ -31,7 +31,7 @@ func InitFunc(t *testing.T, initDbFunc func(db *database.Database, assert *requi
 	}
 	httpexpectConfig := httpexpect.Config{
 		BaseURL:  "http://" + config.Http.Host + ":" + config.Http.Port + "/",
-		Reporter: httpexpect.NewAssertReporter(t),
+		Reporter: httpexpect.NewRequireReporter(t),
 	}
 	if os.Getenv("DEBUG_HTTP") != "" {
 		httpexpectConfig.Printers = []httpexpect.Printer{

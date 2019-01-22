@@ -24,23 +24,52 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext) ([]models.Inspe
 }
 
 func (repo *Repository) CreateInspection(ctx *domain.UserContext, inspection models.Inspection) (int64, error) {
-	inspection.Id = 0
-	inspection.Etat = models.EtatPreparation
-	err := repo.db.client.Insert(&inspection)
-	if err != nil {
-		return 0, err
-	}
-
-	for _, inspecteur := range inspection.Inspecteurs {
-		err = repo.db.client.Insert(&models.InspectionToInspecteur{
-			InspectionId: inspection.Id,
-			UserId:       inspecteur.Id,
-		})
+	inspectionId := int64(0)
+	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
+		inspection.Id = 0
+		inspection.Etat = models.EtatPreparation
+		err := tx.Insert(&inspection)
 		if err != nil {
-			return 0, err
+			return err
 		}
-	}
-	return inspection.Id, nil
+
+		for _, inspecteur := range inspection.Inspecteurs {
+			err = tx.Insert(&models.InspectionToInspecteur{
+				InspectionId: inspection.Id,
+				UserId:       inspecteur.Id,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		inspectionId = inspection.Id
+		return nil
+	})
+	return inspectionId, err
+}
+
+func (repo *Repository) SaveInspection(ctx *domain.UserContext, inspection models.Inspection) error {
+	return repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
+		columns := []string{"date", "type", "origine", "annonce", "circonstance", "detail_circonstance", "contexte", "themes"}
+		_, err := tx.Model(&inspection).Column(columns...).WherePK().Update()
+		if err != nil {
+			return err
+		}
+		_, err = tx.Model(&models.InspectionToInspecteur{}).Where("inspection_id = ?", inspection.Id).Delete()
+		if err != nil {
+			return err
+		}
+		for _, inspecteur := range inspection.Inspecteurs {
+			err = tx.Insert(&models.InspectionToInspecteur{
+				InspectionId: inspection.Id,
+				UserId:       inspecteur.Id,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*models.Inspection, error) {

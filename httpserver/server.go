@@ -55,6 +55,7 @@ func (s *HttpServer) Start() *http.Server {
 		authorized.GET("/inspections", s.listInspections)
 		authorized.POST("/inspections", s.createInspection)
 		authorized.GET("/inspections/:id", s.getInspection)
+		authorized.PUT("/inspections/:id", s.saveInspection)
 	}
 
 	server := &http.Server{

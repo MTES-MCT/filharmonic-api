@@ -102,7 +102,7 @@ func TestGetInspectionAsExploitantAllowed(t *testing.T) {
 	inspection.NotContainsKey("commentaires")
 }
 
-func TestSaveInspection(t *testing.T) {
+func TestCreateInspection(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
@@ -144,4 +144,51 @@ func TestSaveInspection(t *testing.T) {
 	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	inspecteurs.Last().Object().ValueEqual("id", 4)
 	inspecteurs.Last().Object().ValueEqual("email", "inspecteur2@filharmonic.com")
+}
+
+func TestSaveInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	inspectionInput := models.Inspection{
+		Id:      1,
+		Date:    tests.Date("2019-01-30"),
+		Type:    models.TypeCourant,
+		Annonce: true,
+		Origine: models.OriginePlanControle,
+		Inspecteurs: []models.User{
+			models.User{
+				Id: 3,
+			},
+			models.User{
+				Id: 5,
+			},
+		},
+		Themes: []string{
+			"Incendie",
+			"Produits chimiques",
+		},
+		Contexte: "Contrôles de début d'année",
+	}
+
+	tests.AuthInspecteur(e.PUT("/inspections/{id}")).WithPath("id", 1).WithJSON(inspectionInput).
+		Expect().
+		Status(http.StatusOK)
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	inspection.ValueEqual("id", 1)
+	inspection.ValueEqual("etat", models.EtatEnCours)
+	inspection.ValueEqual("date", "2019-01-30")
+	themes := inspection.Value("themes").Array()
+	themes.Length().Equal(2)
+	themes.Equal([]string{"Incendie", "Produits chimiques"})
+	inspecteurs := inspection.Value("inspecteurs").Array()
+	inspecteurs.Length().Equal(2)
+	inspecteurs.First().Object().ValueEqual("id", 3)
+	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
+	inspecteurs.Last().Object().ValueEqual("id", 5)
+	inspecteurs.Last().Object().ValueEqual("email", "inspecteur3@filharmonic.com")
 }
