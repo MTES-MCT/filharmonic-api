@@ -131,3 +131,19 @@ func (s *Service) PublishPointDeControle(ctx *UserContext, idPointDeControle int
 
 	return s.repo.PublishPointDeControle(ctx, idPointDeControle)
 }
+
+func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64) error {
+	if !ctx.IsApprobateur() {
+		return ErrBesoinProfilApprobateur
+	}
+
+	ok, err := s.repo.CheckEtatInspection(idInspection, []models.EtatInspection{models.EtatAttenteValidation})
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrInvalidInput
+	}
+
+	return s.repo.ValidateInspection(ctx, idInspection)
+}

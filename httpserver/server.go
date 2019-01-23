@@ -58,6 +58,7 @@ func (s *HttpServer) Start() *http.Server {
 		authorized.PUT("/inspections/:id", s.updateInspection)
 		authorized.POST("/inspections/:id/commentaires", s.addCommentaire)
 		authorized.POST("/inspections/:id/pointsdecontrole", s.addPointDeControle)
+		authorized.POST("/inspections/:id/valider", s.validateInspection)
 		authorized.PUT("/pointsdecontrole/:id", s.updatePointDeControle)
 		authorized.POST("/pointsdecontrole/:id/publier", s.publishPointDeControle)
 		authorized.POST("/pointsdecontrole/:id/messages", s.addMessage)

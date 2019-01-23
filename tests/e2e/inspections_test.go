@@ -16,11 +16,11 @@ func TestListInspectionsOwnedByInspecteur(t *testing.T) {
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array()
-	results.Length().Equal(2)
+	results.Length().Equal(3)
 	results.First().Object().ValueEqual("id", 1)
 	results.First().Object().Value("etablissement").Object().ValueEqual("id", 1)
-	results.Last().Object().ValueEqual("id", 2)
-	results.Last().Object().Value("etablissement").Object().ValueEqual("id", 3)
+	results.Element(1).Object().ValueEqual("id", 2)
+	results.Element(1).Object().Value("etablissement").Object().ValueEqual("id", 3)
 }
 
 func TestListInspectionsOwnedByExploitant(t *testing.T) {
@@ -203,4 +203,21 @@ func TestGetInspectionAsExploitantPointDeControleNonPublie(t *testing.T) {
 		JSON().Object()
 
 	inspection.Value("points_de_controle").Array().Length().Equal(1)
+}
+
+func TestValidateInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthApprobateur(e.POST("/inspections/{id}/valider")).WithPath("id", 3).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection := tests.AuthApprobateur(e.GET("/inspections/{id}")).WithPath("id", 3).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection.ValueEqual("etat", models.EtatValide)
 }

@@ -152,6 +152,19 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Contexte:        "Incident cuve gaz le 30/12/2017",
 			EtablissementId: 3,
 		},
+		&models.Inspection{
+			// Id:   3,
+			Date: Date("2018-11-15"),
+			Type: models.TypeApprofondi,
+			Themes: []string{
+				"Sanitaire",
+			},
+			Annonce:         true,
+			Origine:         models.OriginePlanControle,
+			Etat:            models.EtatAttenteValidation,
+			Contexte:        "Viande avariée",
+			EtablissementId: 4,
+		},
 	}
 	assert.NoError(db.Insert(inspections...))
 
@@ -163,6 +176,14 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 		&models.InspectionToInspecteur{
 			InspectionId: 2,
 			UserId:       3,
+		},
+		&models.InspectionToInspecteur{
+			InspectionId: 3,
+			UserId:       3,
+		},
+		&models.InspectionToInspecteur{
+			InspectionId: 3,
+			UserId:       4,
 		},
 	}
 	assert.NoError(db.Insert(inspectionToInspecteurs...))
@@ -196,6 +217,15 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			},
 			Publie:       true,
 			InspectionId: 2,
+		},
+		&models.PointDeControle{
+			// Id:    4,
+			Sujet: "Santé",
+			ReferencesReglementaires: []string{
+				"Article 1 de l'Arrêté ministériel du 28 avril 2014",
+			},
+			Publie:       true,
+			InspectionId: 3,
 		},
 	}
 	assert.NoError(db.Insert(pointsDeControle...))

@@ -129,3 +129,21 @@ func (repo *Repository) CheckInspecteurAllowedInspection(ctx *domain.UserContext
 		Count()
 	return count == 1, err
 }
+
+func (repo *Repository) CheckEtatInspection(id int64, etats []models.EtatInspection) (bool, error) {
+	count, err := repo.db.client.Model(&models.Inspection{}).
+		Where("id = ?", id).
+		Where("etat in (?)", pg.In(etats)).
+		Count()
+	return count == 1, err
+}
+
+func (repo *Repository) ValidateInspection(ctx *domain.UserContext, id int64) error {
+	inspection := models.Inspection{
+		Id:   id,
+		Etat: models.EtatValide,
+	}
+	columns := []string{"etat"}
+	_, err := repo.db.client.Model(&inspection).Column(columns...).WherePK().Update()
+	return err
+}
