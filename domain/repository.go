@@ -13,7 +13,10 @@ type Repository interface {
 	SaveInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64) (*models.Inspection, error)
 
+	CreatePointDeControle(ctx *UserContext, idInspection int64, pointDeControle models.PointDeControle) (int64, error)
+
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByID(id int64) (*models.User, error)
 	CheckUsersInspecteurs(ids []int64) (bool, error)
+	CheckInspecteurAllowedInspection(ctx *UserContext, idInspection int64) (bool, error)
 }

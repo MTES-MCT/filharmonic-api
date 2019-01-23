@@ -24,9 +24,9 @@ func (repo *Repository) GetUserByID(id int64) (*models.User, error) {
 }
 
 func (repo *Repository) CheckUsersInspecteurs(ids []int64) (bool, error) {
-	badProfileCount, err := repo.db.client.Model(&models.User{}).
+	goodProfileCount, err := repo.db.client.Model(&models.User{}).
 		Where("id IN (?)", pg.In(ids)).
-		Where("profile <> ?", models.ProfilInspecteur).
+		Where("profile <> ?", models.ProfilExploitant).
 		Count()
-	return badProfileCount == 0, err
+	return goodProfileCount == len(ids), err
 }

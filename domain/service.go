@@ -68,3 +68,18 @@ func (s *Service) SaveInspection(ctx *UserContext, inspection models.Inspection)
 	}
 	return s.repo.SaveInspection(ctx, inspection)
 }
+
+func (s *Service) CreatePointDeControle(ctx *UserContext, idInspection int64, pointDeControle models.PointDeControle) (int64, error) {
+	if ctx.IsExploitant() {
+		return 0, ErrBesoinProfilInspecteur
+	}
+	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	if err != nil {
+		return 0, err
+	}
+	if !ok {
+		return 0, ErrInvalidInput
+	}
+
+	return s.repo.CreatePointDeControle(ctx, idInspection, pointDeControle)
+}

@@ -116,3 +116,11 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*m
 	}
 	return &inspection, err
 }
+
+func (repo *Repository) CheckInspecteurAllowedInspection(ctx *domain.UserContext, id int64) (bool, error) {
+	count, err := repo.db.client.Model(&models.InspectionToInspecteur{}).
+		Where("inspection_id = ?", id).
+		Where("user_id = ?", ctx.User.Id).
+		Count()
+	return count == 1, err
+}
