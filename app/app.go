@@ -22,6 +22,15 @@ func LoadConfig() Config {
 }
 
 func Bootstrap(c Config) (*database.Database, *http.Server) {
+	db, repo := BootstrapDB(c)
+	sso := authentication.New(repo)
+	service := domain.New(repo)
+	httpsrv := httpserver.New(c.Http, service, sso)
+	server := httpsrv.Start()
+	return db, server
+}
+
+func BootstrapDB(c Config) (*database.Database, *database.Repository) {
 	logLevel, err := zerolog.ParseLevel(c.LogLevel)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -34,9 +43,5 @@ func Bootstrap(c Config) (*database.Database, *http.Server) {
 	}
 
 	repo := database.NewRepository(db)
-	sso := authentication.New(repo)
-	service := domain.New(repo)
-	httpsrv := httpserver.New(c.Http, service, sso)
-	server := httpsrv.Start()
-	return db, server
+	return db, repo
 }

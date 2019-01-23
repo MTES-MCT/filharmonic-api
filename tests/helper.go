@@ -24,7 +24,7 @@ func InitFunc(t *testing.T, initDbFunc func(db *database.Database, assert *requi
 	config.LogLevel = ""
 	db, server := app.Bootstrap(config)
 
-	initTestDB(db, assert)
+	seedsTestDB(db, assert)
 
 	if initDbFunc != nil {
 		initDbFunc(db, assert)
@@ -51,19 +51,38 @@ func Init(t *testing.T) (*httpexpect.Expect, func()) {
 	return InitFunc(t, nil)
 }
 
+func InitFuncDB(t *testing.T, initDbFunc func(db *database.Database, assert *require.Assertions)) (*require.Assertions, *database.Repository) {
+	assert := require.New(t)
+	config := app.LoadConfig()
+	config.Database.InitSchema = true
+	config.LogLevel = ""
+	db, repo := app.BootstrapDB(config)
+
+	seedsTestDB(db, assert)
+
+	if initDbFunc != nil {
+		initDbFunc(db, assert)
+	}
+	return assert, repo
+}
+
+func InitDB(t *testing.T) (*require.Assertions, *database.Repository) {
+	return InitFuncDB(t, nil)
+}
+
 func AuthInspecteur(request *httpexpect.Request) *httpexpect.Request {
-	return auth(request, 3)
+	return AuthUser(request, 3)
 }
 
 func AuthExploitant(request *httpexpect.Request) *httpexpect.Request {
-	return auth(request, 1)
+	return AuthUser(request, 1)
 }
 
 func AuthApprobateur(request *httpexpect.Request) *httpexpect.Request {
-	return auth(request, 6)
+	return AuthUser(request, 6)
 }
 
-func auth(request *httpexpect.Request, userId int64) *httpexpect.Request {
+func AuthUser(request *httpexpect.Request, userId int64) *httpexpect.Request {
 	return request.WithHeader(httpserver.AuthorizationHeader, authentication.GenerateToken(userId))
 }
 

@@ -12,7 +12,7 @@ Initialise la base de données avec un jeu de test minimal, utilisable dans les 
 
 Attention à ne pas préciser les Id sans quoi les séquences de clés primaires ne sont pas incrémentées.
 */
-func initTestDB(db *database.Database, assert *require.Assertions) {
+func seedsTestDB(db *database.Database, assert *require.Assertions) {
 	encodedpassword1, err := hash.GenerateFromPassword("password1")
 	assert.NoError(err)
 	encodedpassword2, err := hash.GenerateFromPassword("password2")
@@ -169,7 +169,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 
 	pointsDeControle := []interface{}{
 		&models.PointDeControle{
-			Id:    1,
+			// Id:    1,
 			Sujet: "Mesure des émissions atmosphériques canalisées par un organisme extérieur",
 			ReferencesReglementaires: []string{
 				"Article 3.2.3. de l'arrêté préfectoral du 28 juin 2017",
@@ -180,7 +180,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 			InspectionId: 1,
 		},
 		&models.PointDeControle{
-			Id:    2,
+			// Id:    2,
 			Sujet: "Autosurveillance des émissions canalisées de COV",
 			ReferencesReglementaires: []string{
 				"Article 8.2.1.1. de l'arrêté préfectoral du 28 juin 2017",
@@ -189,7 +189,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 			InspectionId: 1,
 		},
 		&models.PointDeControle{
-			Id:    3,
+			// Id:    3,
 			Sujet: "Eau - Air",
 			ReferencesReglementaires: []string{
 				"Article 1 de l'Arrêté ministériel du 28 avril 2014",
@@ -202,21 +202,21 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 
 	commentaires := []interface{}{
 		&models.Commentaire{
-			Id:           1,
+			// Id:           1,
 			Message:      "Attention à l'article 243.",
 			Date:         DateTime("2018-11-14T08:50:00"),
 			AuteurId:     3,
 			InspectionId: 1,
 		},
 		&models.Commentaire{
-			Id:           2,
+			// Id:           2,
 			Message:      "L'article 843 s'applique également.",
 			Date:         DateTime("2018-11-16T16:50:00"),
 			AuteurId:     4,
 			InspectionId: 1,
 		},
 		&models.Commentaire{
-			Id:           3,
+			// Id:           3,
 			Message:      "Attention au précédent contrôle.",
 			Date:         DateTime("2018-11-18T16:50:00"),
 			AuteurId:     3,
@@ -227,7 +227,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 
 	messages := []interface{}{
 		&models.Message{
-			Id:                1,
+			// Id:                1,
 			Message:           "Auriez-vous l'obligeance de me fournir le document approprié ?",
 			Date:              DateTime("2018-11-14T08:50:00"),
 			Lu:                true,
@@ -236,7 +236,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 			PointDeControleId: 1,
 		},
 		&models.Message{
-			Id:                2,
+			// Id:                2,
 			Message:           "Voici le document.",
 			Date:              DateTime("2018-11-16T16:50:00"),
 			Lu:                true,
@@ -245,7 +245,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 			PointDeControleId: 1,
 		},
 		&models.Message{
-			Id:                3,
+			// Id:                3,
 			Message:           "Attention au précédent contrôle.",
 			Date:              DateTime("2018-11-20T16:50:00"),
 			Lu:                false,
@@ -254,7 +254,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 			PointDeControleId: 1,
 		},
 		&models.Message{
-			Id:                4,
+			// Id:                4,
 			Message:           "Merci de me fournir le document.",
 			Date:              DateTime("2018-11-21T16:50:00"),
 			Lu:                false,
@@ -263,7 +263,7 @@ func initTestDB(db *database.Database, assert *require.Assertions) {
 			PointDeControleId: 2,
 		},
 		&models.Message{
-			Id:                5,
+			// Id:                5,
 			Message:           "Auriez-vous l'obligeance de me fournir une photo de la cuve ?",
 			Date:              DateTime("2018-11-18T17:50:00"),
 			Lu:                true,
