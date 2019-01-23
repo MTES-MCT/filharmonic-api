@@ -67,7 +67,7 @@ func (server *HttpServer) createInspection(c *gin.Context) {
 	})
 }
 
-func (server *HttpServer) saveInspection(c *gin.Context) {
+func (server *HttpServer) updateInspection(c *gin.Context) {
 	var inspection models.Inspection
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -83,7 +83,7 @@ func (server *HttpServer) saveInspection(c *gin.Context) {
 		return
 	}
 	inspection.Id = id
-	err = server.service.SaveInspection(server.retrieveUserContext(c), inspection)
+	err = server.service.UpdateInspection(server.retrieveUserContext(c), inspection)
 	if err != nil {
 		log.Error().Err(err).Msg("Bad service response")
 		c.JSON(http.StatusBadRequest, gin.H{

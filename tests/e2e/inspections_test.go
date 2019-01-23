@@ -146,7 +146,7 @@ func TestCreateInspection(t *testing.T) {
 	inspecteurs.Last().Object().ValueEqual("email", "inspecteur2@filharmonic.com")
 }
 
-func TestSaveInspection(t *testing.T) {
+func TestUpdateInspection(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 

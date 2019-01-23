@@ -48,7 +48,7 @@ func (s *Service) GetInspection(ctx *UserContext, id int64) (*models.Inspection,
 	return s.repo.GetInspectionByID(ctx, id)
 }
 
-func (s *Service) SaveInspection(ctx *UserContext, inspection models.Inspection) error {
+func (s *Service) UpdateInspection(ctx *UserContext, inspection models.Inspection) error {
 	if ctx.IsExploitant() {
 		return ErrBesoinProfilInspecteur
 	}
@@ -66,7 +66,7 @@ func (s *Service) SaveInspection(ctx *UserContext, inspection models.Inspection)
 	if !ok {
 		return ErrInvalidInput
 	}
-	return s.repo.SaveInspection(ctx, inspection)
+	return s.repo.UpdateInspection(ctx, inspection)
 }
 
 func (s *Service) CreatePointDeControle(ctx *UserContext, idInspection int64, pointDeControle models.PointDeControle) (int64, error) {
@@ -82,4 +82,52 @@ func (s *Service) CreatePointDeControle(ctx *UserContext, idInspection int64, po
 	}
 
 	return s.repo.CreatePointDeControle(ctx, idInspection, pointDeControle)
+}
+
+func (s *Service) UpdatePointDeControle(ctx *UserContext, idPointDeControle int64, pointDeControle models.PointDeControle) error {
+	if ctx.IsExploitant() {
+		return ErrBesoinProfilInspecteur
+	}
+
+	ok, err := s.repo.CheckInspecteurAllowedPointDeControle(ctx, idPointDeControle)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrInvalidInput
+	}
+
+	return s.repo.UpdatePointDeControle(ctx, idPointDeControle, pointDeControle)
+}
+
+func (s *Service) DeletePointDeControle(ctx *UserContext, idPointDeControle int64) error {
+	if ctx.IsExploitant() {
+		return ErrBesoinProfilInspecteur
+	}
+
+	ok, err := s.repo.CheckInspecteurAllowedPointDeControle(ctx, idPointDeControle)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrInvalidInput
+	}
+
+	return s.repo.DeletePointDeControle(ctx, idPointDeControle)
+}
+
+func (s *Service) PublishPointDeControle(ctx *UserContext, idPointDeControle int64) error {
+	if ctx.IsExploitant() {
+		return ErrBesoinProfilInspecteur
+	}
+
+	ok, err := s.repo.CheckInspecteurAllowedPointDeControle(ctx, idPointDeControle)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrInvalidInput
+	}
+
+	return s.repo.PublishPointDeControle(ctx, idPointDeControle)
 }
