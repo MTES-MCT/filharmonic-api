@@ -194,7 +194,7 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			ReferencesReglementaires: []string{
 				"Article 1 de l'Arrêté ministériel du 28 avril 2014",
 			},
-			Publie:       false,
+			Publie:       true,
 			InspectionId: 2,
 		},
 	}
@@ -258,7 +258,7 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Message:           "Merci de me fournir le document.",
 			Date:              DateTime("2018-11-21T16:50:00"),
 			Lu:                false,
-			Interne:           true,
+			Interne:           false,
 			AuteurId:          4,
 			PointDeControleId: 2,
 		},
@@ -269,6 +269,24 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Lu:                true,
 			Interne:           false,
 			AuteurId:          3,
+			PointDeControleId: 3,
+		},
+		&models.Message{
+			// Id:                6,
+			Message:           "Il manque un document.",
+			Date:              DateTime("2018-11-26T16:50:00"),
+			Lu:                false,
+			Interne:           false,
+			AuteurId:          3,
+			PointDeControleId: 1,
+		},
+		&models.Message{
+			// Id:                7,
+			Message:           "Voici la photo de la cuve.",
+			Date:              DateTime("2018-11-27T16:50:00"),
+			Lu:                false,
+			Interne:           false,
+			AuteurId:          2,
 			PointDeControleId: 3,
 		},
 	}

@@ -89,7 +89,7 @@ func (s *Service) UpdatePointDeControle(ctx *UserContext, idPointDeControle int6
 		return ErrBesoinProfilInspecteur
 	}
 
-	ok, err := s.repo.CheckInspecteurAllowedPointDeControle(ctx, idPointDeControle)
+	ok, err := s.repo.CheckUserAllowedPointDeControle(ctx, idPointDeControle)
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (s *Service) DeletePointDeControle(ctx *UserContext, idPointDeControle int6
 		return ErrBesoinProfilInspecteur
 	}
 
-	ok, err := s.repo.CheckInspecteurAllowedPointDeControle(ctx, idPointDeControle)
+	ok, err := s.repo.CheckUserAllowedPointDeControle(ctx, idPointDeControle)
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func (s *Service) PublishPointDeControle(ctx *UserContext, idPointDeControle int
 		return ErrBesoinProfilInspecteur
 	}
 
-	ok, err := s.repo.CheckInspecteurAllowedPointDeControle(ctx, idPointDeControle)
+	ok, err := s.repo.CheckUserAllowedPointDeControle(ctx, idPointDeControle)
 	if err != nil {
 		return err
 	}

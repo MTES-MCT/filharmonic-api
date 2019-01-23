@@ -6,6 +6,7 @@ import (
 )
 
 func (repo *Repository) CreatePointDeControle(ctx *domain.UserContext, idInspection int64, pointDeControle models.PointDeControle) (int64, error) {
+	pointDeControle.Id = 0
 	pointDeControle.InspectionId = idInspection
 	err := repo.db.client.Insert(&pointDeControle)
 	if err != nil {
@@ -38,12 +39,26 @@ func (repo *Repository) DeletePointDeControle(ctx *domain.UserContext, idPointDe
 	return repo.db.client.Delete(&pointDeControle)
 }
 
-func (repo *Repository) CheckInspecteurAllowedPointDeControle(ctx *domain.UserContext, id int64) (bool, error) {
-	count, err := repo.db.client.Model(&models.PointDeControle{}).
-		Join("JOIN inspection_to_inspecteurs AS u").
-		JoinOn("u.inspection_id = point_de_controle.inspection_id").
-		JoinOn("u.user_id = ?", ctx.User.Id).
-		Where("point_de_controle.id = ?", id).
-		Count()
-	return count == 1, err
+func (repo *Repository) CheckUserAllowedPointDeControle(ctx *domain.UserContext, id int64) (bool, error) {
+	if ctx.IsExploitant() {
+		count, err := repo.db.client.Model(&models.PointDeControle{}).
+			Join("JOIN inspections AS i").
+			JoinOn("i.id = point_de_controle.inspection_id").
+			Join("JOIN etablissements AS e").
+			JoinOn("e.id = i.etablissement_id").
+			Join("JOIN etablissement_to_exploitants AS ex").
+			JoinOn("ex.etablissement_id = e.id").
+			JoinOn("ex.user_id = ?", ctx.User.Id).
+			Where("point_de_controle.id = ?", id).
+			Count()
+		return count == 1, err
+	} else {
+		count, err := repo.db.client.Model(&models.PointDeControle{}).
+			Join("JOIN inspection_to_inspecteurs AS u").
+			JoinOn("u.inspection_id = point_de_controle.inspection_id").
+			JoinOn("u.user_id = ?", ctx.User.Id).
+			Where("point_de_controle.id = ?", id).
+			Count()
+		return count == 1, err
+	}
 }

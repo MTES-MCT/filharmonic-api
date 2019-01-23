@@ -52,7 +52,7 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	firstPointDeControle.Value("references_reglementaires").Array().Contains("Article 3.2.3. de l'arrêté préfectoral du 28 juin 2017")
 	firstPointDeControle.ValueEqual("sujet", "Mesure des émissions atmosphériques canalisées par un organisme extérieur")
 	messages := firstPointDeControle.Value("messages").Array()
-	messages.Length().Equal(3)
+	messages.Length().Equal(4)
 	firstMessage := messages.First().Object()
 	firstMessage.ValueEqual("message", "Auriez-vous l'obligeance de me fournir le document approprié ?")
 	firstMessage.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
@@ -90,14 +90,14 @@ func TestGetInspectionAsExploitantAllowed(t *testing.T) {
 	firstPointDeControle.Value("references_reglementaires").Array().Contains("Article 3.2.3. de l'arrêté préfectoral du 28 juin 2017")
 	firstPointDeControle.ValueEqual("sujet", "Mesure des émissions atmosphériques canalisées par un organisme extérieur")
 	messages := firstPointDeControle.Value("messages").Array()
-	messages.Length().Equal(2)
+	messages.Length().Equal(3)
 	firstMessage := messages.First().Object()
 	firstMessage.ValueEqual("message", "Auriez-vous l'obligeance de me fournir le document approprié ?")
 	firstMessage.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	firstMessage.Value("auteur").Object().NotContainsKey("password")
 	lastMessage := messages.Last().Object()
-	lastMessage.ValueEqual("message", "Voici le document.")
-	lastMessage.Value("auteur").Object().ValueEqual("email", "exploitant1@filharmonic.com")
+	lastMessage.ValueEqual("message", "Il manque un document.")
+	lastMessage.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	lastMessage.Value("auteur").Object().NotContainsKey("password")
 	inspection.NotContainsKey("commentaires")
 }
@@ -191,4 +191,16 @@ func TestUpdateInspection(t *testing.T) {
 	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	inspecteurs.Last().Object().ValueEqual("id", 5)
 	inspecteurs.Last().Object().ValueEqual("email", "inspecteur3@filharmonic.com")
+}
+
+func TestGetInspectionAsExploitantPointDeControleNonPublie(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	inspection := tests.AuthExploitant(e.GET("/inspections/{id}")).WithPath("id", "1").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection.Value("points_de_controle").Array().Length().Equal(1)
 }

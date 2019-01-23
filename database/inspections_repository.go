@@ -76,7 +76,12 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*m
 	var inspection models.Inspection
 	query := repo.db.client.Model(&inspection).
 		Relation("Etablissement").
-		Relation("PointsDeControle").
+		Relation("PointsDeControle", func(q *orm.Query) (*orm.Query, error) {
+			if ctx.IsExploitant() {
+				q.Where("publie = TRUE")
+			}
+			return q, nil
+		}).
 		Relation("PointsDeControle.Messages", func(q *orm.Query) (*orm.Query, error) {
 			if ctx.IsExploitant() {
 				q.Where("interne = FALSE")

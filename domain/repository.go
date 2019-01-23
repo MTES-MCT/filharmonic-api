@@ -13,14 +13,20 @@ type Repository interface {
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64) (*models.Inspection, error)
 
+	CreateCommentaire(ctx *UserContext, idInspection int64, commentaire models.Commentaire) (int64, error)
+
 	CreatePointDeControle(ctx *UserContext, idInspection int64, pointDeControle models.PointDeControle) (int64, error)
 	UpdatePointDeControle(ctx *UserContext, idPointDeControle int64, pointDeControle models.PointDeControle) error
 	DeletePointDeControle(ctx *UserContext, idPointDeControle int64) error
 	PublishPointDeControle(ctx *UserContext, idPointDeControle int64) error
+	CreateMessage(ctx *UserContext, idPointDeControle int64, message models.Message) (int64, error)
+	LireMessage(ctx *UserContext, idMessage int64) error
+	CheckUserAllowedMessage(ctx *UserContext, idMessage int64) (bool, error)
+	CheckUserIsRecipient(ctx *UserContext, idMessage int64) (bool, error)
 
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByID(id int64) (*models.User, error)
 	CheckUsersInspecteurs(ids []int64) (bool, error)
 	CheckInspecteurAllowedInspection(ctx *UserContext, idInspection int64) (bool, error)
-	CheckInspecteurAllowedPointDeControle(ctx *UserContext, idPointDeControle int64) (bool, error)
+	CheckUserAllowedPointDeControle(ctx *UserContext, idPointDeControle int64) (bool, error)
 }
