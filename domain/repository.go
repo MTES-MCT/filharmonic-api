@@ -13,7 +13,7 @@ type Repository interface {
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64) (*models.Inspection, error)
 	CheckEtatInspection(idInspection int64, etats []models.EtatInspection) (bool, error)
-	ValidateInspection(ctx *UserContext, id int64) error
+	UpdateEtatInspection(ctx *UserContext, id int64, etat models.EtatInspection) error
 
 	CreateCommentaire(ctx *UserContext, idInspection int64, commentaire models.Commentaire) (int64, error)
 

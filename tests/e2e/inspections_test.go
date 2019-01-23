@@ -221,3 +221,51 @@ func TestValidateInspection(t *testing.T) {
 
 	inspection.ValueEqual("etat", models.EtatValide)
 }
+func TestPublishInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthInspecteur(e.POST("/inspections/{id}/publier")).WithPath("id", 2).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 2).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection.ValueEqual("etat", models.EtatEnCours)
+}
+func TestAskValidateInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthInspecteur(e.POST("/inspections/{id}/demandervalidation")).WithPath("id", 1).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection.ValueEqual("etat", models.EtatAttenteValidation)
+}
+func TestRejectInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthApprobateur(e.POST("/inspections/{id}/rejeter")).WithPath("id", 3).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection := tests.AuthApprobateur(e.GET("/inspections/{id}")).WithPath("id", 3).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection.ValueEqual("etat", models.EtatEnCours)
+}

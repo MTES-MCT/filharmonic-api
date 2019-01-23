@@ -138,10 +138,10 @@ func (repo *Repository) CheckEtatInspection(id int64, etats []models.EtatInspect
 	return count == 1, err
 }
 
-func (repo *Repository) ValidateInspection(ctx *domain.UserContext, id int64) error {
+func (repo *Repository) UpdateEtatInspection(ctx *domain.UserContext, id int64, etat models.EtatInspection) error {
 	inspection := models.Inspection{
 		Id:   id,
-		Etat: models.EtatValide,
+		Etat: etat,
 	}
 	columns := []string{"etat"}
 	_, err := repo.db.client.Model(&inspection).Column(columns...).WherePK().Update()

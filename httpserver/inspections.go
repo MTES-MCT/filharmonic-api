@@ -94,6 +94,63 @@ func (server *HttpServer) updateInspection(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "updated"})
 }
 
+func (server *HttpServer) publishInspection(c *gin.Context) {
+	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	err = server.service.PublishInspection(server.retrieveUserContext(c), idInspection)
+	if err != nil {
+		log.Error().Err(err).Msg("Bad service response")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "published"})
+}
+
+func (server *HttpServer) askValidateInspection(c *gin.Context) {
+	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	err = server.service.AskValidateInspection(server.retrieveUserContext(c), idInspection)
+	if err != nil {
+		log.Error().Err(err).Msg("Bad service response")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "validation asked"})
+}
+
+func (server *HttpServer) rejectInspection(c *gin.Context) {
+	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	err = server.service.RejectInspection(server.retrieveUserContext(c), idInspection)
+	if err != nil {
+		log.Error().Err(err).Msg("Bad service response")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "rejected"})
+}
+
 func (server *HttpServer) validateInspection(c *gin.Context) {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
