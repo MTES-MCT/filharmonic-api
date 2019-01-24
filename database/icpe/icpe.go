@@ -22,6 +22,8 @@ const (
 	indexIedmtd     = 13
 	indexAdresse1   = 15
 	indexAdresse2   = 16
+
+	batchSize = 2000
 )
 
 func LoadEtablissementsCSV(filepath string, db *database.Database) error {
@@ -38,34 +40,42 @@ func LoadEtablissementsCSV(filepath string, db *database.Database) error {
 	if err == io.EOF {
 		return err
 	}
-	for {
-		line, err := reader.Read()
-		if err == io.EOF {
-			break
+	etablissements := make([]models.Etablissement, 0)
+	done := false
+	for !done {
+		iterations := 0
+		for iterations < batchSize {
+			var line []string
+			line, err = reader.Read()
+			if err == io.EOF {
+				done = true
+				break
+			}
+			if err != nil {
+				return err
+			}
+			etablissement := models.Etablissement{
+				S3IC:     computeS3IC(line[indexCodeBase], line[indexCodeEtab]),
+				Nom:      line[indexNom],
+				Raison:   line[indexNom],
+				Activite: line[indexActivite],
+				Seveso:   line[indexSeveso],
+				Iedmtd:   toBool(line[indexIedmtd]),
+				Adresse:  line[indexAdresse1] + " " + line[indexAdresse2] + " " + line[indexCodePostal] + " " + line[indexCommune],
+			}
+			etablissements = append(etablissements, etablissement)
+			iterations++
+			nbEtablissementsImportes += 1
 		}
-		if err != nil {
-			return err
-		}
-		etablissement := models.Etablissement{
-			S3IC:     computeS3IC(line[indexCodeBase], line[indexCodeEtab]),
-			Nom:      line[indexNom],
-			Raison:   line[indexNom],
-			Activite: line[indexActivite],
-			Seveso:   line[indexSeveso],
-			Iedmtd:   toBool(line[indexIedmtd]),
-			Adresse:  line[indexAdresse1] + " " + line[indexAdresse2] + " " + line[indexCodePostal] + " " + line[indexCommune],
-		}
-
-		_, err = db.Model(&etablissement).
+		_, err = db.Model(&etablissements).
 			OnConflict("(s3ic) DO UPDATE").
 			Insert()
 		if err != nil {
-			log.Error().Interface("etablissement", etablissement).Msg("failed to save etablissement")
-		} else {
-			nbEtablissementsImportes += 1
+			log.Error().Err(err).Msg("failed to save etablissements")
 		}
+		etablissements = etablissements[:0]
 	}
-	log.Warn().Msgf("%d établissements importés\n", nbEtablissementsImportes)
+	log.Warn().Msgf("%d établissements importés", nbEtablissementsImportes)
 
 	return nil
 }
