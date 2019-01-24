@@ -82,25 +82,25 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 
 	etablissements := []interface{}{
 		&models.Etablissement{
-			Id:      1,
+			// Id:      1,
 			S3IC:    "1234",
 			Raison:  "Raison sociale",
 			Adresse: "1 rue des fleurs 75000 Paris",
 		},
 		&models.Etablissement{
-			Id:      2,
+			// Id:      2,
 			S3IC:    "4567",
 			Raison:  "Raison sociale 2",
 			Adresse: "1 rue des plantes 44000 Nantes",
 		},
 		&models.Etablissement{
-			Id:      3,
+			// Id:      3,
 			S3IC:    "3335655",
 			Raison:  "Raison sociale 3",
 			Adresse: "1 rue des cordeliers 69000 Lyon",
 		},
 		&models.Etablissement{
-			Id:      4,
+			// Id:      4,
 			S3IC:    "4444213",
 			Raison:  "Raison sociale 4",
 			Adresse: "1 place de l'église 63000 Clermont-Ferrand",

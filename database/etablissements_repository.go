@@ -6,6 +6,13 @@ import (
 	"github.com/go-pg/pg"
 )
 
+func (repo *Repository) ListEtablissements() ([]models.Etablissement, error) {
+	var etablissements []models.Etablissement
+	query := repo.db.client.Model(&etablissements)
+	err := query.Select()
+	return etablissements, err
+}
+
 func (repo *Repository) FindEtablissementsByS3IC(ctx *domain.UserContext, s3ic string) ([]models.Etablissement, error) {
 	var etablissements []models.Etablissement
 	query := repo.db.client.Model(&etablissements).Where("s3ic like ?", "%"+s3ic+"%")

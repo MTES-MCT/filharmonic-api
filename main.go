@@ -1,19 +1,32 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"os/signal"
 
 	"github.com/MTES-MCT/filharmonic-api/app"
+	"github.com/MTES-MCT/filharmonic-api/database/icpe"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	importEtablissements := flag.String("import-etablissements", "", "Importe des établissements à partir d'un CSV")
+	flag.Parse()
+
 	config := app.LoadConfig()
 	application := app.New(config)
 	err := application.BootstrapDB()
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not start db")
+	}
+
+	if *importEtablissements != "" {
+		err = icpe.LoadEtablissementsCSV(*importEtablissements, application.DB)
+		if err != nil {
+			log.Fatal().Err(err).Msg("could not import CSV")
+		}
+		os.Exit(0)
 	}
 
 	err = application.BootstrapServer()

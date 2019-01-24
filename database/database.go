@@ -96,6 +96,10 @@ func (d *Database) Insert(model ...interface{}) error {
 	return d.client.Insert(model...)
 }
 
+func (d *Database) Model(model ...interface{}) *orm.Query {
+	return d.client.Model(model...)
+}
+
 type dbLogger struct{}
 
 func (d dbLogger) BeforeQuery(q *pg.QueryEvent) {}
