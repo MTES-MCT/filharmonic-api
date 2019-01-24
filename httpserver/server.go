@@ -1,10 +1,13 @@
 package httpserver
 
 import (
+	"context"
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/authentication"
+	"github.com/gin-contrib/logger"
 	"github.com/rs/zerolog/log"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
@@ -21,6 +24,7 @@ type HttpServer struct {
 	config  Config
 	service *domain.Service
 	sso     *authentication.Sso
+	server  *http.Server
 }
 
 func New(config Config, service *domain.Service, sso *authentication.Sso) *HttpServer {
@@ -31,11 +35,11 @@ func New(config Config, service *domain.Service, sso *authentication.Sso) *HttpS
 	}
 }
 
-func (s *HttpServer) Start() *http.Server {
+func (s *HttpServer) Start() (returnErr error) {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	if s.config.Logger {
-		router.Use(gin.Logger())
+		router.Use(logger.SetLogger())
 	}
 	router.Use(gin.Recovery())
 
@@ -69,20 +73,20 @@ func (s *HttpServer) Start() *http.Server {
 		authorized.POST("/messages/:id/lire", s.lireMessage)
 	}
 
-	server := &http.Server{
+	s.server = &http.Server{
 		Addr:    s.config.Host + ":" + s.config.Port,
 		Handler: router,
 	}
 
 	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal().Msgf("listen error: %s", err)
+		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			returnErr = err
 		}
 	}()
 
 	tryCount := 100
 	for tryCount > 0 {
-		_, err := http.Get("http://" + server.Addr)
+		_, err := http.Get("http://" + s.server.Addr)
 		if err == nil {
 			break
 		}
@@ -90,8 +94,14 @@ func (s *HttpServer) Start() *http.Server {
 		tryCount--
 	}
 	if tryCount == 0 {
-		log.Fatal().Msg("server did not start")
+		return errors.New("server did not start in time")
 	}
-	log.Info().Msgf("server ready and listening on %s", server.Addr)
-	return server
+	if returnErr == nil {
+		log.Info().Msgf("server ready and listening on %s", s.server.Addr)
+	}
+	return returnErr
+}
+
+func (s *HttpServer) Shutdown(ctx context.Context) error {
+	return s.server.Shutdown(ctx)
 }

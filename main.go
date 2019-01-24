@@ -1,37 +1,35 @@
 package main
 
 import (
-	"context"
-	"log"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/app"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	// chargement config
 	config := app.LoadConfig()
-	db, server := app.Bootstrap(config)
-	defer func() {
-		err := db.Close()
-		if err != nil {
-			log.Fatal("Unable to close DB", err)
-		}
-	}()
+	application := app.New(config)
+	err := application.BootstrapDB()
+	if err != nil {
+		log.Fatal().Err(err).Msg("could not start db")
+	}
+
+	err = application.BootstrapServer()
+	if err != nil {
+		log.Fatal().Err(err).Msg("could not start http server")
+	}
 
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	log.Println("Shutdown Server ...")
+	log.Warn().Msg("shutting down application")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := server.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+	if err := application.Shutdown(); err != nil {
+		log.Fatal().Err(err).Msg("application shutdown error")
 	}
-	log.Println("Server exiting")
+	log.Warn().Msg("application shutdown")
 }

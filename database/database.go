@@ -8,6 +8,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
+	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
@@ -51,6 +52,8 @@ func New(config Config) (*Database, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Info().Msg("connected to the database")
+
 	db := &Database{
 		config: config,
 		client: client,
@@ -64,6 +67,7 @@ func New(config Config) (*Database, error) {
 }
 
 func (d *Database) createSchema() error {
+	log.Warn().Msg("clearing and creating database")
 	for _, table := range tables {
 		err := d.client.DropTable(table, &orm.DropTableOptions{
 			Cascade:  true,

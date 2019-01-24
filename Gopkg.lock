@@ -35,6 +35,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:4e65420ca90a2c87b051b44ac6583971d9d23f405c536a3e5323edc9f4a46f91"
+  name = "github.com/gin-contrib/logger"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0b3d4131bf19ad686caa625663ac1797f8bbdc70"
+
+[[projects]]
+  branch = "master"
   digest = "1:36fe9527deed01d2a317617e59304eb2c4ce9f8a24115bcc5c2e37b3aee5bae4"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -179,6 +187,14 @@
   pruneopts = "UT"
   revision = "9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d"
   version = "v1.0.0"
+
+[[projects]]
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -401,11 +417,13 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/gin-contrib/logger",
     "github.com/gin-gonic/gin",
     "github.com/go-pg/migrations",
     "github.com/go-pg/pg",
     "github.com/go-pg/pg/orm",
     "github.com/kelseyhightower/envconfig",
+    "github.com/pkg/errors",
     "github.com/rs/zerolog",
     "github.com/rs/zerolog/log",
     "github.com/stretchr/testify/mock",

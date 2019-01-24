@@ -16,21 +16,12 @@ import (
 )
 
 func InitFunc(t *testing.T, initDbFunc func(db *database.Database, assert *require.Assertions)) (*httpexpect.Expect, func()) {
-	assert := require.New(t)
-	config := app.LoadConfig()
-	config.Database.InitSchema = true
-	config.Http.Host = "localhost"
-	config.Http.Logger = false
-	config.LogLevel = ""
-	db, server := app.Bootstrap(config)
+	assert, application := InitFuncDB(t, initDbFunc)
 
-	seedsTestDB(db, assert)
+	assert.NoError(application.BootstrapServer())
 
-	if initDbFunc != nil {
-		initDbFunc(db, assert)
-	}
 	httpexpectConfig := httpexpect.Config{
-		BaseURL:  "http://" + config.Http.Host + ":" + config.Http.Port + "/",
+		BaseURL:  "http://" + application.Config.Http.Host + ":" + application.Config.Http.Port + "/",
 		Reporter: httpexpect.NewRequireReporter(t),
 	}
 	if os.Getenv("DEBUG_HTTP") != "" {
@@ -40,7 +31,7 @@ func InitFunc(t *testing.T, initDbFunc func(db *database.Database, assert *requi
 	}
 	e := httpexpect.WithConfig(httpexpectConfig)
 	return e, func() {
-		err := server.Close()
+		err := application.Shutdown()
 		if err != nil {
 			log.Fatal().Msg(err.Error())
 		}
@@ -51,22 +42,26 @@ func Init(t *testing.T) (*httpexpect.Expect, func()) {
 	return InitFunc(t, nil)
 }
 
-func InitFuncDB(t *testing.T, initDbFunc func(db *database.Database, assert *require.Assertions)) (*require.Assertions, *database.Repository) {
+func InitFuncDB(t *testing.T, initDbFunc func(db *database.Database, assert *require.Assertions)) (*require.Assertions, *app.Application) {
 	assert := require.New(t)
 	config := app.LoadConfig()
 	config.Database.InitSchema = true
+	config.Http.Host = "localhost"
+	config.Http.Logger = false
 	config.LogLevel = ""
-	db, repo := app.BootstrapDB(config)
+	application := app.New(config)
+	err := application.BootstrapDB()
+	assert.NoError(err)
 
-	seedsTestDB(db, assert)
+	seedsTestDB(application.DB, assert)
 
 	if initDbFunc != nil {
-		initDbFunc(db, assert)
+		initDbFunc(application.DB, assert)
 	}
-	return assert, repo
+	return assert, application
 }
 
-func InitDB(t *testing.T) (*require.Assertions, *database.Repository) {
+func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	return InitFuncDB(t, nil)
 }
 
