@@ -8,18 +8,17 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type Credentials struct {
-	Email    string `form:"email" json:"email" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
+type LoginHTTPRequest struct {
+	Ticket string `json:"ticket" binding:"required"`
 }
 
 func (server *HttpServer) login(c *gin.Context) {
-	var user Credentials
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var request LoginHTTPRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token, err := server.sso.Login(user.Email, user.Password)
+	result, err := server.sso.Login(request.Ticket)
 	if err != nil {
 		if err != authentication.ErrMissingUser {
 			log.Error().Err(err).Msg("Bad service response")
@@ -27,5 +26,26 @@ func (server *HttpServer) login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"status": "unauthorized"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, result)
+}
+
+type AuthenticateHTTPRequest struct {
+	Token string `json:"token" binding:"required"`
+}
+
+func (server *HttpServer) authenticate(c *gin.Context) {
+	var request AuthenticateHTTPRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	result, err := server.sso.ValidateToken(request.Token)
+	if err != nil {
+		if err != authentication.ErrMissingUser {
+			log.Error().Err(err).Msg("Bad service response")
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{"status": "unauthorized"})
+		return
+	}
+	c.JSON(http.StatusOK, result.User)
 }

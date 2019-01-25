@@ -47,6 +47,7 @@ func (s *HttpServer) Start() (returnErr error) {
 		c.JSON(http.StatusOK, gin.H{"message": "server up"})
 	})
 	router.POST("/login", s.login)
+	router.POST("/authenticate", s.authenticate)
 
 	authorized := router.Group("/")
 	authorized.Use(s.authRequired)

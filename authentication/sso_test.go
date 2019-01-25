@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"encoding/xml"
 	"testing"
 
 	"github.com/MTES-MCT/filharmonic-api/authentication/mocks"
@@ -8,10 +9,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestValidToken(t *testing.T) {
+func initSSO(t *testing.T) (*require.Assertions, *Sso, *mocks.Repository) {
 	assert := require.New(t)
 	repository := new(mocks.Repository)
-	sso := New(repository)
+	ssoConfig := Config{
+		// URL: ""
+	}
+	sso := New(ssoConfig, repository)
+	return assert, sso, repository
+}
+
+func TestValidToken(t *testing.T) {
+	assert, sso, repository := initSSO(t)
 
 	repository.On("GetUserByID", int64(123)).Return(&models.User{
 		Id: 123,
@@ -23,13 +32,22 @@ func TestValidToken(t *testing.T) {
 }
 
 func TestInvalidToken(t *testing.T) {
-	assert := require.New(t)
-	repository := new(mocks.Repository)
-	sso := New(repository)
+	assert, sso, repository := initSSO(t)
 
 	repository.On("GetUserByID", int64(123)).Return(nil, nil)
 
 	userCtx, err := sso.ValidateToken("token-123")
 	assert.Equal(err, ErrMissingUser)
 	assert.Nil(userCtx)
+}
+
+func TestUnmarshalValidateTicketResponse(t *testing.T) {
+	assert := require.New(t)
+
+	data := `<cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas"><cas:authenticationSuccess><cas:user>user@example.com</cas:user></cas:authenticationSuccess></cas:serviceResponse>`
+
+	userInfos := UserInfos{}
+	err := xml.Unmarshal([]byte(data), &userInfos)
+	assert.NoError(err)
+	assert.Equal("user@example.com", userInfos.Email)
 }

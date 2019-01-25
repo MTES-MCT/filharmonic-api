@@ -45,7 +45,7 @@ func (a *Application) BootstrapDB() error {
 }
 
 func (a *Application) BootstrapServer() error {
-	a.Sso = authentication.New(a.Repo)
+	a.Sso = authentication.New(a.Config.Sso, a.Repo)
 	a.Service = domain.New(a.Repo)
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.Sso)
 	return a.Server.Start()
