@@ -165,6 +165,19 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Contexte:        "Viande avariée",
 			EtablissementId: 4,
 		},
+		&models.Inspection{
+			// Id:   4,
+			Date: Date("2019-01-15"),
+			Type: models.TypeApprofondi,
+			Themes: []string{
+				"Sanitaire",
+			},
+			Annonce:         true,
+			Origine:         models.OriginePlanControle,
+			Etat:            models.EtatEnCours,
+			Contexte:        "Inspection en cours",
+			EtablissementId: 4,
+		},
 	}
 	assert.NoError(db.Insert(inspections...))
 
@@ -185,8 +198,34 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			InspectionId: 3,
 			UserId:       4,
 		},
+		&models.InspectionToInspecteur{
+			InspectionId: 4,
+			UserId:       3,
+		},
 	}
 	assert.NoError(db.Insert(inspectionToInspecteurs...))
+
+	constats := []interface{}{
+		&models.Constat{
+			// Id: 1,
+			Type:      models.TypeConstatObservation,
+			Remarques: "Il manque des choses",
+			AuteurId:  3,
+		},
+		&models.Constat{
+			// Id: 2,
+			Type:      models.TypeConstatConforme,
+			Remarques: "RAS",
+			AuteurId:  3,
+		},
+		&models.Constat{
+			// Id: 3,
+			Type:      models.TypeConstatNonConforme,
+			Remarques: "Ne respecte pas la réglementation",
+			AuteurId:  3,
+		},
+	}
+	assert.NoError(db.Insert(constats...))
 
 	pointsDeControle := []interface{}{
 		&models.PointDeControle{
@@ -199,6 +238,7 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			},
 			Publie:       true,
 			InspectionId: 1,
+			ConstatId:    1,
 		},
 		&models.PointDeControle{
 			// Id:    2,
@@ -226,6 +266,26 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			},
 			Publie:       true,
 			InspectionId: 3,
+			ConstatId:    2,
+		},
+		&models.PointDeControle{
+			// Id:    5,
+			Sujet: "Santé 1",
+			ReferencesReglementaires: []string{
+				"Article 1 de l'Arrêté ministériel du 28 avril 2014",
+			},
+			Publie:       true,
+			InspectionId: 4,
+			ConstatId:    3,
+		},
+		&models.PointDeControle{
+			// Id:    6,
+			Sujet: "Santé 2",
+			ReferencesReglementaires: []string{
+				"Article 1 de l'Arrêté ministériel du 28 avril 2014",
+			},
+			Publie:       true,
+			InspectionId: 4,
 		},
 	}
 	assert.NoError(db.Insert(pointsDeControle...))
@@ -321,4 +381,5 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 		},
 	}
 	assert.NoError(db.Insert(messages...))
+
 }

@@ -31,6 +31,7 @@ var tables = []interface{}{
 	&models.User{},
 	&models.EtablissementToExploitant{},
 	&models.Inspection{},
+	&models.Constat{},
 	&models.PointDeControle{},
 	&models.ThemeReferentiel{},
 	&models.Commentaire{},

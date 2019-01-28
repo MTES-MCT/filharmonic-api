@@ -16,7 +16,7 @@ func TestListInspectionsOwnedByInspecteur(t *testing.T) {
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array()
-	results.Length().Equal(3)
+	results.Length().Equal(4)
 	results.First().Object().ValueEqual("id", 1)
 	results.First().Object().Value("etablissement").Object().ValueEqual("id", 1)
 	results.Element(1).Object().ValueEqual("id", 2)
@@ -51,6 +51,10 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	firstPointDeControle := inspection.Value("points_de_controle").Array().First().Object()
 	firstPointDeControle.Value("references_reglementaires").Array().Contains("Article 3.2.3. de l'arrêté préfectoral du 28 juin 2017")
 	firstPointDeControle.ValueEqual("sujet", "Mesure des émissions atmosphériques canalisées par un organisme extérieur")
+	constat := firstPointDeControle.Value("constat").Object()
+	constat.ValueEqual("type", "observation")
+	constat.ValueEqual("remarques", "Il manque des choses")
+	constat.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	messages := firstPointDeControle.Value("messages").Array()
 	messages.Length().Equal(4)
 	firstMessage := messages.First().Object()

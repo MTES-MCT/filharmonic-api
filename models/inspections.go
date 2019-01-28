@@ -75,18 +75,6 @@ type InspectionToInspecteur struct {
 	User       *User
 }
 
-type PointDeControle struct {
-	Id                       int64     `json:"id"`
-	Sujet                    string    `json:"sujet"`
-	ReferencesReglementaires []string  `json:"references_reglementaires" sql:",array"`
-	Publie                   bool      `json:"publie" sql:",notnull"`
-	InspectionId             int64     `json:"-" sql:",notnull"`
-	DeletedAt                time.Time `json:"-" pg:",soft_delete"`
-
-	Inspection *Inspection `json:"-"`
-	Messages   []Message   `json:"messages,omitempty"`
-}
-
 type Commentaire struct {
 	Id           int64     `json:"id"`
 	Message      string    `json:"message"`
@@ -96,17 +84,4 @@ type Commentaire struct {
 
 	Auteur     *User       `json:"auteur,omitempty"`
 	Inspection *Inspection `json:"-"`
-}
-
-type Message struct {
-	Id                int64     `json:"id"`
-	Message           string    `json:"message"`
-	Date              time.Time `json:"date"`
-	Lu                bool      `json:"lu" sql:",notnull"`
-	Interne           bool      `json:"interne" sql:",notnull"`
-	AuteurId          int64     `json:"-" sql:",notnull"`
-	PointDeControleId int64     `json:"-" sql:",notnull"`
-
-	Auteur          *User            `json:"auteur,omitempty"`
-	PointDeControle *PointDeControle `json:"-"`
 }

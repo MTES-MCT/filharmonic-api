@@ -25,6 +25,11 @@ type Repository interface {
 	LireMessage(ctx *UserContext, idMessage int64) error
 	CheckUserAllowedMessage(ctx *UserContext, idMessage int64) (bool, error)
 	CheckUserIsRecipient(ctx *UserContext, idMessage int64) (bool, error)
+	CheckCanCreateConstat(ctx *UserContext, idPointDeControle int64) (bool, error)
+	CheckCanDeleteConstat(ctx *UserContext, idPointDeControle int64) (bool, error)
+
+	CreateConstat(ctx *UserContext, idPointDeControle int64, constat models.Constat) (int64, error)
+	DeleteConstat(ctx *UserContext, idPointDeControle int64) error
 
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByID(id int64) (*models.User, error)

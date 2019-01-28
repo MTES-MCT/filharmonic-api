@@ -3,6 +3,7 @@ package database
 import (
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/go-pg/pg"
 )
 
 func (repo *Repository) CreatePointDeControle(ctx *domain.UserContext, idInspection int64, pointDeControle models.PointDeControle) (int64, error) {
@@ -61,4 +62,13 @@ func (repo *Repository) CheckUserAllowedPointDeControle(ctx *domain.UserContext,
 			Count()
 		return count == 1, err
 	}
+}
+func (repo *Repository) CheckEtatPointDeControle(id int64, etats []models.EtatInspection) (bool, error) {
+	count, err := repo.db.client.Model(&models.PointDeControle{}).
+		Join("JOIN inspections AS i").
+		JoinOn("i.id = point_de_controle.inspection_id").
+		Where("i.etat in (?)", pg.In(etats)).
+		Where("point_de_controle.id = ?", id).
+		Count()
+	return count == 1, err
 }
