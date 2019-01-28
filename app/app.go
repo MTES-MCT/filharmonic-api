@@ -4,7 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
+
 	"github.com/MTES-MCT/filharmonic-api/authentication"
+	"github.com/MTES-MCT/filharmonic-api/authentication/cerbere"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
@@ -13,12 +16,14 @@ import (
 )
 
 type Application struct {
-	Config  Config
-	DB      *database.Database
-	Repo    *database.Repository
-	Sso     *authentication.Sso
-	Service *domain.Service
-	Server  *httpserver.HttpServer
+	Config                Config
+	DB                    *database.Database
+	Repo                  *database.Repository
+	Sso                   authentication.Sso
+	Sessions              sessions.Sessions
+	AuthenticationService *authentication.AuthenticationService
+	Service               *domain.Service
+	Server                *httpserver.HttpServer
 }
 
 func New(config Config) *Application {
@@ -45,9 +50,11 @@ func (a *Application) BootstrapDB() error {
 }
 
 func (a *Application) BootstrapServer() error {
-	a.Sso = authentication.New(a.Config.Sso, a.Repo)
+	a.Sso = cerbere.New(a.Config.Sso)
+	a.Sessions = sessions.New()
+	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
 	a.Service = domain.New(a.Repo)
-	a.Server = httpserver.New(a.Config.Http, a.Service, a.Sso)
+	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
 	return a.Server.Start()
 }
 

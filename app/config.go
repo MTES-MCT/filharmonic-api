@@ -11,7 +11,7 @@ import (
 type Config struct {
 	Database database.Config
 	Http     httpserver.Config
-	Sso      authentication.Config
+	Sso      authentication.SsoConfig
 	LogLevel string `default:"info"`
 }
 

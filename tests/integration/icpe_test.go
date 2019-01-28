@@ -3,25 +3,22 @@ package integration
 import (
 	"testing"
 
-	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/database/icpe"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/tests"
-	"github.com/stretchr/testify/require"
 )
 
 func TestLoadEtablissementsFromCSV(t *testing.T) {
-	assert, application := tests.InitFuncDB(t, func(db *database.Database, assert *require.Assertions) {
-		assert.NoError(db.Insert(&models.Etablissement{
-			S3IC:     "0521.00217",
-			Nom:      "FROMAGERIE OLD",
-			Raison:   "FROMAGERIE OLD",
-			Activite: "Fromage",
-			Seveso:   "Haut",
-			Iedmtd:   true,
-			Adresse:  "PLACE DE LA LAITERIE 56000 VANNES",
-		}))
-	})
+	assert, application := tests.InitDB(t)
+	assert.NoError(application.DB.Insert(&models.Etablissement{
+		S3IC:     "0521.00217",
+		Nom:      "FROMAGERIE OLD",
+		Raison:   "FROMAGERIE OLD",
+		Activite: "Fromage",
+		Seveso:   "Haut",
+		Iedmtd:   true,
+		Adresse:  "PLACE DE LA LAITERIE 56000 VANNES",
+	}))
 
 	err := icpe.LoadEtablissementsCSV("s3ic_ic_gen_fabnum.mini.csv", application.DB)
 	assert.NoError(err)

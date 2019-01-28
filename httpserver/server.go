@@ -21,17 +21,17 @@ type Config struct {
 }
 
 type HttpServer struct {
-	config  Config
-	service *domain.Service
-	sso     *authentication.Sso
-	server  *http.Server
+	config                Config
+	service               *domain.Service
+	authenticationService *authentication.AuthenticationService
+	server                *http.Server
 }
 
-func New(config Config, service *domain.Service, sso *authentication.Sso) *HttpServer {
+func New(config Config, service *domain.Service, authenticationService *authentication.AuthenticationService) *HttpServer {
 	return &HttpServer{
-		config:  config,
-		service: service,
-		sso:     sso,
+		config:                config,
+		service:               service,
+		authenticationService: authenticationService,
 	}
 }
 

@@ -18,7 +18,7 @@ func (server *HttpServer) login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	result, err := server.sso.Login(request.Ticket)
+	result, err := server.authenticationService.Login(request.Ticket)
 	if err != nil {
 		if err != authentication.ErrMissingUser {
 			log.Error().Err(err).Msg("Bad service response")
@@ -39,7 +39,7 @@ func (server *HttpServer) authenticate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	result, err := server.sso.ValidateToken(request.Token)
+	result, err := server.authenticationService.ValidateToken(request.Token)
 	if err != nil {
 		if err != authentication.ErrMissingUser {
 			log.Error().Err(err).Msg("Bad service response")

@@ -16,7 +16,7 @@ func (server *HttpServer) authRequired(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
 		return
 	}
-	userContext, err := server.sso.ValidateToken(token)
+	userContext, err := server.authenticationService.ValidateToken(token)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
 		return

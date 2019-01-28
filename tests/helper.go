@@ -2,6 +2,7 @@ package tests
 
 import (
 	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -9,19 +10,34 @@ import (
 
 	"github.com/MTES-MCT/filharmonic-api/app"
 	"github.com/MTES-MCT/filharmonic-api/authentication"
-	"github.com/MTES-MCT/filharmonic-api/database"
+	"github.com/MTES-MCT/filharmonic-api/authentication/mocks"
+	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
+	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
 
-func InitFunc(t *testing.T, initDbFunc func(db *database.Database, assert *require.Assertions)) (*httpexpect.Expect, func()) {
-	assert, application := InitFuncDB(t, initDbFunc)
+func Init(t *testing.T) (*httpexpect.Expect, func()) {
+	e, close, _ := InitWithSso(t)
+	return e, close
+}
 
-	assert.NoError(application.BootstrapServer())
+func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
+
+	assert, a := InitDB(t)
+
+	a.Sessions = sessions.New()
+	sso := new(mocks.Sso)
+	a.Sso = sso
+	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
+	a.Service = domain.New(a.Repo)
+	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
+	assert.NoError(a.Server.Start())
+	initSessions(a.Sessions)
 
 	httpexpectConfig := httpexpect.Config{
-		BaseURL:  "http://" + application.Config.Http.Host + ":" + application.Config.Http.Port + "/",
+		BaseURL:  "http://" + a.Config.Http.Host + ":" + a.Config.Http.Port + "/",
 		Reporter: httpexpect.NewRequireReporter(t),
 	}
 	if os.Getenv("DEBUG_HTTP") != "" {
@@ -31,18 +47,20 @@ func InitFunc(t *testing.T, initDbFunc func(db *database.Database, assert *requi
 	}
 	e := httpexpect.WithConfig(httpexpectConfig)
 	return e, func() {
-		err := application.Shutdown()
+		err := a.Shutdown()
 		if err != nil {
 			log.Fatal().Msg(err.Error())
 		}
+	}, sso
+}
+
+func initSessions(sessionsStorage sessions.Sessions) {
+	for i := 1; i < 8; i++ {
+		sessionsStorage.Set(GenerateToken(int64(i)), int64(i))
 	}
 }
 
-func Init(t *testing.T) (*httpexpect.Expect, func()) {
-	return InitFunc(t, nil)
-}
-
-func InitFuncDB(t *testing.T, initDbFunc func(db *database.Database, assert *require.Assertions)) (*require.Assertions, *app.Application) {
+func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	assert := require.New(t)
 	config := app.LoadConfig()
 	config.Database.InitSchema = true
@@ -55,14 +73,7 @@ func InitFuncDB(t *testing.T, initDbFunc func(db *database.Database, assert *req
 
 	seedsTestDB(application.DB, assert)
 
-	if initDbFunc != nil {
-		initDbFunc(application.DB, assert)
-	}
 	return assert, application
-}
-
-func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
-	return InitFuncDB(t, nil)
 }
 
 func AuthInspecteur(request *httpexpect.Request) *httpexpect.Request {
@@ -78,7 +89,7 @@ func AuthApprobateur(request *httpexpect.Request) *httpexpect.Request {
 }
 
 func AuthUser(request *httpexpect.Request, userId int64) *httpexpect.Request {
-	return request.WithHeader(httpserver.AuthorizationHeader, authentication.GenerateToken(userId))
+	return request.WithHeader(httpserver.AuthorizationHeader, GenerateToken(userId))
 }
 
 func Date(datestr string) time.Time {
@@ -95,4 +106,8 @@ func DateTime(datestr string) time.Time {
 		log.Fatal().Msgf("unable to parse date: %v", err)
 	}
 	return date
+}
+
+func GenerateToken(id int64) string {
+	return "token-" + strconv.FormatInt(id, 10)
 }
