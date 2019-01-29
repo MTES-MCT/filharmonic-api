@@ -8,7 +8,7 @@ import (
 )
 
 func (repo *Repository) ListInspections(ctx *domain.UserContext) ([]models.Inspection, error) {
-	var inspections []models.Inspection
+	inspections := []models.Inspection{}
 	query := repo.db.client.Model(&inspections).Relation("Etablissement")
 	if ctx.IsInspecteur() {
 		query.Join("JOIN inspection_to_inspecteurs AS u").

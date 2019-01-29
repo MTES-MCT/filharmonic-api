@@ -77,6 +77,9 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.POST("/pointsdecontrole/:id/messages", s.addMessage)
 		authorized.DELETE("/pointsdecontrole/:id", s.deletePointDeControle)
 		authorized.POST("/messages/:id/lire", s.lireMessage)
+		authorized.GET("/themes", s.listThemes)
+		authorized.POST("/themes", s.createTheme)
+		authorized.DELETE("/themes/:id", s.deleteTheme)
 	}
 
 	s.server = &http.Server{

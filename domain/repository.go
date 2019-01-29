@@ -8,6 +8,10 @@ type Repository interface {
 	FindEtablissementsByS3IC(ctx *UserContext, s3ic string) ([]models.Etablissement, error)
 	GetEtablissementByID(ctx *UserContext, id int64) (*models.Etablissement, error)
 
+	ListThemes() ([]models.Theme, error)
+	CreateTheme(theme models.Theme) (int64, error)
+	DeleteTheme(idTheme int64) error
+
 	ListInspections(ctx *UserContext) ([]models.Inspection, error)
 	CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error)
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error

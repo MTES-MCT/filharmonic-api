@@ -80,6 +80,34 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 	err = db.Insert(users...)
 	assert.NoError(err)
 
+	themes := []interface{}{
+		&models.Theme{
+			// Id:      1,
+			Nom: "Rejets dans l'eau",
+		},
+		&models.Theme{
+			// Id:      2,
+			Nom: "Rejets dans l'air",
+		},
+		&models.Theme{
+			// Id:      3,
+			Nom: "Sûreté",
+		},
+		&models.Theme{
+			// Id:      4,
+			Nom: "Produits chimiques",
+		},
+		&models.Theme{
+			// Id:      5,
+			Nom: "Incendie",
+		},
+		&models.Theme{
+			// Id:      6,
+			Nom: "COV",
+		},
+	}
+	assert.NoError(db.Insert(themes...))
+
 	etablissements := []interface{}{
 		&models.Etablissement{
 			// Id:      1,

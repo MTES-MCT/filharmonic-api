@@ -34,7 +34,7 @@ var tables = []interface{}{
 	&models.Inspection{},
 	&models.Constat{},
 	&models.PointDeControle{},
-	&models.ThemeReferentiel{},
+	&models.Theme{},
 	&models.Commentaire{},
 	&models.Message{},
 	&models.InspectionToInspecteur{},
