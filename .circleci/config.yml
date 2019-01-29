@@ -36,7 +36,7 @@ jobs:
       - attach_workspace:
           at: '/go/src/github.com/MTES-MCT'
       - run:
-          command: gometalinter --deadline 5m --vendor --disable=golint ./...
+          command: gometalinter ./...
 
   test:
     executor: gotest

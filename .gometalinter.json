@@ -1,0 +1,13 @@
+{
+  "Vendor": true,
+  "Deadline": "5m",
+  "Fast": true,
+  "Linters": {
+    "gofmt": {"Command": "gofmt -l -s -w"},
+    "goimports": {"Command": "goimports -l -w"}
+  },
+  "Disable": [
+    "golint"
+  ]
+}
+
