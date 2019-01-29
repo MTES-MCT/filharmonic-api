@@ -56,6 +56,7 @@ func (s *HttpServer) Start() (returnErr error) {
 			c.JSON(http.StatusOK, gin.H{"message": "authenticated"})
 		})
 		authorized.GET("/user", s.getUser)
+		authorized.GET("/inspecteurs", s.listInspecteurs)
 		authorized.GET("/etablissements", s.listEtablissements)
 		authorized.GET("/etablissements/:id", s.getEtablissement)
 		authorized.GET("/inspections", s.listInspections)

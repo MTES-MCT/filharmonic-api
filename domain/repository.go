@@ -1,6 +1,8 @@
 package domain
 
-import "github.com/MTES-MCT/filharmonic-api/models"
+import (
+	"github.com/MTES-MCT/filharmonic-api/models"
+)
 
 //go:generate mockery -name Repository
 
@@ -46,4 +48,5 @@ type Repository interface {
 	CheckUsersInspecteurs(ids []int64) (bool, error)
 	CheckInspecteurAllowedInspection(ctx *UserContext, idInspection int64) (bool, error)
 	CheckUserAllowedPointDeControle(ctx *UserContext, idPointDeControle int64) (bool, error)
+	FindUsers(filters ListUsersFilters) ([]models.User, error)
 }

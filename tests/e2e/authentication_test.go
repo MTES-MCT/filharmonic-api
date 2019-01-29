@@ -15,3 +15,16 @@ func TestAuthentication(t *testing.T) {
 		Expect().
 		Status(http.StatusOK)
 }
+
+func TestGetUser(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	user := tests.AuthInspecteur(e.GET("/user")).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	user.ValueEqual("id", 3)
+	user.ValueEqual("email", "inspecteur1@filharmonic.com")
+	user.ValueEqual("profile", "inspecteur")
+}
