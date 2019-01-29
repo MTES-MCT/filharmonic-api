@@ -10,7 +10,6 @@ func (repo *Repository) CreateConstat(ctx *domain.UserContext, idPointDeControle
 	constatId := int64(0)
 	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
 		constat.Id = 0
-		constat.AuteurId = ctx.User.Id
 		err := tx.Insert(&constat)
 		if err != nil {
 			return err
@@ -29,24 +28,17 @@ func (repo *Repository) CreateConstat(ctx *domain.UserContext, idPointDeControle
 
 func (repo *Repository) DeleteConstat(ctx *domain.UserContext, idPointDeControle int64) error {
 	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
-		pointDeControle := models.PointDeControle{}
-		err := tx.Model(&pointDeControle).
-			Where("id = ?", idPointDeControle).Select()
+		pointDeControle := models.PointDeControle{
+			Id: idPointDeControle,
+		}
+		err := tx.Model(&pointDeControle).Column("constat_id").WherePK().Select()
 		if err != nil {
 			return err
 		}
 		constat := models.Constat{
 			Id: pointDeControle.ConstatId,
 		}
-		err = tx.Delete(&constat)
-		if err != nil {
-			return err
-		}
-		err = tx.ForceDelete(&constat)
-		if err != nil {
-			return err
-		}
-		return nil
+		return tx.Delete(&constat)
 	})
 	return err
 }

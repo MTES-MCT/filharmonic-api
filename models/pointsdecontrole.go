@@ -41,8 +41,4 @@ type Constat struct {
 	Id        int64       `json:"id"`
 	Type      TypeConstat `json:"type"`
 	Remarques string      `json:"remarques"`
-	AuteurId  int64       `json:"-" sql:",notnull"`
-	DeletedAt time.Time   `json:"-" pg:",soft_delete"` // bug go-pg
-
-	Auteur *User `json:"auteur,omitempty"`
 }

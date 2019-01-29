@@ -30,7 +30,6 @@ func TestAddConstat(t *testing.T) {
 	constatOutput := lastPointDeControle.Value("constat").Object()
 	constatOutput.ValueEqual("type", constatInput.Type)
 	constatOutput.ValueEqual("remarques", constatInput.Remarques)
-	constatOutput.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 }
 
 func TestDeleteConstat(t *testing.T) {

@@ -14,6 +14,12 @@ type Repository interface {
 	GetInspectionByID(ctx *UserContext, id int64) (*models.Inspection, error)
 	CheckEtatInspection(idInspection int64, etats []models.EtatInspection) (bool, error)
 	UpdateEtatInspection(ctx *UserContext, id int64, etat models.EtatInspection) error
+	CheckCanCreateSuite(ctx *UserContext, idInspection int64) (bool, error)
+	CheckCanDeleteSuite(ctx *UserContext, idInspection int64) (bool, error)
+
+	CreateSuite(ctx *UserContext, idInspection int64, suite models.Suite) (int64, error)
+	UpdateSuite(ctx *UserContext, idInspection int64, suite models.Suite) error
+	DeleteSuite(ctx *UserContext, idInspection int64) error
 
 	CreateCommentaire(ctx *UserContext, idInspection int64, commentaire models.Commentaire) (int64, error)
 

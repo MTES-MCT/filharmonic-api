@@ -30,6 +30,7 @@ var tables = []interface{}{
 	&models.Etablissement{},
 	&models.User{},
 	&models.EtablissementToExploitant{},
+	&models.Suite{},
 	&models.Inspection{},
 	&models.Constat{},
 	&models.PointDeControle{},

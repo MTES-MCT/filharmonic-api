@@ -124,6 +124,20 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 	}
 	assert.NoError(db.Insert(etablissementToExploitants...))
 
+	suites := []interface{}{
+		&models.Suite{
+			// Id: 1,
+			Type:     models.TypeSuiteObservation,
+			Delai:    30,
+			Synthese: "Observations à traiter",
+		},
+		&models.Suite{
+			// Id: 2,
+			Type: models.TypeSuiteAucune,
+		},
+	}
+	assert.NoError(db.Insert(suites...))
+
 	inspections := []interface{}{
 		&models.Inspection{
 			// Id:   1,
@@ -137,6 +151,7 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Etat:            models.EtatEnCours,
 			Contexte:        "Emissions de NOx dépassant les seuils le 2/04/2005",
 			EtablissementId: 1,
+			SuiteId:         1,
 		},
 		&models.Inspection{
 			// Id:   2,
@@ -164,6 +179,7 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Etat:            models.EtatAttenteValidation,
 			Contexte:        "Viande avariée",
 			EtablissementId: 4,
+			SuiteId:         2,
 		},
 		&models.Inspection{
 			// Id:   4,
@@ -210,19 +226,16 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			// Id: 1,
 			Type:      models.TypeConstatObservation,
 			Remarques: "Il manque des choses",
-			AuteurId:  3,
 		},
 		&models.Constat{
 			// Id: 2,
 			Type:      models.TypeConstatConforme,
 			Remarques: "RAS",
-			AuteurId:  3,
 		},
 		&models.Constat{
 			// Id: 3,
 			Type:      models.TypeConstatNonConforme,
 			Remarques: "Ne respecte pas la réglementation",
-			AuteurId:  3,
 		},
 	}
 	assert.NoError(db.Insert(constats...))

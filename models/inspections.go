@@ -47,13 +47,15 @@ type Inspection struct {
 	DetailCirconstance string                 `json:"detail_circonstance"`
 	Contexte           string                 `json:"contexte"`
 	Etat               EtatInspection         `json:"etat"`
-	EtablissementId    int64                  `sql:",notnull" json:"etablissement_id"`
+	EtablissementId    int64                  `json:"etablissement_id" sql:",notnull"`
 	Themes             []string               `json:"themes" sql:",array"`
+	SuiteId            int64                  `json:"-" sql:"on_delete:SET NULL"`
 
 	Commentaires     []Commentaire     `json:"commentaires,omitempty"`
 	Etablissement    *Etablissement    `json:"etablissement,omitempty"`
 	Inspecteurs      []User            `pg:"many2many:inspection_to_inspecteurs" json:"inspecteurs,omitempty"`
 	PointsDeControle []PointDeControle `json:"points_de_controle,omitempty"`
+	Suite            *Suite            `json:"suite,omitempty"`
 }
 
 func (i *Inspection) MarshalJSON() ([]byte, error) {
@@ -84,4 +86,22 @@ type Commentaire struct {
 
 	Auteur     *User       `json:"auteur,omitempty"`
 	Inspection *Inspection `json:"-"`
+}
+
+type TypeSuite string
+
+const (
+	TypeSuiteAucune                   TypeSuite = "aucune"
+	TypeSuiteObservation              TypeSuite = "observation"
+	TypeSuitePropositionMiseEnDemeure TypeSuite = "proposition_mise_en_demeure"
+	TypeSuitePropositionRenforcement  TypeSuite = "proposition_renforcement"
+	TypeSuiteAutre                    TypeSuite = "autre"
+)
+
+type Suite struct {
+	Id       int64     `json:"id"`
+	Type     TypeSuite `json:"type"`
+	Synthese string    `json:"synthese"`
+	Delai    int       `json:"delai"`
+	// DeletedAt time.Time `json:"-" pg:",soft_delete"` // bug go-pg
 }

@@ -83,12 +83,6 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*m
 			return q, nil
 		}).
 		Relation("PointsDeControle.Constat").
-		Relation("PointsDeControle.Constat.Auteur").
-		Relation("PointsDeControle.Constat.Auteur.id").
-		Relation("PointsDeControle.Constat.Auteur.prenom").
-		Relation("PointsDeControle.Constat.Auteur.nom").
-		Relation("PointsDeControle.Constat.Auteur.email").
-		Relation("PointsDeControle.Constat.Auteur.profile").
 		Relation("PointsDeControle.Messages", func(q *orm.Query) (*orm.Query, error) {
 			if ctx.IsExploitant() {
 				q.Where("interne = FALSE")
@@ -106,6 +100,7 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*m
 		Relation("Inspecteurs.nom").
 		Relation("Inspecteurs.email").
 		Relation("Inspecteurs.profile").
+		Relation("Suite").
 		Where(`inspection.id = ?`, id)
 	if ctx.IsExploitant() {
 		query.Join("JOIN etablissement_to_exploitants AS u").
