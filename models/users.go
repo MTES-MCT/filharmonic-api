@@ -9,10 +9,9 @@ const (
 )
 
 type User struct {
-	Id       int64  `json:"id"`
-	Nom      string `json:"nom"`
-	Prenom   string `json:"prenom"`
-	Email    string `json:"email" sql:",unique"`
-	Password string `json:"password,omitempty"`
-	Profile  Profil `json:"profile"`
+	Id      int64  `json:"id"`
+	Nom     string `json:"nom"`
+	Prenom  string `json:"prenom"`
+	Email   string `json:"email" sql:",unique"`
+	Profile Profil `json:"profile"`
 }

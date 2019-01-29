@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"github.com/MTES-MCT/filharmonic-api/authentication/hash"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/stretchr/testify/require"
@@ -13,72 +12,58 @@ Initialise la base de données avec un jeu de test minimal, utilisable dans les 
 Attention à ne pas préciser les Id sans quoi les séquences de clés primaires ne sont pas incrémentées.
 */
 func seedsTestDB(db *database.Database, assert *require.Assertions) {
-	encodedpassword1, err := hash.GenerateFromPassword("password1")
-	assert.NoError(err)
-	encodedpassword2, err := hash.GenerateFromPassword("password2")
-	assert.NoError(err)
-	encodedpassword3, err := hash.GenerateFromPassword("password3")
-	assert.NoError(err)
 	users := []interface{}{
 		&models.User{
-			Id:       1,
-			Prenom:   "Michel",
-			Nom:      "Exploitant1",
-			Email:    "exploitant1@filharmonic.com",
-			Password: encodedpassword1,
-			Profile:  models.ProfilExploitant,
+			Id:      1,
+			Prenom:  "Michel",
+			Nom:     "Exploitant1",
+			Email:   "exploitant1@filharmonic.com",
+			Profile: models.ProfilExploitant,
 		},
 		&models.User{
-			Id:       2,
-			Prenom:   "Bernard",
-			Nom:      "Exploitant2",
-			Email:    "exploitant2@filharmonic.com",
-			Password: encodedpassword2,
-			Profile:  models.ProfilExploitant,
+			Id:      2,
+			Prenom:  "Bernard",
+			Nom:     "Exploitant2",
+			Email:   "exploitant2@filharmonic.com",
+			Profile: models.ProfilExploitant,
 		},
 		&models.User{
-			Id:       3,
-			Prenom:   "Alain",
-			Nom:      "Champion",
-			Email:    "inspecteur1@filharmonic.com",
-			Password: encodedpassword1,
-			Profile:  models.ProfilInspecteur,
+			Id:      3,
+			Prenom:  "Alain",
+			Nom:     "Champion",
+			Email:   "inspecteur1@filharmonic.com",
+			Profile: models.ProfilInspecteur,
 		},
 		&models.User{
-			Id:       4,
-			Prenom:   "Corine",
-			Nom:      "Dupont",
-			Email:    "inspecteur2@filharmonic.com",
-			Password: encodedpassword2,
-			Profile:  models.ProfilInspecteur,
+			Id:      4,
+			Prenom:  "Corine",
+			Nom:     "Dupont",
+			Email:   "inspecteur2@filharmonic.com",
+			Profile: models.ProfilInspecteur,
 		},
 		&models.User{
-			Id:       5,
-			Prenom:   "Bernard",
-			Nom:      "Mars",
-			Email:    "inspecteur3@filharmonic.com",
-			Password: encodedpassword3,
-			Profile:  models.ProfilInspecteur,
+			Id:      5,
+			Prenom:  "Bernard",
+			Nom:     "Mars",
+			Email:   "inspecteur3@filharmonic.com",
+			Profile: models.ProfilInspecteur,
 		},
 		&models.User{
-			Id:       6,
-			Prenom:   "Albert",
-			Nom:      "Approbe",
-			Email:    "approbateur1@filharmonic.com",
-			Password: encodedpassword1,
-			Profile:  models.ProfilApprobateur,
+			Id:      6,
+			Prenom:  "Albert",
+			Nom:     "Approbe",
+			Email:   "approbateur1@filharmonic.com",
+			Profile: models.ProfilApprobateur,
 		},
 		&models.User{
-			Id:       7,
-			Prenom:   "Gilbert",
-			Nom:      "Approbe",
-			Email:    "approbateur2@filharmonic.com",
-			Password: encodedpassword2,
-			Profile:  models.ProfilApprobateur,
+			Id:      7,
+			Prenom:  "Gilbert",
+			Nom:     "Approbe",
+			Email:   "approbateur2@filharmonic.com",
+			Profile: models.ProfilApprobateur,
 		},
 	}
-	err = db.Insert(users...)
-	assert.NoError(err)
+	assert.NoError(db.Insert(users...))
 
 	themes := []interface{}{
 		&models.Theme{
