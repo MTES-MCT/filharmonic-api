@@ -1,9 +1,11 @@
-package tests
+package seeds
 
 import (
-	"github.com/MTES-MCT/filharmonic-api/database"
+	"time"
+
 	"github.com/MTES-MCT/filharmonic-api/models"
-	"github.com/stretchr/testify/require"
+	"github.com/go-pg/pg"
+	"github.com/rs/zerolog/log"
 )
 
 /*
@@ -11,7 +13,8 @@ Initialise la base de données avec un jeu de test minimal, utilisable dans les 
 
 Attention à ne pas préciser les Id sans quoi les séquences de clés primaires ne sont pas incrémentées.
 */
-func seedsTestDB(db *database.Database, assert *require.Assertions) {
+// nolint: gocyclo
+func SeedsTestDB(db *pg.DB) error {
 	users := []interface{}{
 		&models.User{
 			Id:      1,
@@ -63,7 +66,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Profile: models.ProfilApprobateur,
 		},
 	}
-	assert.NoError(db.Insert(users...))
+	err := db.Insert(users...)
+	if err != nil {
+		return err
+	}
 
 	themes := []interface{}{
 		&models.Theme{
@@ -91,7 +97,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Nom: "COV",
 		},
 	}
-	assert.NoError(db.Insert(themes...))
+	err = db.Insert(themes...)
+	if err != nil {
+		return err
+	}
 
 	etablissements := []interface{}{
 		&models.Etablissement{
@@ -119,7 +128,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Adresse: "1 place de l'église 63000 Clermont-Ferrand",
 		},
 	}
-	assert.NoError(db.Insert(etablissements...))
+	err = db.Insert(etablissements...)
+	if err != nil {
+		return err
+	}
 
 	etablissementToExploitants := []interface{}{
 		&models.EtablissementToExploitant{
@@ -135,7 +147,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			UserId:          2,
 		},
 	}
-	assert.NoError(db.Insert(etablissementToExploitants...))
+	err = db.Insert(etablissementToExploitants...)
+	if err != nil {
+		return err
+	}
 
 	suites := []interface{}{
 		&models.Suite{
@@ -149,7 +164,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Type: models.TypeSuiteAucune,
 		},
 	}
-	assert.NoError(db.Insert(suites...))
+	err = db.Insert(suites...)
+	if err != nil {
+		return err
+	}
 
 	inspections := []interface{}{
 		&models.Inspection{
@@ -208,7 +226,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			EtablissementId: 4,
 		},
 	}
-	assert.NoError(db.Insert(inspections...))
+	err = db.Insert(inspections...)
+	if err != nil {
+		return err
+	}
 
 	inspectionToInspecteurs := []interface{}{
 		&models.InspectionToInspecteur{
@@ -232,7 +253,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			UserId:       3,
 		},
 	}
-	assert.NoError(db.Insert(inspectionToInspecteurs...))
+	err = db.Insert(inspectionToInspecteurs...)
+	if err != nil {
+		return err
+	}
 
 	constats := []interface{}{
 		&models.Constat{
@@ -251,7 +275,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			Remarques: "Ne respecte pas la réglementation",
 		},
 	}
-	assert.NoError(db.Insert(constats...))
+	err = db.Insert(constats...)
+	if err != nil {
+		return err
+	}
 
 	pointsDeControle := []interface{}{
 		&models.PointDeControle{
@@ -314,7 +341,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			InspectionId: 4,
 		},
 	}
-	assert.NoError(db.Insert(pointsDeControle...))
+	err = db.Insert(pointsDeControle...)
+	if err != nil {
+		return err
+	}
 
 	commentaires := []interface{}{
 		&models.Commentaire{
@@ -339,7 +369,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			InspectionId: 2,
 		},
 	}
-	assert.NoError(db.Insert(commentaires...))
+	err = db.Insert(commentaires...)
+	if err != nil {
+		return err
+	}
 
 	messages := []interface{}{
 		&models.Message{
@@ -406,7 +439,10 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			PointDeControleId: 3,
 		},
 	}
-	assert.NoError(db.Insert(messages...))
+	err = db.Insert(messages...)
+	if err != nil {
+		return err
+	}
 
 	piecesJointes := []interface{}{
 		&models.PieceJointe{
@@ -444,5 +480,22 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 			AuteurId:  3,
 		},
 	}
-	assert.NoError(db.Insert(piecesJointes...))
+	err = db.Insert(piecesJointes...)
+	return err
+}
+
+func Date(datestr string) time.Time {
+	date, err := time.Parse("2006-01-02", datestr)
+	if err != nil {
+		log.Fatal().Msgf("unable to parse date: %v", err)
+	}
+	return date
+}
+
+func DateTime(datestr string) time.Time {
+	date, err := time.Parse("2006-01-02T15:04:05", datestr)
+	if err != nil {
+		log.Fatal().Msgf("unable to parse date: %v", err)
+	}
+	return date
 }

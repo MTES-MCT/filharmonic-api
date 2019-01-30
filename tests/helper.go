@@ -30,9 +30,7 @@ func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
 
 	var err error
 	a.Storage, err = storage.New(a.Config.Storage)
-	if err != nil {
-		log.Fatal().Msg(err.Error())
-	}
+	assert.NoError(err)
 	a.Sessions = sessions.New()
 	sso := new(mocks.Sso)
 	a.Sso = sso
@@ -69,6 +67,7 @@ func initSessions(sessionsStorage sessions.Sessions) {
 func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	assert := require.New(t)
 	config := app.LoadConfig()
+	config.DevMode = true
 	config.Database.InitSchema = true
 	config.Http.Host = "localhost"
 	config.Http.Logger = false
@@ -76,8 +75,6 @@ func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	application := app.New(config)
 	err := application.BootstrapDB()
 	assert.NoError(err)
-
-	seedsTestDB(application.DB, assert)
 
 	return assert, application
 }

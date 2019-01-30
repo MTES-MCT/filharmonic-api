@@ -7,6 +7,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/authentication"
 	"github.com/MTES-MCT/filharmonic-api/authentication/cerbere"
 	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
+	"github.com/MTES-MCT/filharmonic-api/authentication/stubsso"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
@@ -40,6 +41,10 @@ func (a *Application) BootstrapDB() error {
 	}
 	zerolog.SetGlobalLevel(logLevel)
 
+	if a.Config.DevMode {
+		a.Config.Database.Seeds = true
+	}
+
 	db, err := database.New(a.Config.Database)
 	if err != nil {
 		return err
@@ -56,7 +61,11 @@ func (a *Application) BootstrapServer() error {
 		return err
 	}
 	a.Storage = storage
-	a.Sso = cerbere.New(a.Config.Sso)
+	if a.Config.DevMode {
+		a.Sso = stubsso.New(a.Repo)
+	} else {
+		a.Sso = cerbere.New(a.Config.Sso)
+	}
 	a.Sessions = sessions.New()
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
 	a.Service = domain.New(a.Repo, a.Storage)

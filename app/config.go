@@ -15,6 +15,7 @@ type Config struct {
 	Sso      authentication.SsoConfig
 	Storage  storage.Config
 	LogLevel string `default:"info"`
+	DevMode  bool   `default:"false"`
 }
 
 func LoadConfig() Config {

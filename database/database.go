@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/MTES-MCT/filharmonic-api/database/migrations"
+	"github.com/MTES-MCT/filharmonic-api/database/seeds"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
@@ -18,6 +19,7 @@ type Config struct {
 	Password   string `default:"filharmonic"`
 	Name       string `default:"filharmonic"`
 	InitSchema bool   `default:"false"`
+	Seeds      bool   `default:"false"`
 	LogSQL     bool   `default:"false"`
 }
 
@@ -65,6 +67,12 @@ func New(config Config) (*Database, error) {
 		err = db.createSchema()
 	} else {
 		err = migrations.MigrateDB(client)
+	}
+	if err != nil {
+		return nil, err
+	}
+	if config.Seeds {
+		err = seeds.SeedsTestDB(client)
 	}
 	return db, err
 }
