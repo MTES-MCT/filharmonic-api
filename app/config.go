@@ -4,6 +4,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/authentication"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
+	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/rs/zerolog/log"
 )
@@ -12,6 +13,7 @@ type Config struct {
 	Database database.Config
 	Http     httpserver.Config
 	Sso      authentication.SsoConfig
+	Storage  storage.Config
 	LogLevel string `default:"info"`
 }
 

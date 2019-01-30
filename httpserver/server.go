@@ -82,6 +82,8 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.GET("/themes", s.listThemes)
 		authorized.POST("/themes", s.createTheme)
 		authorized.DELETE("/themes/:id", s.deleteTheme)
+		authorized.POST("/piecesjointes", s.createPieceJointe)
+		authorized.GET("/piecesjointes/:id/:name", s.getPieceJointe)
 	}
 
 	s.server = &http.Server{

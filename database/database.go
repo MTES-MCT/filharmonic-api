@@ -37,6 +37,7 @@ var tables = []interface{}{
 	&models.Theme{},
 	&models.Commentaire{},
 	&models.Message{},
+	&models.PieceJointe{},
 	&models.InspectionToInspecteur{},
 }
 

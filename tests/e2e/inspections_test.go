@@ -48,6 +48,9 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	inspection.ValueEqual("date", "2018-09-01")
 	inspection.Value("etablissement").Object().ValueEqual("id", 1)
 	inspection.Value("themes").Array().Contains("Produits chimiques")
+	inspecteurs := inspection.Value("inspecteurs").Array()
+	inspecteurs.Length().Equal(1)
+	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	suite := inspection.Value("suite").Object()
 	suite.ValueEqual("delai", 30)
 	suite.ValueEqual("type", "observation")
@@ -68,6 +71,13 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	firstCommentaire.ValueEqual("message", "Attention à l'article 243.")
 	firstCommentaire.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	firstCommentaire.Value("auteur").Object().NotContainsKey("password")
+	messageAvecPieceJointe := messages.Element(1).Object()
+	piecesJointes := messageAvecPieceJointe.Value("pieces_jointes").Array().NotEmpty()
+	firstPieceJointe := piecesJointes.First().Object()
+	firstPieceJointe.ValueEqual("id", 1)
+	firstPieceJointe.ValueEqual("nom", "photo-cuve.pdf")
+	firstPieceJointe.ValueEqual("type", "application/pdf")
+	firstPieceJointe.ValueEqual("taille", 2262556)
 }
 
 func TestGetInspectionAsExploitantNotAllowed(t *testing.T) {

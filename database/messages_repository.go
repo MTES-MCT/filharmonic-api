@@ -6,19 +6,52 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/orm"
 )
 
 func (repo *Repository) CreateMessage(ctx *domain.UserContext, idPointDeControle int64, message models.Message) (int64, error) {
-	message.Id = 0
-	message.PointDeControleId = idPointDeControle
-	message.AuteurId = ctx.User.Id
-	message.Date = time.Now()
-	message.Lu = false
-	err := repo.db.client.Insert(&message)
-	if err != nil {
-		return 0, err
-	}
-	return message.Id, nil
+	messageId := int64(0)
+	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
+		message.Id = 0
+		message.PointDeControleId = idPointDeControle
+		message.AuteurId = ctx.User.Id
+		message.Date = time.Now()
+		message.Lu = false
+		err := tx.Insert(&message)
+		if err != nil {
+			return err
+		}
+		messageId = message.Id
+		for _, pieceJointe := range message.PiecesJointes {
+			pieceJointe.MessageId = messageId
+			ok, err := repo.checkPieceJointeFree(tx, ctx, pieceJointe.Id)
+			if err != nil {
+				return err
+			}
+			if !ok {
+				return domain.ErrInvalidInput
+			}
+			_, err = tx.Model(&pieceJointe).Column("message_id").WherePK().Update()
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return messageId, err
+}
+
+func (repo *Repository) checkPieceJointeFree(tx *pg.Tx, ctx *domain.UserContext, idPieceJointe int64) (bool, error) {
+	count, err := tx.Model(&models.PieceJointe{}).
+		Where("auteur_id = ?", ctx.User.Id).
+		Where("id = ?", idPieceJointe).
+		WhereGroup(func(q *orm.Query) (*orm.Query, error) {
+			q = q.WhereOr("message_id is NULL").
+				WhereOr("commentaire_id is NULL")
+			return q, nil
+		}).
+		Count()
+	return count == 1, err
 }
 
 func (repo *Repository) LireMessage(ctx *domain.UserContext, idMessage int64) error {

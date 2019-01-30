@@ -33,6 +33,69 @@ func TestAddMessage(t *testing.T) {
 	lastMessage.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 }
 
+func TestAddMessageWithPieceJointe(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	message := models.Message{
+		Message: "Message publique",
+		PiecesJointes: []models.PieceJointe{
+			models.PieceJointe{
+				Id: 2,
+			},
+		},
+	}
+
+	tests.AuthExploitant(e.POST("/pointsdecontrole/{id}/messages")).WithPath("id", 1).WithJSON(message).
+		Expect().
+		Status(http.StatusOK)
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	firstPointDeControle := inspection.Value("points_de_controle").Array().First().Object()
+	messages := firstPointDeControle.Value("messages").Array()
+	messages.Length().Equal(5)
+	lastMessage := messages.Last().Object()
+	lastMessage.ValueEqual("message", "Message publique")
+	lastMessage.Value("auteur").Object().ValueEqual("email", "exploitant1@filharmonic.com")
+	piecesJointes := lastMessage.Value("pieces_jointes").Array().NotEmpty()
+	firstPieceJointe := piecesJointes.First().Object()
+	firstPieceJointe.ValueEqual("id", 2)
+	firstPieceJointe.ValueEqual("nom", "photo-cuve-2.pdf")
+	firstPieceJointe.ValueEqual("type", "application/pdf")
+	firstPieceJointe.ValueEqual("taille", 2262000)
+}
+
+func TestAddMessageWithPieceJointeBadOwner(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	message := models.Message{
+		Message: "Message publique",
+		PiecesJointes: []models.PieceJointe{
+			models.PieceJointe{
+				Id: 2,
+			},
+		},
+	}
+
+	tests.AuthUser(e.POST("/pointsdecontrole/{id}/messages"), 2).WithPath("id", 1).WithJSON(message).
+		Expect().
+		Status(http.StatusBadRequest)
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	firstPointDeControle := inspection.Value("points_de_controle").Array().First().Object()
+	messages := firstPointDeControle.Value("messages").Array()
+	messages.Length().Equal(4)
+}
+
 func TestAddMessageAsInspecteurNotAllowed(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()

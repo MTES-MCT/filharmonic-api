@@ -408,4 +408,41 @@ func seedsTestDB(db *database.Database, assert *require.Assertions) {
 	}
 	assert.NoError(db.Insert(messages...))
 
+	piecesJointes := []interface{}{
+		&models.PieceJointe{
+			// Id:                1,
+			Nom:       "photo-cuve.pdf",
+			Type:      "application/pdf",
+			Taille:    2262556,
+			MessageId: 2,
+			StorageId: "2345678901",
+			AuteurId:  1,
+		},
+		&models.PieceJointe{
+			// Id:                2,
+			Nom:       "photo-cuve-2.pdf",
+			Type:      "application/pdf",
+			Taille:    2262000,
+			StorageId: "1234567890",
+			AuteurId:  1,
+		},
+		&models.PieceJointe{
+			// Id:                3,
+			Nom:           "article-loi.pdf",
+			Type:          "application/pdf",
+			Taille:        2262000,
+			StorageId:     "3456789054",
+			CommentaireId: 2,
+			AuteurId:      3,
+		},
+		&models.PieceJointe{
+			// Id:                4,
+			Nom:       "article-loi-v2.pdf",
+			Type:      "application/pdf",
+			Taille:    10000000,
+			StorageId: "4567890543",
+			AuteurId:  3,
+		},
+	}
+	assert.NoError(db.Insert(piecesJointes...))
 }

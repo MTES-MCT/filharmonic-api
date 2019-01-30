@@ -90,16 +90,8 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*m
 			return q.Order("date ASC"), nil
 		}).
 		Relation("PointsDeControle.Messages.Auteur").
-		Relation("PointsDeControle.Messages.Auteur.id").
-		Relation("PointsDeControle.Messages.Auteur.prenom").
-		Relation("PointsDeControle.Messages.Auteur.nom").
-		Relation("PointsDeControle.Messages.Auteur.email").
-		Relation("PointsDeControle.Messages.Auteur.profile").
-		Relation("Inspecteurs.id").
-		Relation("Inspecteurs.prenom").
-		Relation("Inspecteurs.nom").
-		Relation("Inspecteurs.email").
-		Relation("Inspecteurs.profile").
+		Relation("PointsDeControle.Messages.PiecesJointes").
+		Relation("Inspecteurs").
 		Relation("Suite").
 		Where(`inspection.id = ?`, id)
 	if ctx.IsExploitant() {
@@ -111,11 +103,7 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*m
 			return q.Order("date ASC"), nil
 		}).
 			Relation("Commentaires.Auteur").
-			Relation("Commentaires.Auteur.id").
-			Relation("Commentaires.Auteur.prenom").
-			Relation("Commentaires.Auteur.nom").
-			Relation("Commentaires.Auteur.email").
-			Relation("Commentaires.Auteur.profile")
+			Relation("Commentaires.PiecesJointes")
 	}
 	err := query.Select()
 	if err == pg.ErrNoRows {

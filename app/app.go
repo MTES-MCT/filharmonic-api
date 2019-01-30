@@ -4,13 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
-
 	"github.com/MTES-MCT/filharmonic-api/authentication"
 	"github.com/MTES-MCT/filharmonic-api/authentication/cerbere"
+	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
+	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
@@ -23,6 +23,7 @@ type Application struct {
 	Sessions              sessions.Sessions
 	AuthenticationService *authentication.AuthenticationService
 	Service               *domain.Service
+	Storage               *storage.FileStorage
 	Server                *httpserver.HttpServer
 }
 
@@ -50,10 +51,15 @@ func (a *Application) BootstrapDB() error {
 }
 
 func (a *Application) BootstrapServer() error {
+	storage, err := storage.New(a.Config.Storage)
+	if err != nil {
+		return err
+	}
+	a.Storage = storage
 	a.Sso = cerbere.New(a.Config.Sso)
 	a.Sessions = sessions.New()
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
-	a.Service = domain.New(a.Repo)
+	a.Service = domain.New(a.Repo, a.Storage)
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
 	return a.Server.Start()
 }

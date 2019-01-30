@@ -10,3 +10,13 @@ services:
       POSTGRES_USER: filharmonic
       POSTGRES_PASS: filharmonic
       POSTGRES_DB: filharmonic
+
+  minio:
+    image: minio/minio:RELEASE.2019-01-23T23-18-58Z
+    restart: unless-stopped
+    command: server /data
+    ports:
+      - 9000:9000
+    environment:
+      MINIO_ACCESS_KEY: filharmonic
+      MINIO_SECRET_KEY: filharmonic

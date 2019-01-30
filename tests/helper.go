@@ -14,6 +14,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
+	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
@@ -27,11 +28,16 @@ func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
 
 	assert, a := InitDB(t)
 
+	var err error
+	a.Storage, err = storage.New(a.Config.Storage)
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
 	a.Sessions = sessions.New()
 	sso := new(mocks.Sso)
 	a.Sso = sso
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
-	a.Service = domain.New(a.Repo)
+	a.Service = domain.New(a.Repo, a.Storage)
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
 	assert.NoError(a.Server.Start())
 	initSessions(a.Sessions)

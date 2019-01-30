@@ -13,6 +13,10 @@ executors:
           POSTGRES_USER: filharmonic
           POSTGRES_PASS: filharmonic
           POSTGRES_DB: filharmonic
+      - image: minio/minio:RELEASE.2019-01-23T23-18-58Z
+        environment:
+          MINIO_ACCESS_KEY: filharmonic
+          MINIO_SECRET_KEY: filharmonic
     working_directory: /go/src/github.com/MTES-MCT/filharmonic-api
   gometalinter:
     docker:

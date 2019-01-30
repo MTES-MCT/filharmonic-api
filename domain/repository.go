@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"io"
+
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
@@ -49,4 +51,12 @@ type Repository interface {
 	CheckInspecteurAllowedInspection(ctx *UserContext, idInspection int64) (bool, error)
 	CheckUserAllowedPointDeControle(ctx *UserContext, idPointDeControle int64) (bool, error)
 	FindUsers(filters ListUsersFilters) ([]models.User, error)
+
+	GetPieceJointe(ctx *UserContext, id int64) (*models.PieceJointe, error)
+	CreatePieceJointe(pieceJointe models.PieceJointe) (int64, error)
+}
+
+type Storage interface {
+	Get(id string) (io.Reader, error)
+	Put(file models.PieceJointeFile) (string, error)
 }

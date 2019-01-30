@@ -27,13 +27,17 @@
   version = "1.11.0"
 
 [[constraint]]
-  branch = "master"
-  name = "golang.org/x/crypto"
-
-[[constraint]]
   name = "github.com/go-pg/migrations"
   version = "6.6.3"
 
 [[constraint]]
   branch = "master"
   name = "github.com/gin-contrib/logger"
+
+[[constraint]]
+  name = "github.com/minio/minio-go"
+  version = "6.0.14"
+
+[[constraint]]
+  name = "github.com/gofrs/uuid"
+  version = "3.2.0"

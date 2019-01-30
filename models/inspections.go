@@ -84,8 +84,9 @@ type Commentaire struct {
 	AuteurId     int64     `json:"-" sql:",notnull"`
 	InspectionId int64     `json:"-" sql:",notnull"`
 
-	Auteur     *User       `json:"auteur,omitempty"`
-	Inspection *Inspection `json:"-"`
+	Auteur        *User         `json:"auteur,omitempty"`
+	Inspection    *Inspection   `json:"-"`
+	PiecesJointes []PieceJointe `json:"pieces_jointes,omitempty"`
 }
 
 type TypeSuite string
@@ -103,5 +104,4 @@ type Suite struct {
 	Type     TypeSuite `json:"type"`
 	Synthese string    `json:"synthese"`
 	Delai    int       `json:"delai"`
-	// DeletedAt time.Time `json:"-" pg:",soft_delete"` // bug go-pg
 }

@@ -27,6 +27,7 @@ type Message struct {
 
 	Auteur          *User            `json:"auteur,omitempty"`
 	PointDeControle *PointDeControle `json:"-"`
+	PiecesJointes   []PieceJointe    `json:"pieces_jointes,omitempty"`
 }
 
 type TypeConstat string
