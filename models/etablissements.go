@@ -10,7 +10,8 @@ type Etablissement struct {
 	Activite string `json:"activite"`
 	Iedmtd   bool   `json:"iedmtd" sql:",notnull"`
 
-	Exploitants []User `pg:"many2many:etablissement_to_exploitants" json:"exploitants,omitempty"`
+	Exploitants []User       `pg:"many2many:etablissement_to_exploitants" json:"exploitants,omitempty"`
+	Inspections []Inspection `json:"inspections,omitempty"`
 }
 
 type EtablissementToExploitant struct {

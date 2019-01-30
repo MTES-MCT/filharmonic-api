@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/MTES-MCT/filharmonic-api/models"
+
 	"github.com/MTES-MCT/filharmonic-api/tests"
 )
 
@@ -31,16 +33,24 @@ func TestFindEtablissementsOwnedByExploitant(t *testing.T) {
 	results.Last().Object().ValueEqual("s3ic", "4567")
 }
 
-func TestGetEtablissementsByIdOwnedByExploitant(t *testing.T) {
+func TestGetEtablissementByIdOwnedByExploitant(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	tests.AuthExploitant(e.GET("/etablissements/{id}")).WithPath("id", "1").
+	etablissement := tests.AuthExploitant(e.GET("/etablissements/{id}")).WithPath("id", "1").
 		Expect().
 		Status(http.StatusOK).
-		JSON().Object().ValueEqual("id", 1)
+		JSON().Object()
+	etablissement.ValueEqual("id", 1)
+	inspections := etablissement.Value("inspections").Array()
+	inspections.Length().Equal(1)
+	inspection := inspections.First().Object()
+	inspection.ValueEqual("etat", models.EtatEnCours)
+	inspection.ValueEqual("date", "2018-09-01")
+	exploitants := etablissement.Value("exploitants").Array()
+	exploitants.Length().Equal(1)
 }
-func TestGetEtablissementsByIdNotOwnedByExploitant(t *testing.T) {
+func TestGetEtablissementByIdNotOwnedByExploitant(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 

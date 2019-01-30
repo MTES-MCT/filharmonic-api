@@ -27,7 +27,10 @@ func (repo *Repository) FindEtablissementsByS3IC(ctx *domain.UserContext, s3ic s
 
 func (repo *Repository) GetEtablissementByID(ctx *domain.UserContext, id int64) (*models.Etablissement, error) {
 	var etablissement models.Etablissement
-	query := repo.db.client.Model(&etablissement).Where("id = ?", id)
+	query := repo.db.client.Model(&etablissement).
+		Relation("Inspections").
+		Relation("Exploitants").
+		Where("id = ?", id)
 	if ctx.IsExploitant() {
 		query.Join("JOIN etablissement_to_exploitants AS u").
 			JoinOn("u.etablissement_id = etablissement.id").
