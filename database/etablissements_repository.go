@@ -1,6 +1,8 @@
 package database
 
 import (
+	"strings"
+
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
@@ -13,9 +15,20 @@ func (repo *Repository) ListEtablissements() ([]models.Etablissement, error) {
 	return etablissements, err
 }
 
-func (repo *Repository) FindEtablissementsByS3IC(ctx *domain.UserContext, s3ic string) ([]models.Etablissement, error) {
+func (repo *Repository) FindEtablissements(ctx *domain.UserContext, filter domain.ListEtablissementsFilter) ([]models.Etablissement, error) {
 	etablissements := []models.Etablissement{}
-	query := repo.db.client.Model(&etablissements).Where("s3ic like ?", "%"+s3ic+"%")
+
+	query := repo.db.client.Model(&etablissements)
+	if filter.S3IC != "" {
+		query.Where("lower(s3ic) like ?", "%"+strings.ToLower(filter.S3IC)+"%")
+	}
+	if filter.Nom != "" {
+		query.Where("lower(nom) like ? OR lower(raison) like ?", "%"+strings.ToLower(filter.Nom)+"%", "%"+strings.ToLower(filter.Nom)+"%")
+	}
+	if filter.Adresse != "" {
+		query.Where("lower(adresse) like ?", "%"+strings.ToLower(filter.Adresse)+"%")
+	}
+
 	if ctx.IsExploitant() {
 		query.Join("JOIN etablissement_to_exploitants AS u").
 			JoinOn("u.etablissement_id = etablissement.id").

@@ -9,7 +9,7 @@ import (
 //go:generate mockery -name Repository
 
 type Repository interface {
-	FindEtablissementsByS3IC(ctx *UserContext, s3ic string) ([]models.Etablissement, error)
+	FindEtablissements(ctx *UserContext, filter ListEtablissementsFilter) ([]models.Etablissement, error)
 	GetEtablissementByID(ctx *UserContext, id int64) (*models.Etablissement, error)
 
 	ListThemes() ([]models.Theme, error)

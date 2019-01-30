@@ -9,15 +9,19 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/tests"
 )
 
-func TestFindEtablissementsByS3IC(t *testing.T) {
+func TestFindEtablissements(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	tests.AuthExploitant(e.GET("/etablissements")).WithQuery("s3ic", "23").
+	etablissements := tests.AuthExploitant(e.GET("/etablissements")).
+		WithQuery("s3ic", "12").
+		WithQuery("nom", "social").
+		WithQuery("adresse", "nantes").
 		Expect().
 		Status(http.StatusOK).
-		JSON().Array().
-		Element(0).Object().ValueEqual("s3ic", "1234")
+		JSON().Array()
+	etablissements.Length().Equal(1)
+	etablissements.First().Object().ValueEqual("s3ic", "451267")
 }
 
 func TestFindEtablissementsOwnedByExploitant(t *testing.T) {
@@ -30,7 +34,7 @@ func TestFindEtablissementsOwnedByExploitant(t *testing.T) {
 		JSON().Array()
 	results.Length().Equal(2)
 	results.First().Object().ValueEqual("s3ic", "1234")
-	results.Last().Object().ValueEqual("s3ic", "4567")
+	results.Last().Object().ValueEqual("s3ic", "451267")
 }
 
 func TestGetEtablissementByIdOwnedByExploitant(t *testing.T) {

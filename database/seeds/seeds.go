@@ -111,7 +111,7 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 		&models.Etablissement{
 			// Id:      2,
-			S3IC:    "4567",
+			S3IC:    "451267",
 			Raison:  "Raison sociale 2",
 			Adresse: "1 rue des plantes 44000 Nantes",
 		},

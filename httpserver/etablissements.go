@@ -4,12 +4,20 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
 
 func (server *HttpServer) listEtablissements(c *gin.Context) {
-	etablissements, err := server.service.ListEtablissements(server.retrieveUserContext(c), c.Query("s3ic"))
+	filter := domain.ListEtablissementsFilter{}
+	if err := c.ShouldBindQuery(&filter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	etablissements, err := server.service.ListEtablissements(server.retrieveUserContext(c), filter)
 	if err != nil {
 		log.Error().Err(err).Msg("Bad service response")
 		c.JSON(http.StatusBadRequest, err)
