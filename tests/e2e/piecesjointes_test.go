@@ -18,7 +18,7 @@ func TestAddGetPieceJointe(t *testing.T) {
 		JSON().
 		Object().Value("id").Raw()
 
-	tests.AuthExploitant(e.GET("/piecesjointes/{id}/{name}")).WithPath("id", pieceJointeId).WithPath("name", "pdf-sample.pdf").
+	tests.AuthExploitant(e.GET("/piecesjointes/{id}")).WithPath("id", pieceJointeId).
 		Expect().
 		Status(http.StatusOK).
 		ContentType("application/octet-stream")

@@ -67,6 +67,13 @@ func (storage *FileStorage) Put(pieceJointe models.PieceJointeFile) (string, err
 }
 
 func (storage *FileStorage) Get(id string) (io.Reader, error) {
+	available, err := storage.checkKeyAvailable(id)
+	if err != nil {
+		return nil, err
+	}
+	if available {
+		return nil, errors.New("missing object at key " + id)
+	}
 	obj, err := storage.client.GetObject(storage.config.BucketName, id, minio.GetObjectOptions{})
 	return obj, err
 }

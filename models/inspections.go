@@ -1,8 +1,9 @@
 package models
 
 import (
-	"encoding/json"
 	"time"
+
+	"github.com/MTES-MCT/filharmonic-api/util"
 )
 
 type TypeInspection string
@@ -39,7 +40,7 @@ const (
 
 type Inspection struct {
 	Id                 int64                  `json:"id"`
-	Date               time.Time              `json:"date" sql:"type:date"`
+	Date               util.DateString        `json:"date" sql:"type:date"`
 	Type               TypeInspection         `json:"type"`
 	Annonce            bool                   `json:"annonce" sql:",notnull"`
 	Origine            OrigineInspection      `json:"origine"`
@@ -56,17 +57,6 @@ type Inspection struct {
 	Inspecteurs      []User            `pg:"many2many:inspection_to_inspecteurs" json:"inspecteurs,omitempty"`
 	PointsDeControle []PointDeControle `json:"points_de_controle,omitempty"`
 	Suite            *Suite            `json:"suite,omitempty"`
-}
-
-func (i *Inspection) MarshalJSON() ([]byte, error) {
-	type Alias Inspection
-	return json.Marshal(&struct {
-		Date string `json:"date"`
-		*Alias
-	}{
-		Date:  i.Date.Format("2006-01-02"),
-		Alias: (*Alias)(i),
-	})
 }
 
 type InspectionToInspecteur struct {

@@ -1,11 +1,9 @@
 package seeds
 
 import (
-	"time"
-
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/go-pg/pg"
-	"github.com/rs/zerolog/log"
 )
 
 /*
@@ -172,7 +170,7 @@ func SeedsTestDB(db *pg.DB) error {
 	inspections := []interface{}{
 		&models.Inspection{
 			// Id:   1,
-			Date: Date("2018-09-01"),
+			Date: util.Date("2018-09-01"),
 			Type: models.TypeApprofondi,
 			Themes: []string{
 				"Produits chimiques",
@@ -186,7 +184,7 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 		&models.Inspection{
 			// Id:   2,
-			Date: Date("2018-11-15"),
+			Date: util.Date("2018-11-15"),
 			Type: models.TypeCourant,
 			Themes: []string{
 				"Rejets dans l'eau",
@@ -200,7 +198,7 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 		&models.Inspection{
 			// Id:   3,
-			Date: Date("2018-11-15"),
+			Date: util.Date("2018-11-15"),
 			Type: models.TypeApprofondi,
 			Themes: []string{
 				"Sanitaire",
@@ -214,7 +212,7 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 		&models.Inspection{
 			// Id:   4,
-			Date: Date("2019-01-15"),
+			Date: util.Date("2019-01-15"),
 			Type: models.TypeApprofondi,
 			Themes: []string{
 				"Sanitaire",
@@ -350,21 +348,21 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Commentaire{
 			// Id:           1,
 			Message:      "Attention à l'article 243.",
-			Date:         DateTime("2018-11-14T08:50:00"),
+			Date:         util.DateTime("2018-11-14T08:50:00"),
 			AuteurId:     3,
 			InspectionId: 1,
 		},
 		&models.Commentaire{
 			// Id:           2,
 			Message:      "L'article 843 s'applique également.",
-			Date:         DateTime("2018-11-16T16:50:00"),
+			Date:         util.DateTime("2018-11-16T16:50:00"),
 			AuteurId:     4,
 			InspectionId: 1,
 		},
 		&models.Commentaire{
 			// Id:           3,
 			Message:      "Attention au précédent contrôle.",
-			Date:         DateTime("2018-11-18T16:50:00"),
+			Date:         util.DateTime("2018-11-18T16:50:00"),
 			AuteurId:     3,
 			InspectionId: 2,
 		},
@@ -378,7 +376,7 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Message{
 			// Id:                1,
 			Message:           "Auriez-vous l'obligeance de me fournir le document approprié ?",
-			Date:              DateTime("2018-11-14T08:50:00"),
+			Date:              util.DateTime("2018-11-14T08:50:00"),
 			Lu:                true,
 			Interne:           false,
 			AuteurId:          3,
@@ -387,7 +385,7 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Message{
 			// Id:                2,
 			Message:           "Voici le document.",
-			Date:              DateTime("2018-11-16T16:50:00"),
+			Date:              util.DateTime("2018-11-16T16:50:00"),
 			Lu:                true,
 			Interne:           false,
 			AuteurId:          1,
@@ -396,7 +394,7 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Message{
 			// Id:                3,
 			Message:           "Attention au précédent contrôle.",
-			Date:              DateTime("2018-11-20T16:50:00"),
+			Date:              util.DateTime("2018-11-20T16:50:00"),
 			Lu:                false,
 			Interne:           true,
 			AuteurId:          3,
@@ -405,7 +403,7 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Message{
 			// Id:                4,
 			Message:           "Merci de me fournir le document.",
-			Date:              DateTime("2018-11-21T16:50:00"),
+			Date:              util.DateTime("2018-11-21T16:50:00"),
 			Lu:                false,
 			Interne:           false,
 			AuteurId:          4,
@@ -414,7 +412,7 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Message{
 			// Id:                5,
 			Message:           "Auriez-vous l'obligeance de me fournir une photo de la cuve ?",
-			Date:              DateTime("2018-11-18T17:50:00"),
+			Date:              util.DateTime("2018-11-18T17:50:00"),
 			Lu:                true,
 			Interne:           false,
 			AuteurId:          3,
@@ -423,7 +421,7 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Message{
 			// Id:                6,
 			Message:           "Il manque un document.",
-			Date:              DateTime("2018-11-26T16:50:00"),
+			Date:              util.DateTime("2018-11-26T16:50:00"),
 			Lu:                false,
 			Interne:           false,
 			AuteurId:          3,
@@ -432,7 +430,7 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Message{
 			// Id:                7,
 			Message:           "Voici la photo de la cuve.",
-			Date:              DateTime("2018-11-27T16:50:00"),
+			Date:              util.DateTime("2018-11-27T16:50:00"),
 			Lu:                false,
 			Interne:           false,
 			AuteurId:          2,
@@ -449,9 +447,9 @@ func SeedsTestDB(db *pg.DB) error {
 			// Id:                1,
 			Nom:       "photo-cuve.pdf",
 			Type:      "application/pdf",
-			Taille:    2262556,
+			Taille:    7945,
 			MessageId: 2,
-			StorageId: "2345678901",
+			StorageId: "photo-cuve.pdf",
 			AuteurId:  1,
 		},
 		&models.PieceJointe{
@@ -479,23 +477,25 @@ func SeedsTestDB(db *pg.DB) error {
 			StorageId: "4567890543",
 			AuteurId:  3,
 		},
+		&models.PieceJointe{
+			// Id:                5,
+			Nom:       "image-cuve.jpg",
+			Type:      "image/jpeg",
+			Taille:    53553,
+			MessageId: 2,
+			StorageId: "cuve.jpg",
+			AuteurId:  1,
+		},
+		&models.PieceJointe{
+			// Id:                5,
+			Nom:       "rapport-cuve.odt",
+			Type:      "application/vnd.oasis.opendocument.text",
+			Taille:    6737,
+			MessageId: 2,
+			StorageId: "rapport-cuve.odt",
+			AuteurId:  1,
+		},
 	}
 	err = db.Insert(piecesJointes...)
 	return err
-}
-
-func Date(datestr string) time.Time {
-	date, err := time.Parse("2006-01-02", datestr)
-	if err != nil {
-		log.Fatal().Msgf("unable to parse date: %v", err)
-	}
-	return date
-}
-
-func DateTime(datestr string) time.Time {
-	date, err := time.Parse("2006-01-02T15:04:05", datestr)
-	if err != nil {
-		log.Fatal().Msgf("unable to parse date: %v", err)
-	}
-	return date
 }

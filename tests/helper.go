@@ -4,7 +4,6 @@ import (
 	"os"
 	"strconv"
 	"testing"
-	"time"
 
 	httpexpect "gopkg.in/gavv/httpexpect.v1"
 
@@ -93,22 +92,6 @@ func AuthApprobateur(request *httpexpect.Request) *httpexpect.Request {
 
 func AuthUser(request *httpexpect.Request, userId int64) *httpexpect.Request {
 	return request.WithHeader(httpserver.AuthorizationHeader, GenerateToken(userId))
-}
-
-func Date(datestr string) time.Time {
-	date, err := time.Parse("2006-01-02", datestr)
-	if err != nil {
-		log.Fatal().Msgf("unable to parse date: %v", err)
-	}
-	return date
-}
-
-func DateTime(datestr string) time.Time {
-	date, err := time.Parse("2006-01-02T15:04:05", datestr)
-	if err != nil {
-		log.Fatal().Msgf("unable to parse date: %v", err)
-	}
-	return date
 }
 
 func GenerateToken(id int64) string {

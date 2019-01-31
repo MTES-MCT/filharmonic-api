@@ -6,6 +6,7 @@ import (
 
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/tests"
+	"github.com/MTES-MCT/filharmonic-api/util"
 )
 
 func TestListInspectionsOwnedByInspecteur(t *testing.T) {
@@ -77,7 +78,7 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	firstPieceJointe.ValueEqual("id", 1)
 	firstPieceJointe.ValueEqual("nom", "photo-cuve.pdf")
 	firstPieceJointe.ValueEqual("type", "application/pdf")
-	firstPieceJointe.ValueEqual("taille", 2262556)
+	firstPieceJointe.ValueEqual("taille", 7945)
 }
 
 func TestGetInspectionAsExploitantNotAllowed(t *testing.T) {
@@ -124,7 +125,7 @@ func TestCreateInspection(t *testing.T) {
 	defer close()
 
 	inspectionInput := models.Inspection{
-		Date:            tests.Date("2019-01-22"),
+		Date:            util.Date("2019-01-22"),
 		Type:            models.TypeCourant,
 		Annonce:         true,
 		Origine:         models.OriginePlanControle,
@@ -169,7 +170,7 @@ func TestUpdateInspection(t *testing.T) {
 
 	inspectionInput := models.Inspection{
 		Id:      1,
-		Date:    tests.Date("2019-01-30"),
+		Date:    util.Date("2019-01-30"),
 		Type:    models.TypeCourant,
 		Annonce: true,
 		Origine: models.OriginePlanControle,

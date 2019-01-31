@@ -30,8 +30,8 @@ func (repo *Repository) GetPieceJointe(ctx *domain.UserContext, idPieceJointe in
 			JoinOn("ex.etablissement_id = e.id").
 			JoinOn("ex.user_id = ?", ctx.User.Id).
 			WhereGroup(func(q *orm.Query) (*orm.Query, error) {
-				q = q.Where("(piece_jointe.message_id is NULL AND piece_jointe.commentaire_id is NULL AND piece_jointe.auteur_id = ?)", ctx.User.Id).
-					WhereOr("(piece_jointe.message_id is not NULL AND piece_jointe.commentaire_id is not NULL AND piece_jointe.auteur_id <> ?)", ctx.User.Id)
+				q = q.Where("piece_jointe.message_id is NULL AND piece_jointe.commentaire_id is NULL AND piece_jointe.auteur_id = ?", ctx.User.Id).
+					WhereOr("(piece_jointe.message_id is not NULL OR piece_jointe.commentaire_id is not NULL)", ctx.User.Id)
 				return q, nil
 			}).
 			Where("piece_jointe.id = ?", idPieceJointe).
@@ -49,8 +49,8 @@ func (repo *Repository) GetPieceJointe(ctx *domain.UserContext, idPieceJointe in
 			JoinOnOr("u.inspection_id = c.inspection_id").
 			JoinOn("u.user_id = ?", ctx.User.Id).
 			WhereGroup(func(q *orm.Query) (*orm.Query, error) {
-				q = q.Where("(piece_jointe.message_id is NULL AND piece_jointe.commentaire_id is NULL AND piece_jointe.auteur_id = ?)", ctx.User.Id).
-					WhereOr("(piece_jointe.message_id is not NULL AND piece_jointe.commentaire_id is not NULL AND piece_jointe.auteur_id <> ?)", ctx.User.Id)
+				q = q.Where("piece_jointe.message_id is NULL AND piece_jointe.commentaire_id is NULL AND piece_jointe.auteur_id = ?", ctx.User.Id).
+					WhereOr("(piece_jointe.message_id is not NULL OR piece_jointe.commentaire_id is not NULL)", ctx.User.Id)
 				return q, nil
 			}).
 			Where("piece_jointe.id = ?", idPieceJointe).

@@ -83,7 +83,7 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.POST("/themes", s.createTheme)
 		authorized.DELETE("/themes/:id", s.deleteTheme)
 		authorized.POST("/piecesjointes", s.createPieceJointe)
-		authorized.GET("/piecesjointes/:id/:name", s.getPieceJointe)
+		authorized.GET("/piecesjointes/:id", s.getPieceJointe)
 	}
 
 	s.server = &http.Server{
