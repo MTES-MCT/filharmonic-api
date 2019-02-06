@@ -15,8 +15,11 @@ func TestLoginSuccessful(t *testing.T) {
 
 	sso.On("ValidateTicket", "ticket-exploitant1").Return("exploitant1@filharmonic.com", nil)
 
-	e.POST("/login").WithJSON(&httpserver.LoginHTTPRequest{Ticket: "ticket-exploitant1"}).
-		Expect().Status(http.StatusOK).JSON().Object().ContainsKey("token")
+	loginResult := e.POST("/login").WithJSON(&httpserver.LoginHTTPRequest{Ticket: "ticket-exploitant1"}).
+		Expect().Status(http.StatusOK).JSON().Object()
+	loginResult.ContainsKey("token")
+	user := loginResult.Value("user").Object()
+	user.ContainsKey("favoris")
 }
 
 func TestLoginFailed(t *testing.T) {

@@ -88,3 +88,11 @@ func (s *Service) changeEtatInspection(ctx *UserContext, idInspection int64, fro
 
 	return s.repo.UpdateEtatInspection(ctx, idInspection, toEtat)
 }
+
+func (s *Service) AddFavoriToInspection(ctx *UserContext, idInspection int64) error {
+	return s.repo.AddFavoriToInspection(ctx, idInspection)
+}
+
+func (s *Service) RemoveFavoriToInspection(ctx *UserContext, idInspection int64) error {
+	return s.repo.RemoveFavoriToInspection(ctx, idInspection)
+}

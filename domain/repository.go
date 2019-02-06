@@ -22,6 +22,8 @@ type Repository interface {
 	GetInspectionByID(ctx *UserContext, id int64) (*models.Inspection, error)
 	CheckEtatInspection(idInspection int64, etats []models.EtatInspection) (bool, error)
 	UpdateEtatInspection(ctx *UserContext, id int64, etat models.EtatInspection) error
+	AddFavoriToInspection(ctx *UserContext, idInspection int64) error
+	RemoveFavoriToInspection(ctx *UserContext, idInspection int64) error
 	CheckCanCreateSuite(ctx *UserContext, idInspection int64) (bool, error)
 	CheckCanDeleteSuite(ctx *UserContext, idInspection int64) (bool, error)
 

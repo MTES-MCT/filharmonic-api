@@ -72,6 +72,8 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.POST("/inspections/:id/suite", s.addSuite)
 		authorized.PUT("/inspections/:id/suite", s.updateSuite)
 		authorized.DELETE("/inspections/:id/suite", s.deleteSuite)
+		authorized.POST("/inspections/:id/favori", s.addFavoriToInspection)
+		authorized.DELETE("/inspections/:id/favori", s.removeFavoriToInspection)
 		authorized.PUT("/pointsdecontrole/:id", s.updatePointDeControle)
 		authorized.POST("/pointsdecontrole/:id/constat", s.addConstat)
 		authorized.DELETE("/pointsdecontrole/:id/constat", s.deleteConstat)

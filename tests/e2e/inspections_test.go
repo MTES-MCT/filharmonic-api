@@ -287,3 +287,49 @@ func TestRejectInspection(t *testing.T) {
 
 	inspection.ValueEqual("etat", models.EtatEnCours)
 }
+
+func TestAddFavoriToInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthInspecteur(e.POST("/inspections/{id}/favori")).WithPath("id", 2).
+		Expect().
+		Status(http.StatusOK)
+
+	user := tests.AuthInspecteur(e.GET("/user")).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	user.ValueEqual("id", 3)
+	user.ValueEqual("email", "inspecteur1@filharmonic.com")
+	user.ValueEqual("profile", "inspecteur")
+	favoris := user.Value("favoris").Array()
+	favoris.Length().Equal(2)
+	favori := favoris.Last().Object()
+	favori.NotContainsKey("inspecteurs")
+	favori.NotContainsKey("commentaires")
+	favori.NotContainsKey("points_de_controle")
+	favori.NotContainsKey("suite")
+	favori.ValueEqual("id", 2)
+	favori.ValueEqual("date", "2018-11-15")
+	etablissement := favori.Value("etablissement").Object()
+	etablissement.ValueEqual("adresse", "1 rue des cordeliers 69000 Lyon")
+	etablissement.ValueEqual("nom", "Nom 3")
+}
+func TestRemoveFavoriToInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthInspecteur(e.DELETE("/inspections/{id}/favori")).WithPath("id", 1).
+		Expect().
+		Status(http.StatusOK)
+
+	user := tests.AuthInspecteur(e.GET("/user")).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	user.ValueEqual("id", 3)
+	user.ValueEqual("email", "inspecteur1@filharmonic.com")
+	user.ValueEqual("profile", "inspecteur")
+	user.NotContainsKey("favoris")
+}

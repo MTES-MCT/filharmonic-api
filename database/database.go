@@ -41,6 +41,7 @@ var tables = []interface{}{
 	&models.Message{},
 	&models.PieceJointe{},
 	&models.InspectionToInspecteur{},
+	&models.UserToFavori{},
 }
 
 func New(config Config) (*Database, error) {

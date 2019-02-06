@@ -104,24 +104,28 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Etablissement{
 			// Id:      1,
 			S3IC:    "1234",
+			Nom:     "Nom 1",
 			Raison:  "Raison sociale",
 			Adresse: "1 rue des fleurs 75000 Paris",
 		},
 		&models.Etablissement{
 			// Id:      2,
 			S3IC:    "451267",
+			Nom:     "Nom 2",
 			Raison:  "Raison sociale 2",
 			Adresse: "1 rue des plantes 44000 Nantes",
 		},
 		&models.Etablissement{
 			// Id:      3,
 			S3IC:    "3335655",
+			Nom:     "Nom 3",
 			Raison:  "Raison sociale 3",
 			Adresse: "1 rue des cordeliers 69000 Lyon",
 		},
 		&models.Etablissement{
 			// Id:      4,
 			S3IC:    "4444213",
+			Nom:     "Nom 4",
 			Raison:  "Raison sociale 4",
 			Adresse: "1 place de l'église 63000 Clermont-Ferrand",
 		},
@@ -252,6 +256,21 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 	}
 	err = db.Insert(inspectionToInspecteurs...)
+	if err != nil {
+		return err
+	}
+
+	userToFavoris := []interface{}{
+		&models.UserToFavori{
+			InspectionId: 1,
+			UserId:       3,
+		},
+		&models.UserToFavori{
+			InspectionId: 1,
+			UserId:       1,
+		},
+	}
+	err = db.Insert(userToFavoris...)
 	if err != nil {
 		return err
 	}

@@ -137,3 +137,17 @@ func (repo *Repository) UpdateEtatInspection(ctx *domain.UserContext, id int64, 
 	_, err := repo.db.client.Model(&inspection).Column(columns...).WherePK().Update()
 	return err
 }
+
+func (repo *Repository) AddFavoriToInspection(ctx *domain.UserContext, idInspection int64) error {
+	return repo.db.client.Insert(&models.UserToFavori{
+		InspectionId: idInspection,
+		UserId:       ctx.User.Id,
+	})
+}
+
+func (repo *Repository) RemoveFavoriToInspection(ctx *domain.UserContext, idInspection int64) error {
+	return repo.db.client.Delete(&models.UserToFavori{
+		InspectionId: idInspection,
+		UserId:       ctx.User.Id,
+	})
+}
