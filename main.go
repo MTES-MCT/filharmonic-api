@@ -6,12 +6,13 @@ import (
 	"os/signal"
 
 	"github.com/MTES-MCT/filharmonic-api/app"
-	"github.com/MTES-MCT/filharmonic-api/database/icpe"
+	"github.com/MTES-MCT/filharmonic-api/database/importcsv"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
 	importEtablissements := flag.String("import-etablissements", "", "Importe des établissements à partir d'un CSV")
+	importInspecteurs := flag.String("import-inspecteurs", "", "Importe des inspecteurs à partir d'un CSV")
 	flag.Parse()
 
 	config := app.LoadConfig()
@@ -22,7 +23,15 @@ func main() {
 	}
 
 	if *importEtablissements != "" {
-		err = icpe.LoadEtablissementsCSV(*importEtablissements, application.DB)
+		err = importcsv.LoadEtablissementsCSV(*importEtablissements, application.DB)
+		if err != nil {
+			log.Fatal().Err(err).Msg("could not import CSV")
+		}
+		os.Exit(0)
+	}
+
+	if *importInspecteurs != "" {
+		err = importcsv.LoadInspecteursCSV(*importInspecteurs, application.DB)
 		if err != nil {
 			log.Fatal().Err(err).Msg("could not import CSV")
 		}

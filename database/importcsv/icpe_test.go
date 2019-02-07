@@ -1,4 +1,4 @@
-package icpe
+package importcsv
 
 import (
 	"testing"

@@ -3,7 +3,7 @@ package integration
 import (
 	"testing"
 
-	"github.com/MTES-MCT/filharmonic-api/database/icpe"
+	"github.com/MTES-MCT/filharmonic-api/database/importcsv"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/tests"
 )
@@ -20,7 +20,7 @@ func TestLoadEtablissementsFromCSV(t *testing.T) {
 		Adresse:  "PLACE DE LA LAITERIE 56000 VANNES",
 	}))
 
-	err := icpe.LoadEtablissementsCSV("s3ic_ic_gen_fabnum.mini.csv", application.DB)
+	err := importcsv.LoadEtablissementsCSV("s3ic_ic_gen_fabnum.mini.csv", application.DB)
 	assert.NoError(err)
 	etablissements, err := application.Repo.ListEtablissements()
 	assert.NoError(err)

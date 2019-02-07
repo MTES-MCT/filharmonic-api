@@ -1,4 +1,4 @@
-package icpe
+package importcsv
 
 import (
 	"bufio"
@@ -12,21 +12,22 @@ import (
 )
 
 const (
-	indexCodeBase   = 0
-	indexCodeEtab   = 1
-	indexNom        = 2
-	indexCodePostal = 6
-	indexActivite   = 8
-	indexCommune    = 9
-	indexSeveso     = 10
-	indexIedmtd     = 13
-	indexAdresse1   = 15
-	indexAdresse2   = 16
-
 	batchSize = 2000
 )
 
 func LoadEtablissementsCSV(filepath string, db *database.Database) error {
+	indexesEtablissement := map[string]int{
+		"codeBase":   0,
+		"codeEtab":   1,
+		"nom":        2,
+		"codePostal": 6,
+		"activite":   8,
+		"commune":    9,
+		"seveso":     10,
+		"iedmtd":     13,
+		"adresse1":   15,
+		"adresse2":   16,
+	}
 	file, err := os.Open(filepath) // #nosec
 	if err != nil {
 		return err
@@ -55,13 +56,13 @@ func LoadEtablissementsCSV(filepath string, db *database.Database) error {
 				return err
 			}
 			etablissement := models.Etablissement{
-				S3IC:     computeS3IC(line[indexCodeBase], line[indexCodeEtab]),
-				Nom:      line[indexNom],
-				Raison:   line[indexNom],
-				Activite: line[indexActivite],
-				Seveso:   line[indexSeveso],
-				Iedmtd:   toBool(line[indexIedmtd]),
-				Adresse:  line[indexAdresse1] + " " + line[indexAdresse2] + " " + line[indexCodePostal] + " " + line[indexCommune],
+				S3IC:     computeS3IC(line[indexesEtablissement["codeBase"]], line[indexesEtablissement["codeEtab"]]),
+				Nom:      line[indexesEtablissement["nom"]],
+				Raison:   line[indexesEtablissement["nom"]],
+				Activite: line[indexesEtablissement["activite"]],
+				Seveso:   line[indexesEtablissement["seveso"]],
+				Iedmtd:   toBool(line[indexesEtablissement["iedmtd"]]),
+				Adresse:  line[indexesEtablissement["adresse1"]] + " " + line[indexesEtablissement["adresse2"]] + " " + line[indexesEtablissement["codePostal"]] + " " + line[indexesEtablissement["commune"]],
 			}
 			etablissements = append(etablissements, etablissement)
 			iterations++

@@ -425,11 +425,15 @@
   revision = "2be51725563103c17124a318f1745b66f2347acb"
 
 [[projects]]
-  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
+  digest = "1:40f92575285479681e674ccca7a605e38bebc27c9fdb51b75ff763e3c9f3cd5a"
   name = "golang.org/x/text"
   packages = [
     "collate",
     "collate/build",
+    "encoding",
+    "encoding/charmap",
+    "encoding/internal",
+    "encoding/internal/identifier",
     "internal/colltab",
     "internal/gen",
     "internal/tag",
@@ -497,6 +501,7 @@
     "github.com/rs/zerolog/log",
     "github.com/stretchr/testify/mock",
     "github.com/stretchr/testify/require",
+    "golang.org/x/text/encoding/charmap",
     "gopkg.in/gavv/httpexpect.v1",
   ]
   solver-name = "gps-cdcl"
