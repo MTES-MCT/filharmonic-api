@@ -516,5 +516,50 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 	}
 	err = db.Insert(piecesJointes...)
-	return err
+	if err != nil {
+		return err
+	}
+
+	evenements := []interface{}{
+		&models.Evenement{
+			//Id: 1,
+			Type:         models.CreationMessage,
+			AuteurId:     3,
+			InspectionId: 1,
+			CreatedAt:    util.DateTime("2018-09-16T14:00:00"),
+			Data:         `{"messageId": 1, "pointDeControleId": 1}`,
+		},
+		&models.Evenement{
+			//Id: 2,
+			Type:         models.CommentaireGeneral,
+			AuteurId:     3,
+			InspectionId: 2,
+			CreatedAt:    util.DateTime("2018-11-14T08:50:00"),
+			Data:         `{"messageId": 2}`,
+		},
+	}
+
+	err = db.Insert(evenements...)
+	if err != nil {
+		return err
+	}
+
+	notifications := []interface{}{
+		&models.Notification{
+			//Id: 1,
+			CreatedAt:   util.DateTime("2018-11-14T08:50:00"),
+			Lue:         false,
+			LecteurId:   3,
+			EvenementId: 1,
+		},
+		&models.Notification{
+			//Id: 2,
+			CreatedAt:   util.DateTime("2018-11-14T08:50:00"),
+			Lue:         false,
+			LecteurId:   3,
+			EvenementId: 2,
+		},
+	}
+
+	return db.Insert(notifications...)
 }

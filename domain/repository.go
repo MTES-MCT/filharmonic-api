@@ -56,6 +56,9 @@ type Repository interface {
 
 	GetPieceJointe(ctx *UserContext, id int64) (*models.PieceJointe, error)
 	CreatePieceJointe(pieceJointe models.PieceJointe) (int64, error)
+
+	ListNotifications(filter ListNotificationsFilter) ([]models.Notification, error)
+	CreateNotification(notification models.Notification) (int64, error)
 }
 
 type Storage interface {

@@ -42,6 +42,8 @@ var tables = []interface{}{
 	&models.PieceJointe{},
 	&models.InspectionToInspecteur{},
 	&models.UserToFavori{},
+	&models.Evenement{},
+	&models.Notification{},
 }
 
 func New(config Config) (*Database, error) {
