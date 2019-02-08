@@ -87,7 +87,10 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.POST("/piecesjointes", s.createPieceJointe)
 		authorized.GET("/piecesjointes/:id", s.getPieceJointe)
 		authorized.POST("/notifications", s.createNotification)
+		authorized.POST("/notifications/lire", s.lireNotifications)
 		authorized.GET("/notifications", s.listNotifications)
+		authorized.GET("/evenements", s.listEvenements)
+		authorized.GET("/evenements/:id", s.getEvenement)
 	}
 
 	s.server = &http.Server{

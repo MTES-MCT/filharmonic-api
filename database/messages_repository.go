@@ -1,6 +1,7 @@
 package database
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
@@ -24,9 +25,9 @@ func (repo *Repository) CreateMessage(ctx *domain.UserContext, idPointDeControle
 		messageId = message.Id
 		for _, pieceJointe := range message.PiecesJointes {
 			pieceJointe.MessageId = messageId
-			ok, err := repo.checkPieceJointeFree(tx, ctx, pieceJointe.Id)
-			if err != nil {
-				return err
+			ok, errCheck := repo.checkPieceJointeFree(tx, ctx, pieceJointe.Id)
+			if errCheck != nil {
+				return errCheck
 			}
 			if !ok {
 				return domain.ErrInvalidInput
@@ -35,6 +36,37 @@ func (repo *Repository) CreateMessage(ctx *domain.UserContext, idPointDeControle
 			if err != nil {
 				return err
 			}
+		}
+		pointDeControle := models.PointDeControle{
+			Id: idPointDeControle,
+		}
+		err = tx.Model(&pointDeControle).WherePK().Select()
+		if err != nil {
+			return err
+		}
+		var typeEvenement models.TypeEvenement
+		if message.Interne {
+			typeEvenement = models.CreationCommentaire
+		} else {
+			typeEvenement = models.CreationMessage
+		}
+		evenement := models.Evenement{
+			AuteurId:     ctx.User.Id,
+			CreatedAt:    time.Now(),
+			Type:         typeEvenement,
+			InspectionId: pointDeControle.InspectionId,
+			Data:         `{"message_id": ` + strconv.FormatInt(messageId, 10) + `, "point_de_controle_id": ` + strconv.FormatInt(idPointDeControle, 10) + `}`,
+		}
+		err = tx.Insert(&evenement)
+		if err != nil {
+			return err
+		}
+		notification := models.Notification{
+			EvenementId: evenement.Id,
+		}
+		err = tx.Insert(&notification)
+		if err != nil {
+			return err
 		}
 		return nil
 	})
@@ -55,12 +87,40 @@ func (repo *Repository) checkPieceJointeFree(tx *pg.Tx, ctx *domain.UserContext,
 }
 
 func (repo *Repository) LireMessage(ctx *domain.UserContext, idMessage int64) error {
-	message := models.Message{
-		Id: idMessage,
-		Lu: true,
-	}
-	columns := []string{"lu"}
-	_, err := repo.db.client.Model(&message).Column(columns...).WherePK().Update()
+	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
+		message := models.Message{
+			Id: idMessage,
+			Lu: true,
+		}
+		columns := []string{"lu"}
+		_, err := tx.Model(&message).Column(columns...).WherePK().Update()
+		if err != nil {
+			return err
+		}
+		err = tx.Model(&message).Relation("PointDeControle").WherePK().Select()
+		if err != nil {
+			return err
+		}
+		evenement := models.Evenement{
+			AuteurId:     ctx.User.Id,
+			CreatedAt:    time.Now(),
+			Type:         models.LectureMessage,
+			InspectionId: message.PointDeControle.InspectionId,
+			Data:         `{"message_id": ` + strconv.FormatInt(idMessage, 10) + `, "point_de_controle_id": ` + strconv.FormatInt(message.PointDeControleId, 10) + `}`,
+		}
+		err = tx.Insert(&evenement)
+		if err != nil {
+			return err
+		}
+		notification := models.Notification{
+			EvenementId: evenement.Id,
+		}
+		err = tx.Insert(&notification)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 	return err
 }
 

@@ -36,6 +36,7 @@ const (
 	EtatEnCours           EtatInspection = "en_cours"
 	EtatAttenteValidation EtatInspection = "attente_validation"
 	EtatValide            EtatInspection = "valide"
+	EtatNonValide         EtatInspection = "non_valide"
 )
 
 type Inspection struct {

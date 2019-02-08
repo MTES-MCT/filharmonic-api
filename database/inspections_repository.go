@@ -1,6 +1,9 @@
 package database
 
 import (
+	"errors"
+	"time"
+
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
@@ -43,6 +46,23 @@ func (repo *Repository) CreateInspection(ctx *domain.UserContext, inspection mod
 			}
 		}
 		inspectionId = inspection.Id
+		evenement := models.Evenement{
+			AuteurId:     ctx.User.Id,
+			CreatedAt:    time.Now(),
+			Type:         models.CreationInspection,
+			InspectionId: inspectionId,
+		}
+		err = tx.Insert(&evenement)
+		if err != nil {
+			return err
+		}
+		notification := models.Notification{
+			EvenementId: evenement.Id,
+		}
+		err = tx.Insert(&notification)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 	return inspectionId, err
@@ -67,6 +87,23 @@ func (repo *Repository) UpdateInspection(ctx *domain.UserContext, inspection mod
 			if err != nil {
 				return err
 			}
+		}
+		evenement := models.Evenement{
+			AuteurId:     ctx.User.Id,
+			CreatedAt:    time.Now(),
+			Type:         models.ModificationInspection,
+			InspectionId: inspection.Id,
+		}
+		err = tx.Insert(&evenement)
+		if err != nil {
+			return err
+		}
+		notification := models.Notification{
+			EvenementId: evenement.Id,
+		}
+		err = tx.Insert(&notification)
+		if err != nil {
+			return err
 		}
 		return nil
 	})
@@ -134,8 +171,45 @@ func (repo *Repository) UpdateEtatInspection(ctx *domain.UserContext, id int64, 
 		Etat: etat,
 	}
 	columns := []string{"etat"}
-	_, err := repo.db.client.Model(&inspection).Column(columns...).WherePK().Update()
-	return err
+
+	return repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
+		_, err := tx.Model(&inspection).Column(columns...).WherePK().Update()
+		if err != nil {
+			return err
+		}
+		var typeEvenement models.TypeEvenement
+		switch etat {
+		case models.EtatEnCours:
+			typeEvenement = models.PublicationInspection
+		case models.EtatAttenteValidation:
+			typeEvenement = models.DemandeValidationInspection
+		case models.EtatValide:
+			typeEvenement = models.ValidationInspection
+		case models.EtatNonValide:
+			typeEvenement = models.RejetValidationInspection
+		default:
+			err = errors.New("etat unknown")
+			return err
+		}
+		evenement := models.Evenement{
+			AuteurId:     ctx.User.Id,
+			CreatedAt:    time.Now(),
+			Type:         typeEvenement,
+			InspectionId: inspection.Id,
+		}
+		err = tx.Insert(&evenement)
+		if err != nil {
+			return err
+		}
+		notification := models.Notification{
+			EvenementId: evenement.Id,
+		}
+		err = tx.Insert(&notification)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (repo *Repository) AddFavoriToInspection(ctx *domain.UserContext, idInspection int64) error {

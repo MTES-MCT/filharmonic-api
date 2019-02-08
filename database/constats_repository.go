@@ -1,6 +1,9 @@
 package database
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
@@ -20,8 +23,29 @@ func (repo *Repository) CreateConstat(ctx *domain.UserContext, idPointDeControle
 			ConstatId: constatId,
 		}
 		columns := []string{"constat_id"}
-		_, err = tx.Model(&pointDeControle).Column(columns...).WherePK().Update()
-		return err
+		_, err = tx.Model(&pointDeControle).Column(columns...).WherePK().Returning("inspection_id").Update()
+		if err != nil {
+			return err
+		}
+		evenement := models.Evenement{
+			AuteurId:     ctx.User.Id,
+			CreatedAt:    time.Now(),
+			Type:         models.CreationConstat,
+			InspectionId: pointDeControle.InspectionId,
+			Data:         `{"constat_id": ` + strconv.FormatInt(constat.Id, 10) + `, "point_de_controle_id": ` + strconv.FormatInt(idPointDeControle, 10) + `}`,
+		}
+		err = tx.Insert(&evenement)
+		if err != nil {
+			return err
+		}
+		notification := models.Notification{
+			EvenementId: evenement.Id,
+		}
+		err = tx.Insert(&notification)
+		if err != nil {
+			return err
+		}
+		return nil
 	})
 	return constatId, err
 }
@@ -31,14 +55,36 @@ func (repo *Repository) DeleteConstat(ctx *domain.UserContext, idPointDeControle
 		pointDeControle := models.PointDeControle{
 			Id: idPointDeControle,
 		}
-		err := tx.Model(&pointDeControle).Column("constat_id").WherePK().Select()
+		err := tx.Model(&pointDeControle).Column("constat_id", "inspection_id").WherePK().Select()
 		if err != nil {
 			return err
 		}
 		constat := models.Constat{
 			Id: pointDeControle.ConstatId,
 		}
-		return tx.Delete(&constat)
+		err = tx.Delete(&constat)
+		if err != nil {
+			return err
+		}
+		evenement := models.Evenement{
+			AuteurId:     ctx.User.Id,
+			CreatedAt:    time.Now(),
+			Type:         models.SuppressionConstat,
+			InspectionId: pointDeControle.InspectionId,
+			Data:         `{"constat_id": ` + strconv.FormatInt(pointDeControle.ConstatId, 10) + `, "point_de_controle_id": ` + strconv.FormatInt(idPointDeControle, 10) + `}`,
+		}
+		err = tx.Insert(&evenement)
+		if err != nil {
+			return err
+		}
+		notification := models.Notification{
+			EvenementId: evenement.Id,
+		}
+		err = tx.Insert(&notification)
+		if err != nil {
+			return err
+		}
+		return nil
 	})
 	return err
 }

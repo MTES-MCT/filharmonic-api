@@ -13,18 +13,19 @@ func TestListNotifications(t *testing.T) {
 	defer close()
 
 	notifications := tests.AuthInspecteur(e.GET("/notifications")).
+		WithQuery("lue", "false").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array()
 
-	notifications.Length().Equal(2)
+	notifications.Length().Equal(3)
 	firstNotification := notifications.First().Object()
 	firstNotification.ValueEqual("id", 1)
 	firstNotification.ValueEqual("lue", false)
-	lecteur := firstNotification.Value("lecteur").Object()
-	lecteur.ValueEqual("id", 3)
 	evenement := firstNotification.Value("evenement").Object()
 	evenement.ValueEqual("id", 1)
+	auteur := evenement.Value("auteur").Object()
+	auteur.ValueEqual("id", 3)
 }
 
 func TestCreateNotification(t *testing.T) {
@@ -32,7 +33,7 @@ func TestCreateNotification(t *testing.T) {
 	defer close()
 
 	notificationInput := models.Notification{
-		EvenementId: 3,
+		EvenementId: 4,
 	}
 
 	tests.AuthInspecteur(e.POST("/notifications")).WithJSON(notificationInput).
@@ -43,12 +44,49 @@ func TestCreateNotification(t *testing.T) {
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array()
-	notifications.Length().Equal(3)
+	notifications.Length().Equal(4)
 	lastNotification := notifications.Last().Object()
-	lastNotification.ValueEqual("id", 3)
+	lastNotification.ValueEqual("id", 4)
 	lastNotification.ValueEqual("lue", false)
-	lecteur := lastNotification.Value("lecteur").Object()
-	lecteur.ValueEqual("id", 1)
 	evenement := lastNotification.Value("evenement").Object()
-	evenement.ValueEqual("id", 3)
+	evenement.ValueEqual("id", 4)
+	auteur := evenement.Value("auteur").Object()
+	auteur.ValueEqual("id", 3)
+}
+
+func TestLireNotificationsAllowedInspecteur(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	ids := []interface{}{1, 2}
+
+	tests.AuthInspecteur(e.POST("/notifications/lire")).WithJSON(ids).
+		Expect().
+		Status(http.StatusOK)
+
+	notifications := tests.AuthInspecteur(e.GET("/notifications")).
+		WithQuery("lue", "true").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+	notifications.Length().Equal(2)
+	lastNotification := notifications.Last().Object()
+	lastNotification.ValueEqual("id", 2)
+	lecteur := lastNotification.Value("lecteur").Object()
+	lecteur.ValueEqual("id", 3)
+	evenement := lastNotification.Value("evenement").Object()
+	evenement.ValueEqual("id", 2)
+	auteur := evenement.Value("auteur").Object()
+	auteur.ValueEqual("id", 3)
+}
+
+func TestLireNotificationsDisallowedExploitant(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	ids := []interface{}{1, 2}
+
+	tests.AuthExploitant(e.POST("/notifications/lire")).WithJSON(ids).
+		Expect().
+		Status(http.StatusBadRequest)
 }

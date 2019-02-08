@@ -17,7 +17,7 @@ func (server *HttpServer) listNotifications(c *gin.Context) {
 		})
 		return
 	}
-	notifications, err := server.service.ListNotifications(server.retrieveUserContext(c), filter)
+	notifications, err := server.service.ListNotifications(server.retrieveUserContext(c), &filter)
 	if err != nil {
 		log.Error().Err(err).Msg("Bad service response")
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -46,5 +46,26 @@ func (server *HttpServer) createNotification(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"id": notificationId,
+	})
+}
+
+func (server *HttpServer) lireNotifications(c *gin.Context) {
+	ids := []int64{}
+	if err := c.ShouldBindJSON(&ids); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	err := server.service.LireNotifications(server.retrieveUserContext(c), ids)
+	if err != nil {
+		log.Error().Err(err).Msg("Bad service response")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "read",
 	})
 }

@@ -522,7 +522,7 @@ func SeedsTestDB(db *pg.DB) error {
 
 	evenements := []interface{}{
 		&models.Evenement{
-			//Id: 1,
+			// Id:        1,
 			Type:         models.CreationMessage,
 			AuteurId:     3,
 			InspectionId: 1,
@@ -530,12 +530,26 @@ func SeedsTestDB(db *pg.DB) error {
 			Data:         `{"messageId": 1, "pointDeControleId": 1}`,
 		},
 		&models.Evenement{
-			//Id: 2,
+			// Id:        2,
 			Type:         models.CommentaireGeneral,
 			AuteurId:     3,
 			InspectionId: 2,
 			CreatedAt:    util.DateTime("2018-11-14T08:50:00"),
 			Data:         `{"messageId": 2}`,
+		},
+		&models.Evenement{
+			// Id:        3,
+			Type:         models.ModificationInspection,
+			AuteurId:     3,
+			InspectionId: 2,
+			CreatedAt:    util.DateTime("2019-05-07T18:42:20"),
+		},
+		&models.Evenement{
+			// Id:        4,
+			Type:         models.LectureMessage,
+			AuteurId:     3,
+			InspectionId: 3,
+			CreatedAt:    util.DateTime("2019-05-07T18:42:20"),
 		},
 	}
 
@@ -546,18 +560,22 @@ func SeedsTestDB(db *pg.DB) error {
 
 	notifications := []interface{}{
 		&models.Notification{
-			//Id: 1,
-			CreatedAt:   util.DateTime("2018-11-14T08:50:00"),
+			// Id:       1,
+			ReadAt:      util.DateTime("2018-11-14T08:50:00"),
 			Lue:         false,
-			LecteurId:   3,
 			EvenementId: 1,
 		},
 		&models.Notification{
-			//Id: 2,
-			CreatedAt:   util.DateTime("2018-11-14T08:50:00"),
+			// Id:       2,
+			ReadAt:      util.DateTime("2018-11-14T08:50:00"),
 			Lue:         false,
-			LecteurId:   3,
 			EvenementId: 2,
+		},
+		&models.Notification{
+			// Id:       3,
+			ReadAt:      util.DateTime("2018-11-14T08:50:00"),
+			Lue:         false,
+			EvenementId: 3,
 		},
 	}
 

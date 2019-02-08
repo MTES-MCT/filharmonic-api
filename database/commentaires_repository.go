@@ -1,6 +1,7 @@
 package database
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
@@ -22,9 +23,9 @@ func (repo *Repository) CreateCommentaire(ctx *domain.UserContext, idInspection 
 		commentaireId = commentaire.Id
 		for _, pieceJointe := range commentaire.PiecesJointes {
 			pieceJointe.CommentaireId = commentaireId
-			ok, err := repo.checkPieceJointeFree(tx, ctx, pieceJointe.Id)
-			if err != nil {
-				return err
+			ok, errCheck := repo.checkPieceJointeFree(tx, ctx, pieceJointe.Id)
+			if errCheck != nil {
+				return errCheck
 			}
 			if !ok {
 				return domain.ErrInvalidInput
@@ -33,6 +34,24 @@ func (repo *Repository) CreateCommentaire(ctx *domain.UserContext, idInspection 
 			if err != nil {
 				return err
 			}
+		}
+		evenement := models.Evenement{
+			AuteurId:     ctx.User.Id,
+			CreatedAt:    time.Now(),
+			Type:         models.CommentaireGeneral,
+			InspectionId: idInspection,
+			Data:         `{"commentaire_id": ` + strconv.FormatInt(commentaireId, 10) + `}`,
+		}
+		err = tx.Insert(&evenement)
+		if err != nil {
+			return err
+		}
+		notification := models.Notification{
+			EvenementId: evenement.Id,
+		}
+		err = tx.Insert(&notification)
+		if err != nil {
+			return err
 		}
 		return nil
 	})

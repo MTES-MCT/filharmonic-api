@@ -6,9 +6,9 @@ type TypeEvenement string
 
 const (
 	CreationMessage             TypeEvenement = "message"
+	CreationCommentaire         TypeEvenement = "commentaire"
 	LectureMessage              TypeEvenement = "lecture_message"
 	CommentaireGeneral          TypeEvenement = "commentaire_general"
-	CreationCommentaire         TypeEvenement = "commentaire"
 	CreationInspection          TypeEvenement = "creation_inspection"
 	ModificationInspection      TypeEvenement = "modification_inspection"
 	PublicationInspection       TypeEvenement = "publication_inspection"
@@ -28,10 +28,10 @@ const (
 
 type Notification struct {
 	Id          int64     `json:"id"`
-	CreatedAt   time.Time `json:"created_at"`
+	ReadAt      time.Time `json:"read_at"`
 	Lue         bool      `json:"lue" sql:",notnull"`
-	EvenementId int64     `json:"-" sql:",notnull"`
-	LecteurId   int64     `json:"-" sql:",notnull"`
+	EvenementId int64     `json:"evenement_id" sql:",notnull"`
+	LecteurId   int64     `json:"lecteur_id"`
 
 	Lecteur   *User      `json:"lecteur,omitempty"`
 	Evenement *Evenement `json:"evenement,omitempty"`
@@ -42,9 +42,9 @@ type Evenement struct {
 	Type         TypeEvenement `json:"type"`
 	CreatedAt    time.Time     `json:"created_at"`
 	Data         string        `json:"data" sql:"type:json"`
-	AuteurId     int64         `json:"-" sql:",notnull"`
-	InspectionId int64         `json:"-" sql:",notnull"`
+	AuteurId     int64         `json:"auteur_id" sql:",notnull"`
+	InspectionId int64         `json:"inspection_id" sql:",notnull"`
 
-	Auteur     *User       `json:"-"`
+	Auteur     *User       `json:"auteur,omitempty"`
 	Inspection *Inspection `json:"-"`
 }
