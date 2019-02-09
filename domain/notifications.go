@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"time"
+
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
@@ -38,5 +40,10 @@ func (s *Service) LireNotifications(ctx *UserContext, ids []int64) error {
 	if !ok {
 		return ErrInvalidInput
 	}
-	return s.repo.UpdateNotifications(ctx, ids)
+	notification := models.Notification{
+		Lue:       true,
+		LecteurId: ctx.User.Id,
+		ReadAt:    time.Now(),
+	}
+	return s.repo.UpdateNotifications(ctx, notification, ids)
 }

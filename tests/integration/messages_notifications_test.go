@@ -34,7 +34,7 @@ func TestCreateMessageHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.CreationMessage, notification.Evenement.Type)
 	assert.Equal(int64(1), notification.Evenement.InspectionId)
@@ -50,7 +50,7 @@ func TestCreateMessageHasCreatedNotification(t *testing.T) {
 	notifications, err = application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(5, len(notifications))
-	notification = notifications[len(notifications)-1]
+	notification = notifications[0]
 	assert.Equal(int64(5), notification.Id)
 	assert.Equal(models.CreationCommentaire, notification.Evenement.Type)
 	assert.Equal(int64(1), notification.Evenement.InspectionId)
@@ -74,7 +74,7 @@ func TestLireMessageHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.LectureMessage, notification.Evenement.Type)
 	assert.Equal(int64(2), notification.Evenement.InspectionId)

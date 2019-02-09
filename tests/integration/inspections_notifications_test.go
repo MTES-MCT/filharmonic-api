@@ -40,7 +40,7 @@ func TestCreateInspectionHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.CreationInspection, notification.Evenement.Type)
 	assert.Equal(idInspection, notification.Evenement.InspectionId)
@@ -67,7 +67,7 @@ func TestUpdateInspectionHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.ModificationInspection, notification.Evenement.Type)
 	assert.Equal(int64(1), notification.Evenement.InspectionId)
@@ -91,7 +91,7 @@ func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.PublicationInspection, notification.Evenement.Type)
 	assert.Equal(inspectionId, notification.Evenement.InspectionId)
@@ -103,7 +103,7 @@ func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
 	notifications, err = application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(5, len(notifications))
-	notification = notifications[len(notifications)-1]
+	notification = notifications[0]
 	assert.Equal(int64(5), notification.Id)
 	assert.Equal(models.DemandeValidationInspection, notification.Evenement.Type)
 	assert.Equal(inspectionId, notification.Evenement.InspectionId)
@@ -115,7 +115,7 @@ func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
 	notifications, err = application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(6, len(notifications))
-	notification = notifications[len(notifications)-1]
+	notification = notifications[0]
 	assert.Equal(int64(6), notification.Id)
 	assert.Equal(models.RejetValidationInspection, notification.Evenement.Type)
 	assert.Equal(inspectionId, notification.Evenement.InspectionId)
@@ -127,7 +127,7 @@ func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
 	notifications, err = application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(7, len(notifications))
-	notification = notifications[len(notifications)-1]
+	notification = notifications[0]
 	assert.Equal(int64(7), notification.Id)
 	assert.Equal(models.ValidationInspection, notification.Evenement.Type)
 	assert.Equal(inspectionId, notification.Evenement.InspectionId)

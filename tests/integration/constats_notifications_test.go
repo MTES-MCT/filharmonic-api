@@ -34,7 +34,7 @@ func TestCreateConstatHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.CreationConstat, notification.Evenement.Type)
 	assert.Equal(int64(1), notification.Evenement.InspectionId)
@@ -59,7 +59,7 @@ func TestDeleteConstatHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.SuppressionConstat, notification.Evenement.Type)
 	assert.Equal(int64(4), notification.Evenement.InspectionId)

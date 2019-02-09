@@ -542,14 +542,14 @@ func SeedsTestDB(db *pg.DB) error {
 			Type:         models.ModificationInspection,
 			AuteurId:     3,
 			InspectionId: 2,
-			CreatedAt:    util.DateTime("2019-05-07T18:42:20"),
+			CreatedAt:    util.DateTime("2018-12-07T18:42:20"),
 		},
 		&models.Evenement{
 			// Id:        4,
 			Type:         models.LectureMessage,
 			AuteurId:     3,
 			InspectionId: 3,
-			CreatedAt:    util.DateTime("2019-05-07T18:42:20"),
+			CreatedAt:    util.DateTime("2019-01-07T18:42:20"),
 		},
 	}
 
@@ -561,19 +561,16 @@ func SeedsTestDB(db *pg.DB) error {
 	notifications := []interface{}{
 		&models.Notification{
 			// Id:       1,
-			ReadAt:      util.DateTime("2018-11-14T08:50:00"),
 			Lue:         false,
 			EvenementId: 1,
 		},
 		&models.Notification{
 			// Id:       2,
-			ReadAt:      util.DateTime("2018-11-14T08:50:00"),
 			Lue:         false,
 			EvenementId: 2,
 		},
 		&models.Notification{
 			// Id:       3,
-			ReadAt:      util.DateTime("2018-11-14T08:50:00"),
 			Lue:         false,
 			EvenementId: 3,
 		},

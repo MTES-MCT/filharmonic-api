@@ -30,7 +30,7 @@ func TestAddCommentaireHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.CommentaireGeneral, notification.Evenement.Type)
 	assert.Equal(`{"commentaire_id": 4}`, notification.Evenement.Data)

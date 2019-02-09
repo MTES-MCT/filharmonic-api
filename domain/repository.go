@@ -59,7 +59,7 @@ type Repository interface {
 
 	ListNotifications(ctx *UserContext, filter *ListNotificationsFilter) ([]models.Notification, error)
 	CreateNotification(ctx *UserContext, notification models.Notification) (int64, error)
-	UpdateNotifications(ctx *UserContext, ids []int64) error
+	UpdateNotifications(ctx *UserContext, notification models.Notification, ids []int64) error
 	CheckUserAllowedNotifications(ctx *UserContext, ids []int64) (bool, error)
 	ListEvenements(ctx *UserContext, filter ListEvenementsFilter) ([]models.Evenement, error)
 	GetEvenementByID(ctx *UserContext, id int64) (*models.Evenement, error)

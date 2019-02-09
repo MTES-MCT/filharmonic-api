@@ -15,7 +15,7 @@ func (repo *Repository) ListNotifications(ctx *domain.UserContext, filter *domai
 	if filter != nil {
 		query.Where("lue is ?", filter.Lue)
 	}
-	err := query.Select()
+	err := query.OrderExpr("evenement.created_at DESC").Select()
 	return notifications, err
 }
 
@@ -24,11 +24,7 @@ func (repo *Repository) CreateNotification(ctx *domain.UserContext, notification
 	return notification.Id, err
 }
 
-func (repo *Repository) UpdateNotifications(ctx *domain.UserContext, ids []int64) error {
-	notification := models.Notification{
-		Lue:       true,
-		LecteurId: ctx.User.Id,
-	}
+func (repo *Repository) UpdateNotifications(ctx *domain.UserContext, notification models.Notification, ids []int64) error {
 	_, err := repo.db.client.Model(&notification).Where("id in (?)", pg.In(ids)).Column("lue", "lecteur_id").Update()
 	return err
 }
@@ -49,7 +45,7 @@ func (repo *Repository) CheckUserAllowedNotifications(ctx *domain.UserContext, i
 			query.Where("notification.id in (?)", pg.In(ids))
 		}
 		count, err := query.Count()
-		return count > 1, err
+		return count > 0, err
 	} else {
 		query := repo.db.client.Model(&models.Notification{}).
 			Join("JOIN evenements AS evenement").
@@ -61,6 +57,6 @@ func (repo *Repository) CheckUserAllowedNotifications(ctx *domain.UserContext, i
 			query.Where("notification.id in (?)", pg.In(ids))
 		}
 		count, err := query.Count()
-		return count > 1, err
+		return count > 0, err
 	}
 }

@@ -35,7 +35,7 @@ func TestCreateSuiteHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.CreationSuite, notification.Evenement.Type)
 	assert.Equal(int64(4), notification.Evenement.InspectionId)
@@ -66,7 +66,7 @@ func TestUpdateSuiteHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.ModificationSuite, notification.Evenement.Type)
 	assert.Equal(idInspection, notification.Evenement.InspectionId)
@@ -91,7 +91,7 @@ func TestDeleteSuiteHasCreatedNotification(t *testing.T) {
 	notifications, err := application.Repo.ListNotifications(ctx, nil)
 	assert.NoError(err)
 	assert.Equal(4, len(notifications))
-	notification := notifications[len(notifications)-1]
+	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.SuppressionConstat, notification.Evenement.Type)
 	assert.Equal(idInspection, notification.Evenement.InspectionId)
