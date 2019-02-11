@@ -9,11 +9,11 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/util"
 )
 
-func TestListInspectionsOwnedByInspecteur(t *testing.T) {
+func TestListAllInspections(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	results := tests.AuthInspecteur(e.GET("/inspections")).
+	results := tests.AuthUser(e.GET("/inspections"), 4).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array()
@@ -22,6 +22,19 @@ func TestListInspectionsOwnedByInspecteur(t *testing.T) {
 	results.First().Object().Value("etablissement").Object().ValueEqual("id", 1)
 	results.Element(1).Object().ValueEqual("id", 2)
 	results.Element(1).Object().Value("etablissement").Object().ValueEqual("id", 3)
+}
+
+func TestListInspectionsOwnedByInspecteur(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	results := tests.AuthUser(e.GET("/inspections"), 4).WithQuery("assigned", "true").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+	results.Length().Equal(1)
+	results.First().Object().ValueEqual("id", 3)
+	results.First().Object().Value("etablissement").Object().ValueEqual("id", 4)
 }
 
 func TestListInspectionsOwnedByExploitant(t *testing.T) {

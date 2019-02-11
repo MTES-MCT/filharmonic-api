@@ -10,17 +10,19 @@ import (
 	"github.com/go-pg/pg/orm"
 )
 
-func (repo *Repository) ListInspections(ctx *domain.UserContext) ([]models.Inspection, error) {
+func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.ListInspectionsFilter) ([]models.Inspection, error) {
 	inspections := []models.Inspection{}
 	query := repo.db.client.Model(&inspections).Relation("Etablissement")
-	if ctx.IsInspecteur() {
-		query.Join("JOIN inspection_to_inspecteurs AS u").
-			JoinOn("u.inspection_id = inspection.id").
-			JoinOn("u.user_id = ?", ctx.User.Id)
-	} else if ctx.IsExploitant() {
+	if ctx.IsExploitant() {
 		query.Join("JOIN etablissement_to_exploitants AS u").
 			JoinOn("u.etablissement_id = etablissement.id").
 			JoinOn("u.user_id = ?", ctx.User.Id)
+	} else {
+		if filter.Assigned {
+			query.Join("JOIN inspection_to_inspecteurs AS u").
+				JoinOn("u.inspection_id = inspection.id").
+				JoinOn("u.user_id = ?", ctx.User.Id)
+		}
 	}
 	err := query.Select()
 	return inspections, err

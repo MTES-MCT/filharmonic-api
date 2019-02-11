@@ -2,8 +2,12 @@ package domain
 
 import "github.com/MTES-MCT/filharmonic-api/models"
 
-func (s *Service) ListInspections(ctx *UserContext) ([]models.Inspection, error) {
-	return s.repo.ListInspections(ctx)
+type ListInspectionsFilter struct {
+	Assigned bool `form:"assigned"`
+}
+
+func (s *Service) ListInspections(ctx *UserContext, filter ListInspectionsFilter) ([]models.Inspection, error) {
+	return s.repo.ListInspections(ctx, filter)
 }
 
 func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error) {

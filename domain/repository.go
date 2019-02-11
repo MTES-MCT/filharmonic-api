@@ -16,7 +16,7 @@ type Repository interface {
 	CreateTheme(theme models.Theme) (int64, error)
 	DeleteTheme(idTheme int64) error
 
-	ListInspections(ctx *UserContext) ([]models.Inspection, error)
+	ListInspections(ctx *UserContext, filter ListInspectionsFilter) ([]models.Inspection, error)
 	CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error)
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64) (*models.Inspection, error)
