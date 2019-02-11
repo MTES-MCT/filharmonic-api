@@ -1,8 +1,6 @@
 package database
 
 import (
-	"strconv"
-	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
@@ -27,25 +25,11 @@ func (repo *Repository) CreateConstat(ctx *domain.UserContext, idPointDeControle
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.CreationConstat,
-			InspectionId: pointDeControle.InspectionId,
-			Data:         `{"constat_id": ` + strconv.FormatInt(constat.Id, 10) + `, "point_de_controle_id": ` + strconv.FormatInt(idPointDeControle, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, models.EvenementCreationConstat, pointDeControle.InspectionId, map[string]interface{}{
+			"constat_id":           constat.Id,
+			"point_de_controle_id": idPointDeControle,
+		})
+		return err
 	})
 	return constatId, err
 }
@@ -66,25 +50,11 @@ func (repo *Repository) DeleteConstat(ctx *domain.UserContext, idPointDeControle
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.SuppressionConstat,
-			InspectionId: pointDeControle.InspectionId,
-			Data:         `{"constat_id": ` + strconv.FormatInt(pointDeControle.ConstatId, 10) + `, "point_de_controle_id": ` + strconv.FormatInt(idPointDeControle, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, models.EvenementSuppressionConstat, pointDeControle.InspectionId, map[string]interface{}{
+			"constat_id":           pointDeControle.ConstatId,
+			"point_de_controle_id": idPointDeControle,
+		})
+		return err
 	})
 	return err
 }

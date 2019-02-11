@@ -1,7 +1,6 @@
 package database
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
@@ -46,29 +45,15 @@ func (repo *Repository) CreateMessage(ctx *domain.UserContext, idPointDeControle
 		}
 		var typeEvenement models.TypeEvenement
 		if message.Interne {
-			typeEvenement = models.CreationCommentaire
+			typeEvenement = models.EvenementCreationCommentaire
 		} else {
-			typeEvenement = models.CreationMessage
+			typeEvenement = models.EvenementCreationMessage
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         typeEvenement,
-			InspectionId: pointDeControle.InspectionId,
-			Data:         `{"message_id": ` + strconv.FormatInt(messageId, 10) + `, "point_de_controle_id": ` + strconv.FormatInt(idPointDeControle, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, typeEvenement, pointDeControle.InspectionId, map[string]interface{}{
+			"message_id":           messageId,
+			"point_de_controle_id": idPointDeControle,
+		})
+		return err
 	})
 	return messageId, err
 }
@@ -101,25 +86,11 @@ func (repo *Repository) LireMessage(ctx *domain.UserContext, idMessage int64) er
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.LectureMessage,
-			InspectionId: message.PointDeControle.InspectionId,
-			Data:         `{"message_id": ` + strconv.FormatInt(idMessage, 10) + `, "point_de_controle_id": ` + strconv.FormatInt(message.PointDeControleId, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, models.EvenementLectureMessage, message.PointDeControle.InspectionId, map[string]interface{}{
+			"message_id":           idMessage,
+			"point_de_controle_id": message.PointDeControleId,
+		})
+		return err
 	})
 	return err
 }

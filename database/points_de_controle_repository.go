@@ -1,9 +1,6 @@
 package database
 
 import (
-	"strconv"
-	"time"
-
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
@@ -17,25 +14,11 @@ func (repo *Repository) CreatePointDeControle(ctx *domain.UserContext, idInspect
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.CreationPointDeControle,
-			InspectionId: pointDeControle.InspectionId,
-			Data:         `{"point_de_controle_id": ` + strconv.FormatInt(pointDeControle.Id, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+
+		err = repo.CreateEvenement(tx, ctx, models.EvenementCreationPointDeControle, idInspection, map[string]interface{}{
+			"point_de_controle_id": pointDeControle.Id,
+		})
+		return err
 	})
 	return pointDeControle.Id, err
 }
@@ -48,25 +31,11 @@ func (repo *Repository) UpdatePointDeControle(ctx *domain.UserContext, idPointDe
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.ModificationPointDeControle,
-			InspectionId: pointDeControle.InspectionId,
-			Data:         `{"point_de_controle_id": ` + strconv.FormatInt(pointDeControle.Id, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+
+		err = repo.CreateEvenement(tx, ctx, models.EvenementModificationPointDeControle, pointDeControle.InspectionId, map[string]interface{}{
+			"point_de_controle_id": idPointDeControle,
+		})
+		return err
 	})
 	return err
 }
@@ -82,25 +51,11 @@ func (repo *Repository) PublishPointDeControle(ctx *domain.UserContext, idPointD
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.PublicationPointDeControle,
-			InspectionId: pointDeControle.InspectionId,
-			Data:         `{"point_de_controle_id": ` + strconv.FormatInt(pointDeControle.Id, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+
+		err = repo.CreateEvenement(tx, ctx, models.EvenementPublicationPointDeControle, pointDeControle.InspectionId, map[string]interface{}{
+			"point_de_controle_id": idPointDeControle,
+		})
+		return err
 	})
 	return err
 }
@@ -114,25 +69,10 @@ func (repo *Repository) DeletePointDeControle(ctx *domain.UserContext, idPointDe
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.SuppressionPointDeControle,
-			InspectionId: pointDeControle.InspectionId,
-			Data:         `{"point_de_controle_id": ` + strconv.FormatInt(pointDeControle.Id, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, models.EvenementSuppressionPointDeControle, pointDeControle.InspectionId, map[string]interface{}{
+			"point_de_controle_id": idPointDeControle,
+		})
+		return err
 	})
 	return err
 }

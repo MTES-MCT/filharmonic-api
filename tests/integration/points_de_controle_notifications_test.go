@@ -18,6 +18,11 @@ func TestCreatePointDeControleHasCreatedNotification(t *testing.T) {
 			Id: 3,
 		},
 	}
+	ctx2 := &domain.UserContext{
+		User: &models.User{
+			Id: 4,
+		},
+	}
 
 	idInspection := int64(1)
 
@@ -33,15 +38,15 @@ func TestCreatePointDeControleHasCreatedNotification(t *testing.T) {
 	assert.NoError(err)
 	assert.Equal(int64(7), idPointDeControle)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.CreationPointDeControle, notification.Evenement.Type)
+	assert.Equal(models.EvenementCreationPointDeControle, notification.Evenement.Type)
 	assert.Equal(int64(1), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"point_de_controle_id": 7}`, notification.Evenement.Data)
+	assert.Equal(float64(7), notification.Evenement.Data["point_de_controle_id"])
 }
 func TestUpdatePointDeControleHasCreatedNotification(t *testing.T) {
 	assert, application := tests.InitDB(t)
@@ -51,8 +56,13 @@ func TestUpdatePointDeControleHasCreatedNotification(t *testing.T) {
 			Id: 3,
 		},
 	}
+	ctx2 := &domain.UserContext{
+		User: &models.User{
+			Id: 4,
+		},
+	}
 
-	idPointDeControle := int64(6)
+	idPointDeControle := int64(1)
 
 	pointDeControle := models.PointDeControle{
 		Sujet: "Santé 3",
@@ -61,15 +71,15 @@ func TestUpdatePointDeControleHasCreatedNotification(t *testing.T) {
 	err := application.Repo.UpdatePointDeControle(ctx, idPointDeControle, pointDeControle)
 	assert.NoError(err)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.ModificationPointDeControle, notification.Evenement.Type)
-	assert.Equal(int64(4), notification.Evenement.InspectionId)
+	assert.Equal(models.EvenementModificationPointDeControle, notification.Evenement.Type)
+	assert.Equal(int64(1), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"point_de_controle_id": 6}`, notification.Evenement.Data)
+	assert.Equal(float64(1), notification.Evenement.Data["point_de_controle_id"])
 }
 
 func TestDeletePointDeControleHasCreatedNotification(t *testing.T) {
@@ -80,22 +90,28 @@ func TestDeletePointDeControleHasCreatedNotification(t *testing.T) {
 			Id: 3,
 		},
 	}
+	ctx2 := &domain.UserContext{
+		User: &models.User{
+			Id: 4,
+		},
+	}
 
-	idPointDeControle := int64(6)
+	idPointDeControle := int64(1)
 
 	err := application.Repo.DeletePointDeControle(ctx, idPointDeControle)
 	assert.NoError(err)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.SuppressionPointDeControle, notification.Evenement.Type)
-	assert.Equal(int64(4), notification.Evenement.InspectionId)
+	assert.Equal(models.EvenementSuppressionPointDeControle, notification.Evenement.Type)
+	assert.Equal(int64(1), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"point_de_controle_id": 6}`, notification.Evenement.Data)
+	assert.Equal(float64(1), notification.Evenement.Data["point_de_controle_id"])
 }
+
 func TestPublishPointDeControleHasCreatedNotification(t *testing.T) {
 	assert, application := tests.InitDB(t)
 
@@ -104,19 +120,24 @@ func TestPublishPointDeControleHasCreatedNotification(t *testing.T) {
 			Id: 3,
 		},
 	}
+	ctx2 := &domain.UserContext{
+		User: &models.User{
+			Id: 4,
+		},
+	}
 
-	idPointDeControle := int64(6)
+	idPointDeControle := int64(1)
 
 	err := application.Repo.PublishPointDeControle(ctx, idPointDeControle)
 	assert.NoError(err)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.PublicationPointDeControle, notification.Evenement.Type)
-	assert.Equal(int64(4), notification.Evenement.InspectionId)
+	assert.Equal(models.EvenementPublicationPointDeControle, notification.Evenement.Type)
+	assert.Equal(int64(1), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"point_de_controle_id": 6}`, notification.Evenement.Data)
+	assert.Equal(float64(1), notification.Evenement.Data["point_de_controle_id"])
 }

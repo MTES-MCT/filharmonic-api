@@ -104,7 +104,7 @@ func TestAddMessageAsInspecteurNotAllowed(t *testing.T) {
 		Message: "Message publique",
 	}
 
-	tests.AuthUser(e.POST("/pointsdecontrole/{id}/messages"), 4).WithPath("id", 1).WithJSON(message).
+	tests.AuthUser(e.POST("/pointsdecontrole/{id}/messages"), 5).WithPath("id", 1).WithJSON(message).
 		Expect().
 		Status(http.StatusBadRequest)
 

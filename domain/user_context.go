@@ -1,6 +1,8 @@
 package domain
 
-import "github.com/MTES-MCT/filharmonic-api/models"
+import (
+	"github.com/MTES-MCT/filharmonic-api/models"
+)
 
 type UserContext struct {
 	User *models.User

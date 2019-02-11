@@ -32,9 +32,11 @@ func TestListInspectionsOwnedByInspecteur(t *testing.T) {
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array()
-	results.Length().Equal(1)
-	results.First().Object().ValueEqual("id", 3)
-	results.First().Object().Value("etablissement").Object().ValueEqual("id", 4)
+	results.Length().Equal(2)
+	results.First().Object().ValueEqual("id", 1)
+	results.First().Object().Value("etablissement").Object().ValueEqual("id", 1)
+	results.Last().Object().ValueEqual("id", 3)
+	results.Last().Object().Value("etablissement").Object().ValueEqual("id", 4)
 }
 
 func TestListInspectionsOwnedByExploitant(t *testing.T) {
@@ -63,8 +65,9 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	inspection.Value("etablissement").Object().ValueEqual("id", 1)
 	inspection.Value("themes").Array().Contains("Produits chimiques")
 	inspecteurs := inspection.Value("inspecteurs").Array()
-	inspecteurs.Length().Equal(1)
+	inspecteurs.Length().Equal(2)
 	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
+	inspecteurs.Last().Object().ValueEqual("email", "inspecteur2@filharmonic.com")
 	suite := inspection.Value("suite").Object()
 	suite.ValueEqual("delai", 30)
 	suite.ValueEqual("type", "observation")

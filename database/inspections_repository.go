@@ -2,7 +2,6 @@ package database
 
 import (
 	"errors"
-	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
@@ -48,24 +47,8 @@ func (repo *Repository) CreateInspection(ctx *domain.UserContext, inspection mod
 			}
 		}
 		inspectionId = inspection.Id
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.CreationInspection,
-			InspectionId: inspectionId,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, models.EvenementCreationInspection, inspectionId, nil)
+		return err
 	})
 	return inspectionId, err
 }
@@ -90,24 +73,8 @@ func (repo *Repository) UpdateInspection(ctx *domain.UserContext, inspection mod
 				return err
 			}
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.ModificationInspection,
-			InspectionId: inspection.Id,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, models.EvenementModificationInspection, inspection.Id, nil)
+		return err
 	})
 }
 
@@ -182,35 +149,19 @@ func (repo *Repository) UpdateEtatInspection(ctx *domain.UserContext, id int64, 
 		var typeEvenement models.TypeEvenement
 		switch etat {
 		case models.EtatEnCours:
-			typeEvenement = models.PublicationInspection
+			typeEvenement = models.EvenementPublicationInspection
 		case models.EtatAttenteValidation:
-			typeEvenement = models.DemandeValidationInspection
+			typeEvenement = models.EvenementDemandeValidationInspection
 		case models.EtatValide:
-			typeEvenement = models.ValidationInspection
+			typeEvenement = models.EvenementValidationInspection
 		case models.EtatNonValide:
-			typeEvenement = models.RejetValidationInspection
+			typeEvenement = models.EvenementRejetValidationInspection
 		default:
 			err = errors.New("etat unknown")
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         typeEvenement,
-			InspectionId: inspection.Id,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, typeEvenement, inspection.Id, nil)
+		return err
 	})
 }
 

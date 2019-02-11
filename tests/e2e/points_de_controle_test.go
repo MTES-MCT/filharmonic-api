@@ -45,7 +45,7 @@ func TestAddPointDeControleWithInspecteurNotAllowed(t *testing.T) {
 		},
 	}
 
-	tests.AuthUser(e.POST("/inspections/{id}/pointsdecontrole"), 4).WithPath("id", 1).WithJSON(pointControle).
+	tests.AuthUser(e.POST("/inspections/{id}/pointsdecontrole"), 5).WithPath("id", 1).WithJSON(pointControle).
 		Expect().
 		Status(http.StatusBadRequest)
 
@@ -96,7 +96,7 @@ func TestUpdatePointDeControleNotAllowed(t *testing.T) {
 		},
 	}
 
-	tests.AuthUser(e.PUT("/pointsdecontrole/{id}"), 4).WithPath("id", 2).WithJSON(pointControle).
+	tests.AuthUser(e.PUT("/pointsdecontrole/{id}"), 5).WithPath("id", 2).WithJSON(pointControle).
 		Expect().
 		Status(http.StatusBadRequest)
 

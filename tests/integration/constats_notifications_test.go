@@ -18,6 +18,11 @@ func TestCreateConstatHasCreatedNotification(t *testing.T) {
 			Id: 3,
 		},
 	}
+	ctx2 := &domain.UserContext{
+		User: &models.User{
+			Id: 4,
+		},
+	}
 
 	idPointDeControle := int64(1)
 
@@ -31,15 +36,16 @@ func TestCreateConstatHasCreatedNotification(t *testing.T) {
 	assert.NoError(err)
 	assert.Equal(int64(4), idConstat)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.CreationConstat, notification.Evenement.Type)
+	assert.Equal(models.EvenementCreationConstat, notification.Evenement.Type)
 	assert.Equal(int64(1), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"constat_id": 4, "point_de_controle_id": 1}`, notification.Evenement.Data)
+	assert.Equal(float64(4), notification.Evenement.Data["constat_id"])
+	assert.Equal(float64(1), notification.Evenement.Data["point_de_controle_id"])
 }
 
 func TestDeleteConstatHasCreatedNotification(t *testing.T) {
@@ -50,19 +56,25 @@ func TestDeleteConstatHasCreatedNotification(t *testing.T) {
 			Id: 3,
 		},
 	}
+	ctx2 := &domain.UserContext{
+		User: &models.User{
+			Id: 4,
+		},
+	}
 
-	idPointDeControle := int64(5)
+	idPointDeControle := int64(1)
 
 	err := application.Repo.DeleteConstat(ctx, idPointDeControle)
 	assert.NoError(err)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.SuppressionConstat, notification.Evenement.Type)
-	assert.Equal(int64(4), notification.Evenement.InspectionId)
+	assert.Equal(models.EvenementSuppressionConstat, notification.Evenement.Type)
+	assert.Equal(int64(1), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"constat_id": 3, "point_de_controle_id": 5}`, notification.Evenement.Data)
+	assert.Equal(float64(1), notification.Evenement.Data["constat_id"])
+	assert.Equal(float64(1), notification.Evenement.Data["point_de_controle_id"])
 }

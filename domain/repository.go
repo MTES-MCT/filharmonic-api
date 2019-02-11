@@ -58,11 +58,8 @@ type Repository interface {
 	CreatePieceJointe(pieceJointe models.PieceJointe) (int64, error)
 
 	ListNotifications(ctx *UserContext, filter *ListNotificationsFilter) ([]models.Notification, error)
-	CreateNotification(ctx *UserContext, notification models.Notification) (int64, error)
-	UpdateNotifications(ctx *UserContext, notification models.Notification, ids []int64) error
-	CheckUserAllowedNotifications(ctx *UserContext, ids []int64) (bool, error)
+	LireNotifications(ctx *UserContext, ids []int64) error
 	ListEvenements(ctx *UserContext, filter ListEvenementsFilter) ([]models.Evenement, error)
-	GetEvenementByID(ctx *UserContext, id int64) (*models.Evenement, error)
 }
 
 type Storage interface {

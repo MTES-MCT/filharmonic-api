@@ -1,7 +1,6 @@
 package database
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
@@ -35,25 +34,10 @@ func (repo *Repository) CreateCommentaire(ctx *domain.UserContext, idInspection 
 				return err
 			}
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.CommentaireGeneral,
-			InspectionId: idInspection,
-			Data:         `{"commentaire_id": ` + strconv.FormatInt(commentaireId, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, models.EvenementCommentaireGeneral, idInspection, map[string]interface{}{
+			"commentaire_id":           commentaireId,
+		})
+		return err
 	})
 	return commentaireId, err
 }

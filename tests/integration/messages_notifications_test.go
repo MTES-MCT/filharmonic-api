@@ -13,9 +13,14 @@ import (
 func TestCreateMessageHasCreatedNotification(t *testing.T) {
 	assert, application := tests.InitDB(t)
 
-	ctx := &domain.UserContext{
+	ctxInspecteur := &domain.UserContext{
 		User: &models.User{
 			Id: 3,
+		},
+	}
+	ctxExploitant := &domain.UserContext{
+		User: &models.User{
+			Id: 1,
 		},
 	}
 
@@ -27,57 +32,54 @@ func TestCreateMessageHasCreatedNotification(t *testing.T) {
 		PointDeControleId: idPointDeControle,
 	}
 
-	idMessage, err := application.Repo.CreateMessage(ctx, idPointDeControle, message)
+	idMessage, err := application.Repo.CreateMessage(ctxInspecteur, idPointDeControle, message)
 	assert.NoError(err)
 	assert.Equal(int64(8), idMessage)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctxExploitant, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.CreationMessage, notification.Evenement.Type)
-	assert.Equal(int64(1), notification.Evenement.InspectionId)
-	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"message_id": 8, "point_de_controle_id": 1}`, notification.Evenement.Data)
 
 	message.Interne = true
-
-	idMessage, err = application.Repo.CreateMessage(ctx, idPointDeControle, message)
+	idMessage, err = application.Repo.CreateMessage(ctxInspecteur, idPointDeControle, message)
 	assert.NoError(err)
 	assert.Equal(int64(9), idMessage)
 
-	notifications, err = application.Repo.ListNotifications(ctx, nil)
+	notifications, err = application.Repo.ListNotifications(ctxExploitant, nil)
 	assert.NoError(err)
-	assert.Equal(5, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification = notifications[0]
-	assert.Equal(int64(5), notification.Id)
-	assert.Equal(models.CreationCommentaire, notification.Evenement.Type)
-	assert.Equal(int64(1), notification.Evenement.InspectionId)
-	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"message_id": 9, "point_de_controle_id": 1}`, notification.Evenement.Data)
+	assert.Equal(int64(4), notification.Id)
 }
 func TestLireMessageHasCreatedNotification(t *testing.T) {
 	assert, application := tests.InitDB(t)
 
-	ctx := &domain.UserContext{
+	ctxInspecteur := &domain.UserContext{
 		User: &models.User{
 			Id: 3,
+		},
+	}
+	ctxExploitant := &domain.UserContext{
+		User: &models.User{
+			Id: 2,
 		},
 	}
 
 	idMessage := int64(7)
 
-	err := application.Repo.LireMessage(ctx, idMessage)
+	err := application.Repo.LireMessage(ctxInspecteur, idMessage)
 	assert.NoError(err)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctxExploitant, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.LectureMessage, notification.Evenement.Type)
+	assert.Equal(models.EvenementLectureMessage, notification.Evenement.Type)
 	assert.Equal(int64(2), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"message_id": 7, "point_de_controle_id": 3}`, notification.Evenement.Data)
+	assert.Equal(float64(7), notification.Evenement.Data["message_id"])
+	assert.Equal(float64(3), notification.Evenement.Data["point_de_controle_id"])
 }

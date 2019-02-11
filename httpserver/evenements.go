@@ -2,7 +2,6 @@ package httpserver
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/gin-gonic/gin"
@@ -24,23 +23,4 @@ func (server *HttpServer) listEvenements(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, evenements)
-}
-
-func (server *HttpServer) getEvenement(c *gin.Context) {
-	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	evenement, err := server.service.GetEvenement(server.retrieveUserContext(c), id)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	if evenement == nil {
-		c.JSON(http.StatusNotFound, nil)
-		return
-	}
-	c.JSON(http.StatusOK, evenement)
 }

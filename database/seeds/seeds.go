@@ -254,6 +254,14 @@ func SeedsTestDB(db *pg.DB) error {
 			InspectionId: 4,
 			UserId:       3,
 		},
+		&models.InspectionToInspecteur{
+			InspectionId: 1,
+			UserId:       4,
+		},
+		&models.InspectionToInspecteur{
+			InspectionId: 2,
+			UserId:       5,
+		},
 	}
 	err = db.Insert(inspectionToInspecteurs...)
 	if err != nil {
@@ -523,30 +531,35 @@ func SeedsTestDB(db *pg.DB) error {
 	evenements := []interface{}{
 		&models.Evenement{
 			// Id:        1,
-			Type:         models.CreationMessage,
+			Type:         models.EvenementCreationMessage,
 			AuteurId:     3,
 			InspectionId: 1,
 			CreatedAt:    util.DateTime("2018-09-16T14:00:00"),
-			Data:         `{"messageId": 1, "pointDeControleId": 1}`,
+			Data: map[string]interface{}{
+				"message_id":           1,
+				"point_de_controle_id": 1,
+			},
 		},
 		&models.Evenement{
 			// Id:        2,
-			Type:         models.CommentaireGeneral,
+			Type:         models.EvenementCommentaireGeneral,
 			AuteurId:     3,
 			InspectionId: 2,
 			CreatedAt:    util.DateTime("2018-11-14T08:50:00"),
-			Data:         `{"messageId": 2}`,
+			Data: map[string]interface{}{
+				"message_d": 2,
+			},
 		},
 		&models.Evenement{
 			// Id:        3,
-			Type:         models.ModificationInspection,
+			Type:         models.EvenementModificationInspection,
 			AuteurId:     3,
 			InspectionId: 2,
 			CreatedAt:    util.DateTime("2018-12-07T18:42:20"),
 		},
 		&models.Evenement{
 			// Id:        4,
-			Type:         models.LectureMessage,
+			Type:         models.EvenementLectureMessage,
 			AuteurId:     3,
 			InspectionId: 3,
 			CreatedAt:    util.DateTime("2019-01-07T18:42:20"),
@@ -561,18 +574,21 @@ func SeedsTestDB(db *pg.DB) error {
 	notifications := []interface{}{
 		&models.Notification{
 			// Id:       1,
-			Lue:         false,
-			EvenementId: 1,
+			Lue:            false,
+			EvenementId:    1,
+			DestinataireId: 3,
 		},
 		&models.Notification{
 			// Id:       2,
-			Lue:         false,
-			EvenementId: 2,
+			Lue:            false,
+			EvenementId:    2,
+			DestinataireId: 3,
 		},
 		&models.Notification{
 			// Id:       3,
-			Lue:         false,
-			EvenementId: 3,
+			Lue:            false,
+			EvenementId:    3,
+			DestinataireId: 3,
 		},
 	}
 

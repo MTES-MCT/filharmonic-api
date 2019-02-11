@@ -1,9 +1,6 @@
 package database
 
 import (
-	"strconv"
-	"time"
-
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
@@ -27,25 +24,8 @@ func (repo *Repository) CreateSuite(ctx *domain.UserContext, idInspection int64,
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.CreationSuite,
-			InspectionId: idInspection,
-			Data:         `{"suite_id": ` + strconv.FormatInt(suite.Id, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+		err = repo.CreateEvenement(tx, ctx, models.EvenementCreationSuite, idInspection, nil)
+		return err
 	})
 	return suiteId, err
 }
@@ -57,25 +37,9 @@ func (repo *Repository) UpdateSuite(ctx *domain.UserContext, idInspection int64,
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.ModificationSuite,
-			InspectionId: idInspection,
-			Data:         `{"suite_id": ` + strconv.FormatInt(suite.Id, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+
+		err = repo.CreateEvenement(tx, ctx, models.EvenementModificationSuite, idInspection, nil)
+		return err
 	})
 	return err
 }
@@ -96,25 +60,9 @@ func (repo *Repository) DeleteSuite(ctx *domain.UserContext, idInspection int64)
 		if err != nil {
 			return err
 		}
-		evenement := models.Evenement{
-			AuteurId:     ctx.User.Id,
-			CreatedAt:    time.Now(),
-			Type:         models.SuppressionConstat,
-			InspectionId: idInspection,
-			Data:         `{"suite_id": ` + strconv.FormatInt(suite.Id, 10) + `}`,
-		}
-		err = tx.Insert(&evenement)
-		if err != nil {
-			return err
-		}
-		notification := models.Notification{
-			EvenementId: evenement.Id,
-		}
-		err = tx.Insert(&notification)
-		if err != nil {
-			return err
-		}
-		return nil
+
+		err = repo.CreateEvenement(tx, ctx, models.EvenementSuppressionSuite, idInspection, nil)
+		return err
 	})
 	return err
 }

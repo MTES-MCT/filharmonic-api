@@ -18,8 +18,13 @@ func TestCreateSuiteHasCreatedNotification(t *testing.T) {
 			Id: 3,
 		},
 	}
+	ctx2 := &domain.UserContext{
+		User: &models.User{
+			Id: 4,
+		},
+	}
 
-	idInspection := int64(4)
+	idInspection := int64(1)
 
 	suite := models.Suite{
 		// Id: 3,
@@ -32,15 +37,14 @@ func TestCreateSuiteHasCreatedNotification(t *testing.T) {
 	assert.NoError(err)
 	assert.Equal(int64(3), idSuite)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.CreationSuite, notification.Evenement.Type)
-	assert.Equal(int64(4), notification.Evenement.InspectionId)
+	assert.Equal(models.EvenementCreationSuite, notification.Evenement.Type)
+	assert.Equal(int64(1), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"suite_id": 3}`, notification.Evenement.Data)
 }
 
 func TestUpdateSuiteHasCreatedNotification(t *testing.T) {
@@ -49,6 +53,11 @@ func TestUpdateSuiteHasCreatedNotification(t *testing.T) {
 	ctx := &domain.UserContext{
 		User: &models.User{
 			Id: 3,
+		},
+	}
+	ctx2 := &domain.UserContext{
+		User: &models.User{
+			Id: 4,
 		},
 	}
 
@@ -63,15 +72,14 @@ func TestUpdateSuiteHasCreatedNotification(t *testing.T) {
 	err := application.Repo.UpdateSuite(ctx, idInspection, suite)
 	assert.NoError(err)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.ModificationSuite, notification.Evenement.Type)
+	assert.Equal(models.EvenementModificationSuite, notification.Evenement.Type)
 	assert.Equal(idInspection, notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"suite_id": 1}`, notification.Evenement.Data)
 }
 
 func TestDeleteSuiteHasCreatedNotification(t *testing.T) {
@@ -82,19 +90,23 @@ func TestDeleteSuiteHasCreatedNotification(t *testing.T) {
 			Id: 3,
 		},
 	}
+	ctx2 := &domain.UserContext{
+		User: &models.User{
+			Id: 4,
+		},
+	}
 
 	idInspection := int64(1)
 
 	err := application.Repo.DeleteSuite(ctx, idInspection)
 	assert.NoError(err)
 
-	notifications, err := application.Repo.ListNotifications(ctx, nil)
+	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification := notifications[0]
 	assert.Equal(int64(4), notification.Id)
-	assert.Equal(models.SuppressionConstat, notification.Evenement.Type)
+	assert.Equal(models.EvenementSuppressionSuite, notification.Evenement.Type)
 	assert.Equal(idInspection, notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(`{"suite_id": 1}`, notification.Evenement.Data)
 }
