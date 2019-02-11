@@ -52,8 +52,12 @@ func (service *AuthenticationService) Login(ticket string) (*LoginResult, error)
 	if user == nil {
 		return nil, ErrMissingUser
 	}
+	token, err := service.sessions.Add(user.Id)
+	if err != nil {
+		return nil, err
+	}
 	result := &LoginResult{
-		Token: service.sessions.Add(user.Id),
+		Token: token,
 		User:  *user,
 	}
 	return result, nil
@@ -72,4 +76,10 @@ func (service *AuthenticationService) ValidateToken(token string) (*domain.UserC
 		return nil, ErrMissingUser
 	}
 	return &domain.UserContext{User: user}, nil
+}
+
+func (service *AuthenticationService) Logout(token string) error {
+	log.Debug().Str("token", token).Msg("logout")
+	service.sessions.Delete(token)
+	return nil
 }

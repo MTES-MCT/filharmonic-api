@@ -49,3 +49,15 @@ func (server *HttpServer) authenticate(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, result.User)
 }
+
+func (server *HttpServer) logout(c *gin.Context) {
+	err := server.authenticationService.Logout(c.Request.Header.Get(AuthorizationHeader))
+	if err != nil {
+		log.Error().Err(err).Msg("Bad service response")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "disconnected"})
+}

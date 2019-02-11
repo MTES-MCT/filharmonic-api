@@ -36,7 +36,7 @@ func TestAuthenticateSuccessful(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	e.POST("/authenticate").WithJSON(&httpserver.AuthenticateHTTPRequest{Token: "token-1"}).
+	e.POST("/authenticate").WithJSON(&httpserver.AuthenticateHTTPRequest{Token: tests.UserSessions[1]}).
 		Expect().Status(http.StatusOK)
 }
 
@@ -45,5 +45,16 @@ func TestAuthenticateFailed(t *testing.T) {
 	defer close()
 
 	e.POST("/authenticate").WithJSON(&httpserver.AuthenticateHTTPRequest{Token: "invalid-token"}).
+		Expect().Status(http.StatusUnauthorized)
+}
+
+func TestLogout(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthExploitant(e.POST("/logout")).
+		Expect().Status(http.StatusOK)
+
+	e.POST("/authenticate").WithJSON(&httpserver.AuthenticateHTTPRequest{Token: tests.UserSessions[1]}).
 		Expect().Status(http.StatusUnauthorized)
 }

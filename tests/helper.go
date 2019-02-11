@@ -2,7 +2,6 @@ package tests
 
 import (
 	"os"
-	"strconv"
 	"testing"
 
 	httpexpect "gopkg.in/gavv/httpexpect.v1"
@@ -37,7 +36,7 @@ func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
 	a.Service = domain.New(a.Repo, a.Storage)
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
 	assert.NoError(a.Server.Start())
-	initSessions(a.Sessions)
+	assert.NoError(initSessions(a.Sessions))
 
 	httpexpectConfig := httpexpect.Config{
 		BaseURL:  "http://" + a.Config.Http.Host + ":" + a.Config.Http.Port + "/",
@@ -57,10 +56,17 @@ func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
 	}, sso
 }
 
-func initSessions(sessionsStorage sessions.Sessions) {
+var UserSessions = make(map[int64]string, 0)
+
+func initSessions(sessionsStorage sessions.Sessions) error {
 	for i := 1; i < 8; i++ {
-		sessionsStorage.Set(GenerateToken(int64(i)), int64(i))
+		sessionToken, err := sessionsStorage.Add(int64(i))
+		if err != nil {
+			return err
+		}
+		UserSessions[int64(i)] = sessionToken
 	}
+	return nil
 }
 
 func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
@@ -91,9 +97,5 @@ func AuthApprobateur(request *httpexpect.Request) *httpexpect.Request {
 }
 
 func AuthUser(request *httpexpect.Request, userId int64) *httpexpect.Request {
-	return request.WithHeader(httpserver.AuthorizationHeader, GenerateToken(userId))
-}
-
-func GenerateToken(id int64) string {
-	return "token-" + strconv.FormatInt(id, 10)
+	return request.WithHeader(httpserver.AuthorizationHeader, UserSessions[userId])
 }

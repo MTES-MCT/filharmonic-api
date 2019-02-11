@@ -55,6 +55,7 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.GET("/ping", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"message": "authenticated"})
 		})
+		authorized.POST("/logout", s.logout)
 		authorized.GET("/user", s.getUser)
 		authorized.GET("/inspecteurs", s.listInspecteurs)
 		authorized.GET("/etablissements", s.listEtablissements)
