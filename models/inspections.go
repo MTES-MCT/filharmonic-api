@@ -58,6 +58,7 @@ type Inspection struct {
 	Inspecteurs      []User            `pg:"many2many:inspection_to_inspecteurs" json:"inspecteurs,omitempty"`
 	PointsDeControle []PointDeControle `json:"points_de_controle,omitempty"`
 	Suite            *Suite            `json:"suite,omitempty"`
+	Evenements       []Evenement       `json:"evenements,omitempty"`
 }
 
 type InspectionToInspecteur struct {

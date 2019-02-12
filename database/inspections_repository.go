@@ -109,7 +109,9 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*m
 			return q.Order("date ASC"), nil
 		}).
 			Relation("Commentaires.Auteur").
-			Relation("Commentaires.PiecesJointes")
+			Relation("Commentaires.PiecesJointes").
+			Relation("Evenements").
+			Relation("Evenements.Auteur")
 	}
 	err := query.Select()
 	if err == pg.ErrNoRows {
