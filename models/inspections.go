@@ -92,8 +92,9 @@ const (
 )
 
 type Suite struct {
-	Id       int64     `json:"id"`
-	Type     TypeSuite `json:"type"`
-	Synthese string    `json:"synthese"`
-	Delai    int       `json:"delai"`
+	Id          int64     `json:"id"`
+	Type        TypeSuite `json:"type"`
+	Synthese    string    `json:"synthese"`
+	Delai       int       `json:"delai"`
+	PenalEngage bool      `json:"penal_engage"`
 }

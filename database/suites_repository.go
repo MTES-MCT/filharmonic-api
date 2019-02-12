@@ -32,8 +32,8 @@ func (repo *Repository) CreateSuite(ctx *domain.UserContext, idInspection int64,
 
 func (repo *Repository) UpdateSuite(ctx *domain.UserContext, idInspection int64, suite models.Suite) error {
 	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
-		columns := []string{"id", "type", "delai", "synthese"}
-		_, err := tx.Model(&suite).Column(columns...).WherePK().Update()
+		_, err := tx.Model(&suite).
+			WherePK().Update()
 		if err != nil {
 			return err
 		}

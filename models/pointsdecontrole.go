@@ -42,4 +42,5 @@ type Constat struct {
 	Id        int64       `json:"id"`
 	Type      TypeConstat `json:"type"`
 	Remarques string      `json:"remarques"`
+	Delai     string      `json:"delai"`
 }
