@@ -124,18 +124,21 @@ func (repo *Repository) CheckUserAllowedMessage(ctx *domain.UserContext, id int6
 }
 
 func (repo *Repository) CheckUserIsRecipient(ctx *domain.UserContext, id int64) (bool, error) {
-	profilAuteurs := make([]models.Profil, 0)
-	if ctx.IsExploitant() {
-		profilAuteurs = append(profilAuteurs, models.ProfilInspecteur, models.ProfilApprobateur)
-	} else {
-		profilAuteurs = append(profilAuteurs, models.ProfilExploitant)
-	}
-
 	count, err := repo.db.client.Model(&models.Message{}).
 		Join("JOIN users AS u").
 		JoinOn("u.id = message.auteur_id").
-		Where("u.profile in (?)", pg.In(profilAuteurs)).
+		Where("u.profile in (?)", pg.In(getDestinataires(ctx))).
 		Where("message.id = ?", id).
 		Count()
 	return count == 1, err
+}
+
+func getDestinataires(ctx *domain.UserContext) []models.Profil {
+	profilDestinataires := make([]models.Profil, 0)
+	if ctx.IsExploitant() {
+		profilDestinataires = append(profilDestinataires, models.ProfilInspecteur, models.ProfilApprobateur)
+	} else {
+		profilDestinataires = append(profilDestinataires, models.ProfilExploitant)
+	}
+	return profilDestinataires
 }
