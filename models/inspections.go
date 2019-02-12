@@ -59,6 +59,8 @@ type Inspection struct {
 	PointsDeControle []PointDeControle `json:"points_de_controle,omitempty"`
 	Suite            *Suite            `json:"suite,omitempty"`
 	Evenements       []Evenement       `json:"evenements,omitempty"`
+
+	NbMessagesNonLus int `json:"nb_messages_non_lus" sql:"-"`
 }
 
 type InspectionToInspecteur struct {

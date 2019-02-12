@@ -11,10 +11,11 @@ import (
 
 func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.ListInspectionsFilter) ([]models.Inspection, error) {
 	inspections := []models.Inspection{}
-	query := repo.db.client.Model(&inspections).Relation("Etablissement")
+	query := repo.db.client.Model(&models.Inspection{}).
+		Relation("Etablissement")
 	if ctx.IsExploitant() {
 		query.Join("JOIN etablissement_to_exploitants AS u").
-			JoinOn("u.etablissement_id = etablissement.id").
+			JoinOn("u.etablissement_id = inspection.etablissement_id").
 			JoinOn("u.user_id = ?", ctx.User.Id)
 	} else {
 		if filter.Assigned {
@@ -23,7 +24,22 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.L
 				JoinOn("u.user_id = ?", ctx.User.Id)
 		}
 	}
-	err := query.Select()
+
+	query.Join("LEFT JOIN point_de_controles AS p").
+		JoinOn("p.inspection_id = inspection.id").
+		JoinOn("p.publie IS TRUE").
+		Join("LEFT JOIN messages AS m").
+		JoinOn("m.point_de_controle_id = p.id").
+		JoinOn("m.lu IS FALSE").
+		JoinOn("m.interne IS FALSE").
+		Join("LEFT JOIN users AS auteur").
+		JoinOn("auteur.id = m.auteur_id").
+		JoinOn("auteur.profile in (?)", pg.In(getDestinataires(ctx))).
+		Group("inspection.id", "etablissement.id").
+		ColumnExpr("COUNT(inspection.id) AS nb_messages_non_lus").
+		ColumnExpr("inspection.*")
+
+	err := query.Select(&inspections)
 	return inspections, err
 }
 
