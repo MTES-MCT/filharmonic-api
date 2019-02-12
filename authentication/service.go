@@ -64,7 +64,10 @@ func (service *AuthenticationService) Login(ticket string) (*LoginResult, error)
 }
 
 func (service *AuthenticationService) ValidateToken(token string) (*domain.UserContext, error) {
-	userId := service.sessions.Get(token)
+	userId, err := service.sessions.Get(token)
+	if err != nil {
+		return nil, err
+	}
 	if userId == 0 {
 		return nil, ErrUnauthorized
 	}
@@ -80,6 +83,5 @@ func (service *AuthenticationService) ValidateToken(token string) (*domain.UserC
 
 func (service *AuthenticationService) Logout(token string) error {
 	log.Debug().Str("token", token).Msg("logout")
-	service.sessions.Delete(token)
-	return nil
+	return service.sessions.Delete(token)
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 type Application struct {
@@ -41,7 +42,8 @@ func (a *Application) BootstrapDB() error {
 	}
 	zerolog.SetGlobalLevel(logLevel)
 
-	if a.Config.DevMode {
+	log.Info().Msgf("starting in mode %s", a.Config.Mode)
+	if a.Config.Mode == ModeTest {
 		a.Config.Database.Seeds = true
 	}
 
@@ -61,12 +63,24 @@ func (a *Application) BootstrapServer() error {
 		return err
 	}
 	a.Storage = storage
-	if a.Config.DevMode {
+	if a.Config.Mode == ModeDev {
 		a.Sso = stubsso.New(a.Repo)
+		redisSessions, err := sessions.NewRedis(a.Config.Redis)
+		if err != nil {
+			return err
+		}
+		a.Sessions = redisSessions
+	} else if a.Config.Mode == ModeTest {
+		a.Sso = cerbere.New(a.Config.Sso)
+		a.Sessions = sessions.NewMemory()
 	} else {
 		a.Sso = cerbere.New(a.Config.Sso)
+		redisSessions, err := sessions.NewRedis(a.Config.Redis)
+		if err != nil {
+			return err
+		}
+		a.Sessions = redisSessions
 	}
-	a.Sessions = sessions.New()
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
 	a.Service = domain.New(a.Repo, a.Storage)
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)

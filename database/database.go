@@ -47,26 +47,29 @@ var tables = []interface{}{
 }
 
 func New(config Config) (*Database, error) {
+	address := config.Host + ":" + strconv.Itoa(config.Port)
 	client := pg.Connect(&pg.Options{
 		User:     config.User,
 		Password: config.Password,
-		Addr:     config.Host + ":" + strconv.Itoa(config.Port),
+		Addr:     address,
 		Database: config.Name,
 	})
 	if config.LogSQL {
 		client.AddQueryHook(dbLogger{})
 	}
+	log.Info().Msgf("connecting to postgresql endpoint on %s", address)
 	_, err := client.ExecOne("select 1")
 	if err != nil {
 		return nil, err
 	}
-	log.Info().Msg("connected to the database")
+	log.Info().Msg("connected to postgresql")
 
 	db := &Database{
 		config: config,
 		client: client,
 	}
 	if config.InitSchema {
+		log.Warn().Msg("clearing and creating database schema")
 		err = db.createSchema()
 	} else {
 		err = migrations.MigrateDB(client)
@@ -75,13 +78,13 @@ func New(config Config) (*Database, error) {
 		return nil, err
 	}
 	if config.Seeds {
+		log.Warn().Msg("seeding database")
 		err = seeds.SeedsTestDB(client)
 	}
 	return db, err
 }
 
 func (d *Database) createSchema() error {
-	log.Warn().Msg("clearing and creating database")
 	for _, table := range tables {
 		err := d.client.DropTable(table, &orm.DropTableOptions{
 			Cascade:  true,

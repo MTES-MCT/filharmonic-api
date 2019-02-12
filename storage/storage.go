@@ -42,6 +42,7 @@ func New(config Config) (*FileStorage, error) {
 			return nil, err
 		}
 	}
+	log.Info().Msgf("connected to minio")
 
 	return &FileStorage{
 		config: config,

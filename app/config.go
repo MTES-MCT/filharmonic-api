@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/MTES-MCT/filharmonic-api/authentication"
+	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/storage"
@@ -9,13 +10,22 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type ModeEnv string
+
+const (
+	ModeDev  ModeEnv = "dev"
+	ModeTest ModeEnv = "test"
+	ModeProd ModeEnv = "prod"
+)
+
 type Config struct {
 	Database database.Config
 	Http     httpserver.Config
 	Sso      authentication.SsoConfig
+	Redis    sessions.RedisConfig
 	Storage  storage.Config
-	LogLevel string `default:"info"`
-	DevMode  bool   `default:"false"`
+	LogLevel string  `default:"info"`
+	Mode     ModeEnv `default:"prod"`
 }
 
 func LoadConfig() Config {

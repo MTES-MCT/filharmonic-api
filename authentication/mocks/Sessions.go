@@ -10,7 +10,7 @@ type Sessions struct {
 }
 
 // Add provides a mock function with given fields: userId
-func (_m *Sessions) Add(userId int64) string {
+func (_m *Sessions) Add(userId int64) (string, error) {
 	ret := _m.Called(userId)
 
 	var r0 string
@@ -20,16 +20,32 @@ func (_m *Sessions) Add(userId int64) string {
 		r0 = ret.Get(0).(string)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(userId)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // Delete provides a mock function with given fields: sessionToken
-func (_m *Sessions) Delete(sessionToken string) {
-	_m.Called(sessionToken)
+func (_m *Sessions) Delete(sessionToken string) error {
+	ret := _m.Called(sessionToken)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(sessionToken)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // Get provides a mock function with given fields: sessionToken
-func (_m *Sessions) Get(sessionToken string) int64 {
+func (_m *Sessions) Get(sessionToken string) (int64, error) {
 	ret := _m.Called(sessionToken)
 
 	var r0 int64
@@ -39,10 +55,26 @@ func (_m *Sessions) Get(sessionToken string) int64 {
 		r0 = ret.Get(0).(int64)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(sessionToken)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // Set provides a mock function with given fields: sessionToken, userId
-func (_m *Sessions) Set(sessionToken string, userId int64) {
-	_m.Called(sessionToken, userId)
+func (_m *Sessions) Set(sessionToken string, userId int64) error {
+	ret := _m.Called(sessionToken, userId)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, int64) error); ok {
+		r0 = rf(sessionToken, userId)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }

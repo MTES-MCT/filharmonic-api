@@ -1,8 +1,8 @@
 package sessions
 
 type Sessions interface {
-	Get(sessionToken string) int64
+	Get(sessionToken string) (int64, error)
 	Add(userId int64) (string, error)
-	Set(sessionToken string, userId int64)
-	Delete(sessionToken string)
+	Set(sessionToken string, userId int64) error
+	Delete(sessionToken string) error
 }

@@ -23,13 +23,12 @@ func Init(t *testing.T) (*httpexpect.Expect, func()) {
 }
 
 func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
-
 	assert, a := InitDB(t)
 
 	var err error
 	a.Storage, err = storage.New(a.Config.Storage)
 	assert.NoError(err)
-	a.Sessions = sessions.New()
+	a.Sessions = sessions.NewMemory()
 	sso := new(mocks.Sso)
 	a.Sso = sso
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
@@ -72,7 +71,7 @@ func initSessions(sessionsStorage sessions.Sessions) error {
 func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	assert := require.New(t)
 	config := app.LoadConfig()
-	config.DevMode = true
+	config.Mode = app.ModeTest
 	config.Database.InitSchema = true
 	config.Http.Host = "localhost"
 	config.Http.Logger = false

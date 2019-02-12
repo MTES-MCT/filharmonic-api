@@ -8,14 +8,14 @@ type MemorySessions struct {
 	sessions map[string]int64
 }
 
-func New() *MemorySessions {
+func NewMemory() *MemorySessions {
 	return &MemorySessions{
 		sessions: make(map[string]int64),
 	}
 }
 
-func (memorySessions *MemorySessions) Get(sessionToken string) int64 {
-	return memorySessions.sessions[sessionToken]
+func (memorySessions *MemorySessions) Get(sessionToken string) (int64, error) {
+	return memorySessions.sessions[sessionToken], nil
 }
 
 func (memorySessions *MemorySessions) Add(userId int64) (string, error) {
@@ -24,14 +24,19 @@ func (memorySessions *MemorySessions) Add(userId int64) (string, error) {
 		return "", err
 	}
 	sessionToken := id.String()
-	memorySessions.sessions[sessionToken] = userId
+	err = memorySessions.Set(sessionToken, userId)
+	if err != nil {
+		return "", err
+	}
 	return sessionToken, nil
 }
 
-func (memorySessions *MemorySessions) Set(sessionToken string, userId int64) {
+func (memorySessions *MemorySessions) Set(sessionToken string, userId int64) error {
 	memorySessions.sessions[sessionToken] = userId
+	return nil
 }
 
-func (memorySessions *MemorySessions) Delete(sessionToken string) {
+func (memorySessions *MemorySessions) Delete(sessionToken string) error {
 	delete(memorySessions.sessions, sessionToken)
+	return nil
 }

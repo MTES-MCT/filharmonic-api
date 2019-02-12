@@ -20,7 +20,7 @@ func initAuthenticationService(t *testing.T) (*require.Assertions, *Authenticati
 	assert := require.New(t)
 	repository := new(mocks.Repository)
 	sso := new(mocks.Sso)
-	sessions := sessions.New()
+	sessions := sessions.NewMemory()
 	mocks := AuthenticationServiceMocks{
 		Repo:     repository,
 		Sso:      sso,
