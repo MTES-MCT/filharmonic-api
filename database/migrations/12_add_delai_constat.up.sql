@@ -1,2 +1,2 @@
 ALTER TABLE "constats"
-  ADD COLUMN "delai" string;
+  ADD COLUMN "delai" text;
