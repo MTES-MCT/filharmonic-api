@@ -17,7 +17,7 @@ func (repo *Repository) GetPieceJointe(ctx *domain.UserContext, idPieceJointe in
 	pieceJointe := models.PieceJointe{}
 	var err error
 	if ctx.IsExploitant() {
-		err = repo.db.client.Model(&pieceJointe).Column("piece_jointe.*").
+		err = repo.db.client.Model(&pieceJointe).ColumnExpr("DISTINCT piece_jointe.*").
 			Join("LEFT JOIN messages AS m").
 			JoinOn("m.id = piece_jointe.message_id").
 			Join("LEFT JOIN point_de_controles AS p").
@@ -37,7 +37,7 @@ func (repo *Repository) GetPieceJointe(ctx *domain.UserContext, idPieceJointe in
 			Where("piece_jointe.id = ?", idPieceJointe).
 			Select()
 	} else {
-		err = repo.db.client.Model(&pieceJointe).Column("piece_jointe.*").
+		err = repo.db.client.Model(&pieceJointe).ColumnExpr("DISTINCT piece_jointe.*").
 			Join("LEFT JOIN commentaires AS c").
 			JoinOn("c.id = piece_jointe.commentaire_id").
 			Join("LEFT JOIN messages AS m").
