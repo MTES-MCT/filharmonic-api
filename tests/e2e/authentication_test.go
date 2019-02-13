@@ -37,6 +37,6 @@ func TestGetUser(t *testing.T) {
 	favori.ValueEqual("id", 1)
 	favori.ValueEqual("date", "2018-09-01")
 	etablissement := favori.Value("etablissement").Object()
-	etablissement.ValueEqual("adresse", "1 rue des fleurs 75000 Paris")
+	etablissement.ValueEqual("adresse1", "1 rue des fleurs")
 	etablissement.ValueEqual("nom", "Nom 1")
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/orm"
 )
 
 func (repo *Repository) ListEtablissements() ([]models.Etablissement, error) {
@@ -26,7 +27,14 @@ func (repo *Repository) FindEtablissements(ctx *domain.UserContext, filter domai
 		query.Where("lower(nom) like ? OR lower(raison) like ?", "%"+strings.ToLower(filter.Nom)+"%", "%"+strings.ToLower(filter.Nom)+"%")
 	}
 	if filter.Adresse != "" {
-		query.Where("lower(adresse) like ?", "%"+strings.ToLower(filter.Adresse)+"%")
+		adresseLowerCase := strings.ToLower(filter.Adresse)
+		query.WhereGroup(func(q *orm.Query) (*orm.Query, error) {
+			q.WhereOr("lower(adresse1) like ?", "%"+adresseLowerCase+"%").
+				WhereOr("lower(adresse2) like ?", "%"+adresseLowerCase+"%").
+				WhereOr("lower(code_postal) like ?", "%"+adresseLowerCase+"%").
+				WhereOr("lower(commune) like ?", "%"+adresseLowerCase+"%")
+			return q, nil
+		})
 	}
 
 	if ctx.IsExploitant() {

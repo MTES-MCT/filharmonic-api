@@ -12,7 +12,10 @@ func (repo *Repository) GetUserByEmail(email string) (*models.User, error) {
 		Relation("Favoris.id").
 		Relation("Favoris.date").
 		Relation("Favoris.Etablissement.nom").
-		Relation("Favoris.Etablissement.adresse").
+		Relation("Favoris.Etablissement.adresse1").
+		Relation("Favoris.Etablissement.adresse2").
+		Relation("Favoris.Etablissement.code_postal").
+		Relation("Favoris.Etablissement.commune").
 		Where("email = ?", email).Select()
 	if err == pg.ErrNoRows {
 		return nil, nil
@@ -26,7 +29,10 @@ func (repo *Repository) GetUserByID(id int64) (*models.User, error) {
 		Relation("Favoris.id").
 		Relation("Favoris.date").
 		Relation("Favoris.Etablissement.nom").
-		Relation("Favoris.Etablissement.adresse").
+		Relation("Favoris.Etablissement.adresse1").
+		Relation("Favoris.Etablissement.adresse2").
+		Relation("Favoris.Etablissement.code_postal").
+		Relation("Favoris.Etablissement.commune").
 		Where("id = ?", id).Select()
 	if err == pg.ErrNoRows {
 		return nil, nil

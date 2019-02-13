@@ -9,13 +9,65 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/tests"
 )
 
-func TestFindEtablissements(t *testing.T) {
+func TestFindEtablissementsMultipleFields(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
 	etablissements := tests.AuthExploitant(e.GET("/etablissements")).
 		WithQuery("s3ic", "12").
 		WithQuery("nom", "social").
+		WithQuery("adresse", "40").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+	etablissements.Length().Equal(1)
+	etablissements.First().Object().ValueEqual("s3ic", "451267")
+}
+
+func TestFindEtablissementsByAdresse1(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	etablissements := tests.AuthExploitant(e.GET("/etablissements")).
+		WithQuery("adresse", "rue des plantes").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+	etablissements.Length().Equal(1)
+	etablissements.First().Object().ValueEqual("s3ic", "451267")
+}
+
+func TestFindEtablissementsByAdresse2(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	etablissements := tests.AuthExploitant(e.GET("/etablissements")).
+		WithQuery("adresse", "parcelle 207").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+	etablissements.Length().Equal(1)
+	etablissements.First().Object().ValueEqual("s3ic", "451267")
+}
+
+func TestFindEtablissementsByCodePostal(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	etablissements := tests.AuthExploitant(e.GET("/etablissements")).
+		WithQuery("adresse", "44000").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+	etablissements.Length().Equal(1)
+	etablissements.First().Object().ValueEqual("s3ic", "451267")
+}
+
+func TestFindEtablissementsByCommune(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	etablissements := tests.AuthExploitant(e.GET("/etablissements")).
 		WithQuery("adresse", "nantes").
 		Expect().
 		Status(http.StatusOK).

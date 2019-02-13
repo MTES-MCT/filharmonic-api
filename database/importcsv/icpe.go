@@ -56,13 +56,16 @@ func LoadEtablissementsCSV(filepath string, db *database.Database) error {
 				return err
 			}
 			etablissement := models.Etablissement{
-				S3IC:     computeS3IC(line[indexesEtablissement["codeBase"]], line[indexesEtablissement["codeEtab"]]),
-				Nom:      line[indexesEtablissement["nom"]],
-				Raison:   line[indexesEtablissement["nom"]],
-				Activite: line[indexesEtablissement["activite"]],
-				Seveso:   line[indexesEtablissement["seveso"]],
-				Iedmtd:   toBool(line[indexesEtablissement["iedmtd"]]),
-				Adresse:  line[indexesEtablissement["adresse1"]] + " " + line[indexesEtablissement["adresse2"]] + " " + line[indexesEtablissement["codePostal"]] + " " + line[indexesEtablissement["commune"]],
+				S3IC:       computeS3IC(line[indexesEtablissement["codeBase"]], line[indexesEtablissement["codeEtab"]]),
+				Nom:        line[indexesEtablissement["nom"]],
+				Raison:     line[indexesEtablissement["nom"]],
+				Activite:   line[indexesEtablissement["activite"]],
+				Seveso:     line[indexesEtablissement["seveso"]],
+				Iedmtd:     toBool(line[indexesEtablissement["iedmtd"]]),
+				Adresse1:   line[indexesEtablissement["adresse1"]],
+				Adresse2:   line[indexesEtablissement["adresse2"]],
+				CodePostal: line[indexesEtablissement["codePostal"]],
+				Commune:    line[indexesEtablissement["commune"]],
 			}
 			etablissements = append(etablissements, etablissement)
 			iterations++

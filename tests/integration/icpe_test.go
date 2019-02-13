@@ -11,13 +11,16 @@ import (
 func TestLoadEtablissementsFromCSV(t *testing.T) {
 	assert, application := tests.InitDB(t)
 	assert.NoError(application.DB.Insert(&models.Etablissement{
-		S3IC:     "0521.00217",
-		Nom:      "FROMAGERIE OLD",
-		Raison:   "FROMAGERIE OLD",
-		Activite: "Fromage",
-		Seveso:   "Haut",
-		Iedmtd:   true,
-		Adresse:  "PLACE DE LA LAITERIE 56000 VANNES",
+		S3IC:       "0521.00217",
+		Nom:        "FROMAGERIE OLD",
+		Raison:     "FROMAGERIE OLD",
+		Activite:   "Fromage",
+		Seveso:     "Haut",
+		Iedmtd:     true,
+		Adresse1:   "PLACE DE LA LAITERIE",
+		Adresse2:   "",
+		CodePostal: "56000",
+		Commune:    "Vannes",
 	}))
 
 	err := importcsv.LoadEtablissementsCSV("s3ic_ic_gen_fabnum.mini.csv", application.DB)
@@ -31,7 +34,10 @@ func TestLoadEtablissementsFromCSV(t *testing.T) {
 	assert.Equal("FROMAGERIE BERTHAUT", etablissement.Raison)
 	assert.Equal("FROMAGERIE BERTHAUT", etablissement.Nom)
 	assert.Equal("10\",\"Fabrication de fromage", etablissement.Activite)
-	assert.Equal("PLACE DU CHAMP DE FOIRE BP 5 21460 EPOISSES", etablissement.Adresse)
+	assert.Equal("PLACE DU CHAMP DE FOIRE", etablissement.Adresse1)
+	assert.Equal("BP 5", etablissement.Adresse2)
+	assert.Equal("21460", etablissement.CodePostal)
+	assert.Equal("EPOISSES", etablissement.Commune)
 	assert.Equal("Non Seveso", etablissement.Seveso)
 	assert.False(etablissement.Iedmtd)
 }

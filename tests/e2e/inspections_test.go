@@ -329,7 +329,7 @@ func TestAddFavoriToInspection(t *testing.T) {
 	favori.ValueEqual("id", 2)
 	favori.ValueEqual("date", "2018-11-15")
 	etablissement := favori.Value("etablissement").Object()
-	etablissement.ValueEqual("adresse", "1 rue des cordeliers 69000 Lyon")
+	etablissement.ValueEqual("adresse1", "1 rue des cordeliers")
 	etablissement.ValueEqual("nom", "Nom 3")
 }
 func TestRemoveFavoriToInspection(t *testing.T) {

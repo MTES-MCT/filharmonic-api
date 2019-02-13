@@ -63,3 +63,5 @@ Pour vérifier que le schéma des migrations correpond bien à celui des structu
 ```
 ./database/scripts/check_migrations.sh
 ```
+
+Afin que le script de vérification fonctionne, il faut veiller à ce que chaque nouveau champ ajouté à un modèle soit défini après tous les autres champs car PostgreSQL ne permet pas de [changer la position des colonne](https://wiki.postgresql.org/wiki/Alter_column_position) sans recréer la table.
