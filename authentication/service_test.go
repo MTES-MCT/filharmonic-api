@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
+	"github.com/rs/zerolog"
 
 	"github.com/MTES-MCT/filharmonic-api/authentication/mocks"
 	"github.com/MTES-MCT/filharmonic-api/models"
@@ -17,6 +18,7 @@ type AuthenticationServiceMocks struct {
 }
 
 func initAuthenticationService(t *testing.T) (*require.Assertions, *AuthenticationService, *AuthenticationServiceMocks) {
+	zerolog.SetGlobalLevel(zerolog.Disabled)
 	assert := require.New(t)
 	repository := new(mocks.Repository)
 	sso := new(mocks.Sso)
