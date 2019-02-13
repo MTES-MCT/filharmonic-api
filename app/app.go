@@ -71,7 +71,7 @@ func (a *Application) BootstrapServer() error {
 		}
 		a.Sessions = redisSessions
 	} else if a.Config.Mode == ModeTest {
-		a.Sso = cerbere.New(a.Config.Sso)
+		a.Sso = stubsso.New(a.Repo)
 		a.Sessions = sessions.NewMemory()
 	} else {
 		a.Sso = cerbere.New(a.Config.Sso)
