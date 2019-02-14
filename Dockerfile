@@ -1,5 +1,7 @@
 FROM alpine:latest
 
+RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
+
 COPY filharmonic-api /usr/local/bin/filharmonic-api
 
 # add migrations in a specific folder
