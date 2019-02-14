@@ -8,6 +8,6 @@ import (
 
 func TestEscapeString(t *testing.T) {
 	assert := require.New(t)
-	assert.Equal("NomEtab", EscapeString("NomEtab"))
-	assert.Equal("Nom\\%Et\\%\\%a\\\\%b", EscapeString("Nom%Et%%a\\%b"))
+	assert.Equal("%NomEtab%", BuildSearchValue("NomEtab"))
+	assert.Equal("%Nom\\%Et\\%\\%a\\\\%b%", BuildSearchValue("Nom%Et%%a\\%b"))
 }

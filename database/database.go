@@ -13,14 +13,15 @@ import (
 )
 
 type Config struct {
-	Host       string `default:"localhost"`
-	Port       int    `default:"5432"`
-	User       string `default:"filharmonic"`
-	Password   string `default:"filharmonic"`
-	Name       string `default:"filharmonic"`
-	InitSchema bool   `default:"false"`
-	Seeds      bool   `default:"false"`
-	LogSQL     bool   `default:"false"`
+	Host           string `default:"localhost"`
+	Port           int    `default:"5432"`
+	User           string `default:"filharmonic"`
+	Password       string `default:"filharmonic"`
+	Name           string `default:"filharmonic"`
+	InitSchema     bool   `default:"false"`
+	Seeds          bool   `default:"false"`
+	LogSQL         bool   `default:"false"`
+	PaginationSize int    `default:"50"`
 }
 
 type Database struct {

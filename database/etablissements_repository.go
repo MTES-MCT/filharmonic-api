@@ -8,6 +8,7 @@ import (
 	"github.com/go-pg/pg/orm"
 )
 
+// utilisé seulement dans les tests
 func (repo *Repository) ListEtablissements() ([]models.Etablissement, error) {
 	etablissements := []models.Etablissement{}
 	query := repo.db.client.Model(&etablissements)
@@ -15,7 +16,7 @@ func (repo *Repository) ListEtablissements() ([]models.Etablissement, error) {
 	return etablissements, err
 }
 
-func (repo *Repository) FindEtablissements(ctx *domain.UserContext, filter domain.ListEtablissementsFilter) ([]models.Etablissement, error) {
+func (repo *Repository) FindEtablissements(ctx *domain.UserContext, filter domain.ListEtablissementsFilter) (*models.FindEtablissementResults, error) {
 	etablissements := []models.Etablissement{}
 
 	query := repo.db.client.Model(&etablissements)
@@ -41,8 +42,18 @@ func (repo *Repository) FindEtablissements(ctx *domain.UserContext, filter domai
 			JoinOn("u.etablissement_id = etablissement.id").
 			JoinOn("u.user_id = ?", ctx.User.Id)
 	}
-	err := query.Select()
-	return etablissements, err
+	total, err := query.Count()
+	if err != nil {
+		return nil, err
+	}
+	err = query.
+		Limit(repo.config.PaginationSize).
+		Offset((filter.GetPage() - 1) * repo.config.PaginationSize).
+		Select()
+	return &models.FindEtablissementResults{
+		Total:          total,
+		Etablissements: etablissements,
+	}, err
 }
 
 func (repo *Repository) GetEtablissementByID(ctx *domain.UserContext, id int64) (*models.Etablissement, error) {

@@ -24,3 +24,8 @@ type EtablissementToExploitant struct {
 	Etablissement *Etablissement
 	User          *User
 }
+
+type FindEtablissementResults struct {
+	Etablissements []Etablissement `json:"etablissements"`
+	Total          int             `json:"total"`
+}

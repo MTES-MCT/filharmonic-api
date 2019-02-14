@@ -17,13 +17,13 @@ func (server *HttpServer) listEtablissements(c *gin.Context) {
 		})
 		return
 	}
-	etablissements, err := server.service.ListEtablissements(server.retrieveUserContext(c), filter)
+	searchResults, err := server.service.ListEtablissements(server.retrieveUserContext(c), filter)
 	if err != nil {
 		log.Error().Err(err).Msg("Bad service response")
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
-	c.JSON(http.StatusOK, etablissements)
+	c.JSON(http.StatusOK, searchResults)
 }
 
 func (server *HttpServer) getEtablissement(c *gin.Context) {

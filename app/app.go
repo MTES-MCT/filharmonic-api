@@ -53,7 +53,7 @@ func (a *Application) BootstrapDB() error {
 	}
 	a.DB = db
 
-	a.Repo = database.NewRepository(db)
+	a.Repo = database.NewRepository(a.Config.Repository, db)
 	return nil
 }
 

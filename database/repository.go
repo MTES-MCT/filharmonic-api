@@ -1,11 +1,17 @@
 package database
 
-type Repository struct {
-	db *Database
+type RepositoryConfig struct {
+	PaginationSize int `default:"50"`
 }
 
-func NewRepository(db *Database) *Repository {
+type Repository struct {
+	config RepositoryConfig
+	db     *Database
+}
+
+func NewRepository(config RepositoryConfig, db *Database) *Repository {
 	return &Repository{
-		db: db,
+		config: config,
+		db:     db,
 	}
 }

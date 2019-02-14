@@ -19,13 +19,14 @@ const (
 )
 
 type Config struct {
-	Database database.Config
-	Http     httpserver.Config
-	Sso      authentication.SsoConfig
-	Redis    sessions.RedisConfig
-	Storage  storage.Config
-	LogLevel string  `default:"info"`
-	Mode     ModeEnv `default:"prod"`
+	Database   database.Config
+	Repository database.RepositoryConfig
+	Http       httpserver.Config
+	Sso        authentication.SsoConfig
+	Redis      sessions.RedisConfig
+	Storage    storage.Config
+	LogLevel   string  `default:"info"`
+	Mode       ModeEnv `default:"prod"`
 }
 
 func LoadConfig() Config {
