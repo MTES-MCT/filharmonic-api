@@ -1,8 +1,7 @@
 package database
 
 import (
-	"strings"
-
+	"github.com/MTES-MCT/filharmonic-api/database/helper"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
@@ -21,18 +20,18 @@ func (repo *Repository) FindEtablissements(ctx *domain.UserContext, filter domai
 
 	query := repo.db.client.Model(&etablissements)
 	if filter.S3IC != "" {
-		query.Where("lower(s3ic) like ?", "%"+strings.ToLower(filter.S3IC)+"%")
+		query.Where("s3ic ilike ?", helper.BuildSearchValue(filter.S3IC))
 	}
 	if filter.Nom != "" {
-		query.Where("lower(nom) like ? OR lower(raison) like ?", "%"+strings.ToLower(filter.Nom)+"%", "%"+strings.ToLower(filter.Nom)+"%")
+		query.Where("nom ilike ? OR raison ilike ?", helper.BuildSearchValue(filter.Nom), helper.BuildSearchValue(filter.Nom))
 	}
 	if filter.Adresse != "" {
-		adresseLowerCase := strings.ToLower(filter.Adresse)
+		adresse := helper.BuildSearchValue(filter.Adresse)
 		query.WhereGroup(func(q *orm.Query) (*orm.Query, error) {
-			q.WhereOr("lower(adresse1) like ?", "%"+adresseLowerCase+"%").
-				WhereOr("lower(adresse2) like ?", "%"+adresseLowerCase+"%").
-				WhereOr("lower(code_postal) like ?", "%"+adresseLowerCase+"%").
-				WhereOr("lower(commune) like ?", "%"+adresseLowerCase+"%")
+			q.WhereOr("adresse1 ilike ?", adresse).
+				WhereOr("adresse2 ilike ?", adresse).
+				WhereOr("code_postal ilike ?", adresse).
+				WhereOr("commune ilike ?", adresse)
 			return q, nil
 		})
 	}
