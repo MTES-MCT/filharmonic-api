@@ -49,6 +49,7 @@ func (repo *Repository) FindEtablissements(ctx *domain.UserContext, filter domai
 	err = query.
 		Limit(repo.config.PaginationSize).
 		Offset((filter.GetPage() - 1) * repo.config.PaginationSize).
+		Order("etablissement.nom").
 		Select()
 	return &models.FindEtablissementResults{
 		Total:          total,
