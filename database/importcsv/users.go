@@ -9,7 +9,6 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/rs/zerolog/log"
-	"golang.org/x/text/encoding/charmap"
 )
 
 func LoadInspecteursCSV(filepath string, db *database.Database) error {
@@ -23,8 +22,8 @@ func LoadInspecteursCSV(filepath string, db *database.Database) error {
 	if err != nil {
 		return err
 	}
-	reader := csv.NewReader(bufio.NewReader(charmap.ISO8859_3.NewDecoder().Reader(file)))
-	reader.Comma = ','
+	reader := csv.NewReader(bufio.NewReader(file))
+	reader.Comma = ';'
 	reader.LazyQuotes = true
 	log.Warn().Msg("début de l'import")
 	nbInspecteursImportes := 0
