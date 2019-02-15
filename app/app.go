@@ -94,6 +94,12 @@ func (a *Application) Shutdown() error {
 			return errors.Wrap(err, "could not close db")
 		}
 	}
+	if a.Sessions != nil {
+		err := a.Sessions.Close()
+		if err != nil {
+			return errors.Wrap(err, "could not close sessions")
+		}
+	}
 	if a.Server != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()

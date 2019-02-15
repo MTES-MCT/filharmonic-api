@@ -40,3 +40,7 @@ func (memorySessions *MemorySessions) Delete(sessionToken string) error {
 	delete(memorySessions.sessions, sessionToken)
 	return nil
 }
+
+func (memorySessions *MemorySessions) Close() error {
+	return nil
+}

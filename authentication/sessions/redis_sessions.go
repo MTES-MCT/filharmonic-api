@@ -66,3 +66,7 @@ func (redisSessions *RedisSessions) Set(sessionToken string, userId int64) error
 func (redisSessions *RedisSessions) Delete(sessionToken string) error {
 	return redisSessions.client.Del(Prefix + sessionToken).Err()
 }
+
+func (redisSessions *RedisSessions) Close() error {
+	return redisSessions.client.Close()
+}
