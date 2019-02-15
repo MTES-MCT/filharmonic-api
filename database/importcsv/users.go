@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/models"
@@ -52,7 +53,7 @@ func LoadInspecteursCSV(filepath string, db *database.Database) error {
 			inspecteur := models.User{
 				Nom:     nom,
 				Prenom:  line[indexesInspecteur["prenom"]],
-				Email:   line[indexesInspecteur["email"]],
+				Email:   strings.ToLower(line[indexesInspecteur["email"]]),
 				Profile: models.ProfilInspecteur,
 			}
 			inspecteurs = append(inspecteurs, inspecteur)
