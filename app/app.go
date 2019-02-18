@@ -69,9 +69,9 @@ func (a *Application) BootstrapServer() error {
 	a.Storage = storage
 	if a.Config.Mode == ModeDev {
 		a.Sso = stubsso.New(a.Repo)
-		redisSessions, err := sessions.NewRedis(a.Config.Redis)
-		if err != nil {
-			return err
+		redisSessions, err2 := sessions.NewRedis(a.Config.Redis)
+		if err2 != nil {
+			return err2
 		}
 		a.Sessions = redisSessions
 	} else if a.Config.Mode == ModeTest {
@@ -79,9 +79,9 @@ func (a *Application) BootstrapServer() error {
 		a.Sessions = sessions.NewMemory()
 	} else {
 		a.Sso = cerbere.New(a.Config.Sso)
-		redisSessions, err := sessions.NewRedis(a.Config.Redis)
-		if err != nil {
-			return err
+		redisSessions, err2 := sessions.NewRedis(a.Config.Redis)
+		if err2 != nil {
+			return err2
 		}
 		a.Sessions = redisSessions
 	}
