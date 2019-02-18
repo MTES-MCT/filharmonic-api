@@ -20,8 +20,8 @@ func TestListAllInspections(t *testing.T) {
 	results.Length().Equal(4)
 	results.First().Object().ValueEqual("id", 1)
 	results.First().Object().Value("etablissement").Object().ValueEqual("id", 1)
-	results.Element(1).Object().ValueEqual("id", 3)
-	results.Element(1).Object().Value("etablissement").Object().ValueEqual("id", 4)
+	results.Element(2).Object().ValueEqual("id", 3)
+	results.Element(2).Object().Value("etablissement").Object().ValueEqual("id", 4)
 }
 
 func TestListInspectionsOwnedByInspecteur(t *testing.T) {

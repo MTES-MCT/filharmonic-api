@@ -25,19 +25,20 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.L
 		}
 	}
 
-	query.Join("LEFT JOIN point_de_controles AS p").
-		JoinOn("p.inspection_id = inspection.id").
-		JoinOn("p.publie IS TRUE").
-		Join("LEFT JOIN messages AS m").
-		JoinOn("m.point_de_controle_id = p.id").
-		JoinOn("m.lu IS FALSE").
-		JoinOn("m.interne IS FALSE").
-		Join("LEFT JOIN users AS auteur").
-		JoinOn("auteur.id = m.auteur_id").
-		JoinOn("auteur.profile in (?)", pg.In(getDestinataires(ctx))).
-		Group("inspection.id", "etablissement.id").
-		ColumnExpr("COUNT(inspection.id) AS nb_messages_non_lus").
-		ColumnExpr("inspection.*")
+	query.ColumnExpr("inspection.*").
+		ColumnExpr(`(
+		SELECT count(m.id)
+		FROM point_de_controles AS p
+		JOIN messages AS m
+			ON m.point_de_controle_id = p.id
+			AND m.lu IS FALSE
+			AND m.interne IS FALSE
+		JOIN users AS auteur
+			ON auteur.id = m.auteur_id
+			AND auteur.profile in (?)
+		WHERE p.inspection_id = inspection.id
+		AND p.publie IS TRUE
+		) AS nb_messages_non_lus`, pg.In(getDestinataires(ctx)))
 
 	err := query.Select(&inspections)
 	return inspections, err
