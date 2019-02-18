@@ -11,7 +11,8 @@ import (
 )
 
 type Config struct {
-	Activity string `default:"0 0 1 * * *"`
+	Activity     string `default:"0 0 1 * * *"`
+	TemplatesDir string `default:"cron/templates"`
 }
 
 type CronManager struct {
@@ -19,17 +20,8 @@ type CronManager struct {
 	cron         *cron.Cron
 	service      *domain.Service
 	emailService *emails.EmailService
-}
 
-var nouveauxMessagesTemplate *template.Template
-
-func init() {
-	var err error
-	nouveauxMessagesTemplate, err = template.ParseFiles("templates/new-messages.tmpl")
-	// nouveauxMessagesTemplate, err = template.ParseFiles("cron/templates/new-messages.tmpl")
-	if err != nil {
-		log.Fatal().Err(err).Msg("could not parse template")
-	}
+	nouveauxMessagesTemplate *template.Template
 }
 
 func New(config Config, service *domain.Service, emailService *emails.EmailService) (*CronManager, error) {
@@ -40,8 +32,15 @@ func New(config Config, service *domain.Service, emailService *emails.EmailServi
 		emailService: emailService,
 	}
 	err := cronmanager.cron.AddFunc(config.Activity, cronmanager.sendEmailsNouveauxMessages)
+	if err != nil {
+		return nil, err
+	}
+	cronmanager.nouveauxMessagesTemplate, err = template.ParseFiles(config.TemplatesDir + "/new-messages.tmpl")
+	if err != nil {
+		return nil, err
+	}
 	cronmanager.cron.Start()
-	return cronmanager, err
+	return cronmanager, nil
 }
 
 func (cron *CronManager) sendEmailsNouveauxMessages() {
@@ -51,7 +50,7 @@ func (cron *CronManager) sendEmailsNouveauxMessages() {
 		log.Error().Err(err).Msg("error while fetching data from database to be sent by emails")
 	}
 	for _, nouveauxMessagesUser := range nouveauxMessagesUsers {
-		htmlPart, err := renderEmailTemplate(nouveauxMessagesTemplate, nouveauxMessagesUser)
+		htmlPart, err := renderEmailTemplate(cron.nouveauxMessagesTemplate, nouveauxMessagesUser)
 		if err != nil {
 			log.Error().Err(err).Msg("error while rendering email")
 		}

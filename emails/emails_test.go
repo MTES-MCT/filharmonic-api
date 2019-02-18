@@ -31,11 +31,8 @@ func TestSend(t *testing.T) {
 		Subject:        "Test Email",
 		RecipientEmail: "sample-user@filharmonic.beta.gouv.fr",
 		RecipientName:  "Sample user",
-		Template:       NotificationSummary,
-		Variables: map[string]interface{}{
-			"name":            "Michel",
-			"nbNotifications": 3,
-		},
+		TextPart:       "message",
+		HTMLPart:       "<b>message</b>",
 	})
 	assert.NoError(err)
 }

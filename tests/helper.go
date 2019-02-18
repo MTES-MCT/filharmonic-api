@@ -75,6 +75,7 @@ func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	config.Database.InitSchema = true
 	config.Http.Host = "localhost"
 	config.Http.Logger = false
+	// config.Cron.TemplatesDir = "../../cron/templates"
 	config.LogLevel = ""
 	application := app.New(config)
 	err := application.BootstrapDB()

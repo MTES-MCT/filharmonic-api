@@ -1,3 +1,4 @@
 *
+!cron/templates
 !database/migrations/*.sql
 !filharmonic-api
