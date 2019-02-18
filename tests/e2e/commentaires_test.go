@@ -8,7 +8,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/tests"
 )
 
-func TestAddCommentaire(t *testing.T) {
+func TestAddCommentaireAsInspecteur(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
@@ -21,6 +21,27 @@ func TestAddCommentaire(t *testing.T) {
 		Status(http.StatusOK)
 
 	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	commentaires := inspection.Value("commentaires").Array()
+	commentaires.Length().Equal(3)
+	commentaires.Last().Object().ValueEqual("message", "Commentaire général")
+}
+
+func TestAddCommentaireAsApprobateur(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	commentaire := models.Commentaire{
+		Message: "Commentaire général",
+	}
+
+	tests.AuthApprobateur(e.POST("/inspections/{id}/commentaires")).WithPath("id", 1).WithJSON(commentaire).
+		Expect().
+		Status(http.StatusOK)
+
+	inspection := tests.AuthApprobateur(e.GET("/inspections/{id}")).WithPath("id", 1).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
