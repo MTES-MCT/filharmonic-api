@@ -3,6 +3,7 @@ package emails
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -17,6 +18,7 @@ func TestSend(t *testing.T) {
 		})
 		http.ListenAndServe(":5100", nil)
 	}()
+	time.Sleep(20 * time.Millisecond)
 
 	emailConfig := Config{
 		FromEmail:     "contact@filharmonic.beta.gouv.fr",
