@@ -3,6 +3,7 @@ package domain
 import (
 	"io"
 
+	"github.com/MTES-MCT/filharmonic-api/emails"
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
@@ -60,9 +61,14 @@ type Repository interface {
 	ListNotifications(ctx *UserContext, filter *ListNotificationsFilter) ([]models.Notification, error)
 	LireNotifications(ctx *UserContext, ids []int64) error
 	ListEvenements(ctx *UserContext, filter ListEvenementsFilter) ([]models.Evenement, error)
+	ListNouveauxMessages() ([]NouveauxMessagesUser, error)
 }
 
 type Storage interface {
 	Get(id string) (io.Reader, error)
 	Put(file models.PieceJointeFile) (string, error)
+}
+
+type EmailService interface {
+	Send(email emails.Email) error
 }

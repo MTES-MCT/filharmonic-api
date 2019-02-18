@@ -142,3 +142,107 @@ func getDestinataires(ctx *domain.UserContext) []models.Profil {
 	}
 	return profilDestinataires
 }
+
+func (repo *Repository) ListNouveauxMessages() ([]domain.NouveauxMessagesUser, error) {
+	nouveauxMessagesExploitants := []RowNouveauMessageUser{}
+	err := repo.buildQueryNouveauxMessage(func(query *orm.Query) (*orm.Query, error) {
+		return query.
+			Join("JOIN etablissement_to_exploitants AS e2e").
+			JoinOn(`e2e.user_id = "user".id`).
+			Join("JOIN etablissements AS etablissement").
+			JoinOn(`e2e.etablissement_id = etablissement.id`).
+			Join("JOIN inspections AS inspection").
+			JoinOn(`inspection.etablissement_id = etablissement.id`), nil
+	}, []models.Profil{"inspecteur", "approbateur"}).
+		Select(&nouveauxMessagesExploitants)
+	if err != nil {
+		return nil, err
+	}
+
+	nouveauxMessagesInspecteurs := []RowNouveauMessageUser{}
+	err = repo.buildQueryNouveauxMessage(func(query *orm.Query) (*orm.Query, error) {
+		return query.
+			Join("JOIN inspection_to_inspecteurs AS i2i").
+			JoinOn(`i2i.user_id = "user".id`).
+			Join("JOIN inspections AS inspection").
+			JoinOn(`i2i.inspection_id = inspection.id`).
+			Join("JOIN etablissements AS etablissement").
+			JoinOn(`inspection.etablissement_id = etablissement.id`), nil
+	}, []models.Profil{"exploitant"}).
+		Select(&nouveauxMessagesInspecteurs)
+	if err != nil {
+		return nil, err
+	}
+
+	return repo.toNouveauxMessageUsers(append(nouveauxMessagesExploitants, nouveauxMessagesInspecteurs...)), err
+}
+
+func (repo *Repository) toNouveauxMessageUsers(rows []RowNouveauMessageUser) []domain.NouveauxMessagesUser {
+	nouveauxMessagesUsers := []domain.NouveauxMessagesUser{}
+	if len(rows) == 0 {
+		return nouveauxMessagesUsers
+	}
+
+	currentUser := domain.NouveauxMessagesUser{
+		Destinataire: models.User{
+			Email: rows[0].EmailDestinataire,
+			Nom:   rows[0].NomDestinataire,
+		},
+		Messages: []domain.NouveauMessage{},
+	}
+	for _, row := range rows {
+		if row.EmailDestinataire != currentUser.Destinataire.Email {
+			nouveauxMessagesUsers = append(nouveauxMessagesUsers, currentUser)
+			currentUser = domain.NouveauxMessagesUser{
+				Destinataire: models.User{
+					Email: row.EmailDestinataire,
+					Nom:   row.NomDestinataire,
+				},
+				Messages: []domain.NouveauMessage{},
+			}
+		}
+		currentUser.Messages = append(currentUser.Messages, domain.NouveauMessage{
+			DateInspection:       row.DateInspection,
+			RaisonEtablissement:  row.RaisonEtablissement,
+			SujetPointDeControle: row.SujetPointDeControle,
+			Message:              row.Message,
+			NomAuteur:            row.NomAuteur,
+		})
+	}
+	nouveauxMessagesUsers = append(nouveauxMessagesUsers, currentUser)
+
+	return nouveauxMessagesUsers
+}
+
+type RowNouveauMessageUser struct {
+	EmailDestinataire    string
+	NomDestinataire      string
+	DateInspection       string
+	RaisonEtablissement  string
+	SujetPointDeControle string
+	Message              string
+	NomAuteur            string
+}
+
+func (repo *Repository) buildQueryNouveauxMessage(joinFunc func(*orm.Query) (*orm.Query, error), profils []models.Profil) *orm.Query {
+	return repo.db.client.Model(&models.User{}).
+		ColumnExpr(`"user".email as email_destinataire`).
+		ColumnExpr(`"user".prenom || ' ' || "user".nom as nom_destinataire`).
+		ColumnExpr("inspection.date as date_inspection").
+		ColumnExpr(`etablissement.raison as raison_etablissement`).
+		ColumnExpr(`p.sujet as sujet_point_de_controle`).
+		ColumnExpr(`m.message as message`).
+		ColumnExpr(`auteur.prenom || ' ' || auteur.nom as nom_auteur`).
+		Apply(joinFunc).
+		Join("JOIN point_de_controles AS p").
+		JoinOn("p.inspection_id = inspection.id").
+		JoinOn("p.publie IS TRUE").
+		Join("JOIN messages AS m").
+		JoinOn("m.point_de_controle_id = p.id").
+		JoinOn("m.lu IS FALSE").
+		JoinOn("m.interne IS FALSE").
+		Join("JOIN users AS auteur").
+		JoinOn("auteur.id = m.auteur_id").
+		JoinOn("auteur.profile in (?)", pg.In(profils)).
+		Order("user.id")
+}

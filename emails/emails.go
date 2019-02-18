@@ -21,8 +21,8 @@ type Email struct {
 	RecipientEmail string
 	RecipientName  string
 	Subject        string
-	Template       emailTemplate
-	Variables      map[string]interface{}
+	TextPart       string
+	HTMLPart       string
 }
 
 type emailTemplate struct {
@@ -40,7 +40,6 @@ func New(config Config) *EmailService {
 // See https://dev.mailjet.com/guides/#send-api-v3-1
 func (em *EmailService) Send(email Email) error {
 	log.Debug().
-		Str("template", email.Template.Name).
 		Str("recipient", email.RecipientEmail).
 		Msg("send email")
 	messagesInfo := []mailjet.InfoMessagesV31{
@@ -55,10 +54,9 @@ func (em *EmailService) Send(email Email) error {
 					Name:  email.RecipientName,
 				},
 			},
-			TemplateID:       email.Template.MailJetID,
-			TemplateLanguage: true,
-			Subject:          email.Subject,
-			Variables:        email.Variables,
+			Subject:  email.Subject,
+			TextPart: email.TextPart,
+			HTMLPart: email.HTMLPart,
 		},
 	}
 	messages := mailjet.MessagesV31{Info: messagesInfo}

@@ -36,3 +36,20 @@ func (s *Service) LireMessage(ctx *UserContext, idMessage int64) error {
 	}
 	return s.repo.LireMessage(ctx, idMessage)
 }
+
+type NouveauxMessagesUser struct {
+	Destinataire models.User
+	Messages     []NouveauMessage
+}
+
+type NouveauMessage struct {
+	DateInspection       string `json:"date_inspection"`
+	NomAuteur            string `json:"nom_auteur"`
+	RaisonEtablissement  string `json:"raison_etablissement"`
+	SujetPointDeControle string `json:"sujet_point_de_controle"`
+	Message              string `json:"message"`
+}
+
+func (s *Service) ListNouveauxMessages() ([]NouveauxMessagesUser, error) {
+	return s.repo.ListNouveauxMessages()
+}

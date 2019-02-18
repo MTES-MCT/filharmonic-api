@@ -1,0 +1,30 @@
+<html>
+<body>
+<div style="background-color: white; color: black; padding-left: 10px; padding-right: 10px;">
+
+Bonjour {{ .Destinataire.Nom }},
+
+Vous avez {{ len .Messages }} messages non lus.<br>
+Vous pouvez les consulter en ligne sur https://filharmonic.beta.gouv.fr.
+{{ range .Messages }}
+<ul>
+  <li>
+    Etablissement : {{ .RaisonEtablissement }}
+  </li>
+  <li>
+    Date Inspection : {{ .DateInspection }}
+  </li>
+  <li>
+    Point de contrôle : {{ .SujetPointDeControle }}
+  </li>
+  <li>
+    Auteur : {{ .NomAuteur }}
+  </li>
+  <li>
+    Message : {{ .Message }}
+  </li>
+</ul>
+{{ end }}
+</div>
+</body>
+</html>

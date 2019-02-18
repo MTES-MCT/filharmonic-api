@@ -8,8 +8,10 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/authentication/cerbere"
 	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
 	"github.com/MTES-MCT/filharmonic-api/authentication/stubsso"
+	"github.com/MTES-MCT/filharmonic-api/cron"
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/domain"
+	"github.com/MTES-MCT/filharmonic-api/emails"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/pkg/errors"
@@ -21,6 +23,8 @@ type Application struct {
 	Config                Config
 	DB                    *database.Database
 	Repo                  *database.Repository
+	EmailService          *emails.EmailService
+	Cron                  *cron.CronManager
 	Sso                   authentication.Sso
 	Sessions              sessions.Sessions
 	AuthenticationService *authentication.AuthenticationService
@@ -81,8 +85,13 @@ func (a *Application) BootstrapServer() error {
 		}
 		a.Sessions = redisSessions
 	}
+	a.EmailService = emails.New(a.Config.Emails)
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
-	a.Service = domain.New(a.Repo, a.Storage)
+	a.Service = domain.New(a.Repo, a.Storage, a.EmailService)
+	a.Cron, err = cron.New(a.Config.Cron, a.Service, a.EmailService)
+	if err != nil {
+		return err
+	}
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
 	return a.Server.Start()
 }

@@ -5,7 +5,7 @@ type Service struct {
 	storage Storage
 }
 
-func New(repo Repository, storage Storage) *Service {
+func New(repo Repository, storage Storage, emails EmailService) *Service {
 	return &Service{
 		repo:    repo,
 		storage: storage,
