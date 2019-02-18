@@ -55,7 +55,10 @@ func (repo *Repository) FindUsers(filters domain.ListUsersFilters) ([]models.Use
 	query := repo.db.client.Model(&users)
 
 	if filters.Inspecteurs {
-		query.Where("profile = ?", models.ProfilInspecteur)
+		query.WhereOr("profile = ?", models.ProfilInspecteur)
+	}
+	if filters.Approbateurs {
+		query.WhereOr("profile = ?", models.ProfilApprobateur)
 	}
 
 	err := query.Select()

@@ -14,10 +14,11 @@ import (
 
 func LoadInspecteursCSV(filepath string, db *database.Database) error {
 	indexesInspecteur := map[string]int{
-		"nom":      0,
-		"prenom":   1,
-		"nomUsage": 2,
-		"email":    3,
+		"nom":         0,
+		"prenom":      1,
+		"nomUsage":    2,
+		"email":       3,
+		"approbateur": 5,
 	}
 	file, err := os.Open(filepath) // #nosec
 	if err != nil {
@@ -50,11 +51,15 @@ func LoadInspecteursCSV(filepath string, db *database.Database) error {
 			if line[indexesInspecteur["nomUsage"]] != "" {
 				nom = line[indexesInspecteur["nomUsage"]]
 			}
+			profil := models.ProfilInspecteur
+			if line[indexesInspecteur["approbateur"]] == "oui" {
+				profil = models.ProfilApprobateur
+			}
 			inspecteur := models.User{
 				Nom:     nom,
 				Prenom:  line[indexesInspecteur["prenom"]],
 				Email:   strings.ToLower(line[indexesInspecteur["email"]]),
-				Profile: models.ProfilInspecteur,
+				Profile: profil,
 			}
 			inspecteurs = append(inspecteurs, inspecteur)
 			iterations++
