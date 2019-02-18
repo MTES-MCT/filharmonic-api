@@ -25,7 +25,11 @@ func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspectio
 	if !ok {
 		return 0, ErrInvalidInput
 	}
-	return s.repo.CreateInspection(ctx, inspection)
+	inspectionId, err := s.repo.CreateInspection(ctx, inspection)
+	if err != nil {
+		return 0, err
+	}
+	return inspectionId, s.addMissingThemes(inspection.Themes)
 }
 
 func (s *Service) GetInspection(ctx *UserContext, id int64) (*models.Inspection, error) {
@@ -50,7 +54,11 @@ func (s *Service) UpdateInspection(ctx *UserContext, inspection models.Inspectio
 	if !ok {
 		return ErrInvalidInput
 	}
-	return s.repo.UpdateInspection(ctx, inspection)
+	err = s.repo.UpdateInspection(ctx, inspection)
+	if err != nil {
+		return err
+	}
+	return s.addMissingThemes(inspection.Themes)
 }
 
 func (s *Service) PublishInspection(ctx *UserContext, idInspection int64) error {
