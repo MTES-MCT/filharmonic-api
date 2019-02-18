@@ -9,12 +9,11 @@ const (
 )
 
 type User struct {
-	Id      int64        `json:"id"`
-	Nom     string       `json:"nom"`
-	Prenom  string       `json:"prenom"`
-	Email   string       `json:"email" sql:",unique"`
-	Profile Profil       `json:"profile"`
-	Favoris []Inspection `pg:"many2many:user_to_favoris" json:"favoris,omitempty"`
+	Id      int64  `json:"id"`
+	Nom     string `json:"nom"`
+	Prenom  string `json:"prenom"`
+	Email   string `json:"email" sql:",unique"`
+	Profile Profil `json:"profile"`
 }
 
 type UserToFavori struct {

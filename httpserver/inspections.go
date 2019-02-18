@@ -215,3 +215,15 @@ func (server *HttpServer) removeFavoriToInspection(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "deleted"})
 }
+
+func (server *HttpServer) listInspectionsFavorites(c *gin.Context) {
+	inspections, err := server.service.ListInspectionsFavorites(server.retrieveUserContext(c))
+	if err != nil {
+		log.Error().Err(err).Msg("Bad service response")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, inspections)
+}

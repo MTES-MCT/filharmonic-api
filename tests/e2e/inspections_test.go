@@ -328,14 +328,10 @@ func TestAddFavoriToInspection(t *testing.T) {
 		Expect().
 		Status(http.StatusOK)
 
-	user := tests.AuthInspecteur(e.GET("/user")).
+	favoris := tests.AuthInspecteur(e.GET("/inspectionsfavorites")).
 		Expect().
 		Status(http.StatusOK).
-		JSON().Object()
-	user.ValueEqual("id", 3)
-	user.ValueEqual("email", "inspecteur1@filharmonic.com")
-	user.ValueEqual("profile", "inspecteur")
-	favoris := user.Value("favoris").Array()
+		JSON().Array()
 	favoris.Length().Equal(2)
 	favori := favoris.Last().Object()
 	favori.NotContainsKey("inspecteurs")
@@ -356,12 +352,31 @@ func TestRemoveFavoriToInspection(t *testing.T) {
 		Expect().
 		Status(http.StatusOK)
 
-	user := tests.AuthInspecteur(e.GET("/user")).
+	favoris := tests.AuthInspecteur(e.GET("/inspectionsfavorites")).
 		Expect().
 		Status(http.StatusOK).
-		JSON().Object()
-	user.ValueEqual("id", 3)
-	user.ValueEqual("email", "inspecteur1@filharmonic.com")
-	user.ValueEqual("profile", "inspecteur")
-	user.NotContainsKey("favoris")
+		JSON().Array()
+	favoris.Length().Equal(0)
+}
+
+func TestListInspectionsFavorites(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	favoris := tests.AuthInspecteur(e.GET("/inspectionsfavorites")).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+
+	favoris.Length().Equal(1)
+	favori := favoris.First().Object()
+	favori.NotContainsKey("inspecteurs")
+	favori.NotContainsKey("commentaires")
+	favori.NotContainsKey("points_de_controle")
+	favori.NotContainsKey("suite")
+	favori.ValueEqual("id", 1)
+	favori.ValueEqual("date", "2018-09-01")
+	etablissement := favori.Value("etablissement").Object()
+	etablissement.ValueEqual("adresse1", "1 rue des fleurs")
+	etablissement.ValueEqual("nom", "Nom 1")
 }

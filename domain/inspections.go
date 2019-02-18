@@ -10,6 +10,10 @@ func (s *Service) ListInspections(ctx *UserContext, filter ListInspectionsFilter
 	return s.repo.ListInspections(ctx, filter)
 }
 
+func (s *Service) ListInspectionsFavorites(ctx *UserContext) ([]models.Inspection, error) {
+	return s.repo.ListInspectionsFavorites(ctx)
+}
+
 func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error) {
 	if ctx.IsExploitant() {
 		return 0, ErrBesoinProfilInspecteur

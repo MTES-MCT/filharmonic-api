@@ -62,6 +62,7 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.GET("/etablissements/:id", s.getEtablissement)
 		authorized.GET("/inspections", s.listInspections)
 		authorized.POST("/inspections", s.createInspection)
+		authorized.GET("/inspectionsfavorites", s.listInspectionsFavorites)
 		authorized.GET("/inspections/:id", s.getInspection)
 		authorized.PUT("/inspections/:id", s.updateInspection)
 		authorized.POST("/inspections/:id/commentaires", s.addCommentaire)

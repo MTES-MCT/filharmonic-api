@@ -44,6 +44,17 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.L
 	return inspections, err
 }
 
+func (repo *Repository) ListInspectionsFavorites(ctx *domain.UserContext) ([]models.Inspection, error) {
+	inspections := []models.Inspection{}
+	err := repo.db.client.Model(&models.Inspection{}).
+		Relation("Etablissement").
+		Join("JOIN user_to_favoris AS favoris").
+		JoinOn("favoris.inspection_id = inspection.id").
+		JoinOn("favoris.user_id = ?", ctx.User.Id).
+		Select(&inspections)
+	return inspections, err
+}
+
 func (repo *Repository) CreateInspection(ctx *domain.UserContext, inspection models.Inspection) (int64, error) {
 	inspectionId := int64(0)
 	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
