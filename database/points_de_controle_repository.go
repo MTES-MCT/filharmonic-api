@@ -15,7 +15,7 @@ func (repo *Repository) CreatePointDeControle(ctx *domain.UserContext, idInspect
 			return err
 		}
 
-		err = repo.CreateEvenement(tx, ctx, models.EvenementCreationPointDeControle, idInspection, map[string]interface{}{
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementCreationPointDeControle, idInspection, map[string]interface{}{
 			"point_de_controle_id": pointDeControle.Id,
 		})
 		return err
@@ -32,7 +32,7 @@ func (repo *Repository) UpdatePointDeControle(ctx *domain.UserContext, idPointDe
 			return err
 		}
 
-		err = repo.CreateEvenement(tx, ctx, models.EvenementModificationPointDeControle, pointDeControle.InspectionId, map[string]interface{}{
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementModificationPointDeControle, pointDeControle.InspectionId, map[string]interface{}{
 			"point_de_controle_id": idPointDeControle,
 		})
 		return err
@@ -52,7 +52,7 @@ func (repo *Repository) PublishPointDeControle(ctx *domain.UserContext, idPointD
 			return err
 		}
 
-		err = repo.CreateEvenement(tx, ctx, models.EvenementPublicationPointDeControle, pointDeControle.InspectionId, map[string]interface{}{
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementPublicationPointDeControle, pointDeControle.InspectionId, map[string]interface{}{
 			"point_de_controle_id": idPointDeControle,
 		})
 		return err
@@ -69,7 +69,7 @@ func (repo *Repository) DeletePointDeControle(ctx *domain.UserContext, idPointDe
 		if err != nil {
 			return err
 		}
-		err = repo.CreateEvenement(tx, ctx, models.EvenementSuppressionPointDeControle, pointDeControle.InspectionId, map[string]interface{}{
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementSuppressionPointDeControle, pointDeControle.InspectionId, map[string]interface{}{
 			"point_de_controle_id": idPointDeControle,
 		})
 		return err

@@ -69,28 +69,48 @@ func (s *Service) PublishInspection(ctx *UserContext, idInspection int64) error 
 	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
-	return s.changeEtatInspection(ctx, idInspection, models.EtatPreparation, models.EtatEnCours)
+	err := s.changeEtatInspection(ctx, idInspection, models.EtatPreparation, models.EtatEnCours)
+	if err != nil {
+		return err
+	}
+	err = s.repo.CreateEvenement(ctx, models.EvenementPublicationInspection, idInspection, nil)
+	return err
 }
 
 func (s *Service) AskValidateInspection(ctx *UserContext, idInspection int64) error {
 	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
-	return s.changeEtatInspection(ctx, idInspection, models.EtatEnCours, models.EtatAttenteValidation)
+	err := s.changeEtatInspection(ctx, idInspection, models.EtatEnCours, models.EtatAttenteValidation)
+	if err != nil {
+		return err
+	}
+	err = s.repo.CreateEvenement(ctx, models.EvenementDemandeValidationInspection, idInspection, nil)
+	return err
 }
 
 func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64) error {
 	if !ctx.IsApprobateur() {
 		return ErrBesoinProfilApprobateur
 	}
-	return s.changeEtatInspection(ctx, idInspection, models.EtatAttenteValidation, models.EtatValide)
+	err := s.changeEtatInspection(ctx, idInspection, models.EtatAttenteValidation, models.EtatValide)
+	if err != nil {
+		return err
+	}
+	err = s.repo.CreateEvenement(ctx, models.EvenementValidationInspection, idInspection, nil)
+	return err
 }
 
 func (s *Service) RejectInspection(ctx *UserContext, idInspection int64) error {
 	if !ctx.IsApprobateur() {
 		return ErrBesoinProfilApprobateur
 	}
-	return s.changeEtatInspection(ctx, idInspection, models.EtatAttenteValidation, models.EtatEnCours)
+	err := s.changeEtatInspection(ctx, idInspection, models.EtatAttenteValidation, models.EtatEnCours)
+	if err != nil {
+		return err
+	}
+	err = s.repo.CreateEvenement(ctx, models.EvenementRejetValidationInspection, idInspection, nil)
+	return err
 }
 
 func (s *Service) changeEtatInspection(ctx *UserContext, idInspection int64, fromEtat models.EtatInspection, toEtat models.EtatInspection) error {

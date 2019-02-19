@@ -1,8 +1,6 @@
 package database
 
 import (
-	"errors"
-
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
@@ -75,7 +73,7 @@ func (repo *Repository) CreateInspection(ctx *domain.UserContext, inspection mod
 			}
 		}
 		inspectionId = inspection.Id
-		err = repo.CreateEvenement(tx, ctx, models.EvenementCreationInspection, inspectionId, nil)
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementCreationInspection, inspectionId, nil)
 		return err
 	})
 	return inspectionId, err
@@ -101,7 +99,7 @@ func (repo *Repository) UpdateInspection(ctx *domain.UserContext, inspection mod
 				return err
 			}
 		}
-		err = repo.CreateEvenement(tx, ctx, models.EvenementModificationInspection, inspection.Id, nil)
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementModificationInspection, inspection.Id, nil)
 		return err
 	})
 }
@@ -170,29 +168,8 @@ func (repo *Repository) UpdateEtatInspection(ctx *domain.UserContext, id int64, 
 		Etat: etat,
 	}
 	columns := []string{"etat"}
-
-	return repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
-		_, err := tx.Model(&inspection).Column(columns...).WherePK().Update()
-		if err != nil {
-			return err
-		}
-		var typeEvenement models.TypeEvenement
-		switch etat {
-		case models.EtatEnCours:
-			typeEvenement = models.EvenementPublicationInspection
-		case models.EtatAttenteValidation:
-			typeEvenement = models.EvenementDemandeValidationInspection
-		case models.EtatValide:
-			typeEvenement = models.EvenementValidationInspection
-		case models.EtatNonValide:
-			typeEvenement = models.EvenementRejetValidationInspection
-		default:
-			err = errors.New("etat unknown")
-			return err
-		}
-		err = repo.CreateEvenement(tx, ctx, typeEvenement, inspection.Id, nil)
-		return err
-	})
+	_, err := repo.db.client.Model(&inspection).Column(columns...).WherePK().Update()
+	return err
 }
 
 func (repo *Repository) AddFavoriToInspection(ctx *domain.UserContext, idInspection int64) error {

@@ -101,25 +101,34 @@ func TestUpdateInspectionHasCreatedNotification(t *testing.T) {
 }
 
 func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
-	assert, application := tests.InitDB(t)
+	assert, application, close := tests.InitService(t)
+	defer close()
 
-	ctx := &domain.UserContext{
+	ctxInspecteur1 := &domain.UserContext{
 		User: &models.User{
-			Id: 3,
+			Id:      3,
+			Profile: models.ProfilInspecteur,
 		},
 	}
-	ctx2 := &domain.UserContext{
+	ctxInspecteur2 := &domain.UserContext{
 		User: &models.User{
-			Id: 5,
+			Id:      5,
+			Profile: models.ProfilInspecteur,
+		},
+	}
+	ctxApprobateur := &domain.UserContext{
+		User: &models.User{
+			Id:      6,
+			Profile: models.ProfilApprobateur,
 		},
 	}
 
 	inspectionId := int64(2)
 
-	err := application.Repo.UpdateEtatInspection(ctx, inspectionId, models.EtatEnCours)
+	err := application.Service.PublishInspection(ctxInspecteur1, inspectionId)
 	assert.NoError(err)
 
-	notifications, err := application.Repo.ListNotifications(ctx2, nil)
+	notifications, err := application.Repo.ListNotifications(ctxInspecteur2, nil)
 	assert.NoError(err)
 	assert.Equal(1, len(notifications))
 	notification := notifications[0]
@@ -128,10 +137,10 @@ func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
 	assert.Equal(inspectionId, notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
 
-	err = application.Repo.UpdateEtatInspection(ctx, inspectionId, models.EtatAttenteValidation)
+	err = application.Service.AskValidateInspection(ctxInspecteur1, inspectionId)
 	assert.NoError(err)
 
-	notifications, err = application.Repo.ListNotifications(ctx2, nil)
+	notifications, err = application.Repo.ListNotifications(ctxInspecteur2, nil)
 	assert.NoError(err)
 	assert.Equal(2, len(notifications))
 	notification = notifications[0]
@@ -140,27 +149,29 @@ func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
 	assert.Equal(inspectionId, notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
 
-	err = application.Repo.UpdateEtatInspection(ctx, inspectionId, models.EtatNonValide)
+	err = application.Service.RejectInspection(ctxApprobateur, inspectionId)
 	assert.NoError(err)
 
-	notifications, err = application.Repo.ListNotifications(ctx2, nil)
+	notifications, err = application.Repo.ListNotifications(ctxInspecteur2, nil)
 	assert.NoError(err)
 	assert.Equal(3, len(notifications))
 	notification = notifications[0]
-	assert.Equal(int64(9), notification.Id)
+	assert.Equal(int64(10), notification.Id)
 	assert.Equal(models.EvenementRejetValidationInspection, notification.Evenement.Type)
 	assert.Equal(inspectionId, notification.Evenement.InspectionId)
-	assert.Equal(int64(3), notification.Evenement.AuteurId)
+	assert.Equal(int64(6), notification.Evenement.AuteurId)
 
-	err = application.Repo.UpdateEtatInspection(ctx, inspectionId, models.EtatValide)
+	err = application.Service.AskValidateInspection(ctxInspecteur1, inspectionId)
+	assert.NoError(err)
+	err = application.Service.ValidateInspection(ctxApprobateur, inspectionId)
 	assert.NoError(err)
 
-	notifications, err = application.Repo.ListNotifications(ctx2, nil)
+	notifications, err = application.Repo.ListNotifications(ctxInspecteur2, nil)
 	assert.NoError(err)
-	assert.Equal(4, len(notifications))
+	assert.Equal(5, len(notifications))
 	notification = notifications[0]
-	assert.Equal(int64(10), notification.Id)
+	assert.Equal(int64(15), notification.Id)
 	assert.Equal(models.EvenementValidationInspection, notification.Evenement.Type)
 	assert.Equal(inspectionId, notification.Evenement.InspectionId)
-	assert.Equal(int64(3), notification.Evenement.AuteurId)
+	assert.Equal(int64(6), notification.Evenement.AuteurId)
 }

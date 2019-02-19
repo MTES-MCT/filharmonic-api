@@ -87,7 +87,7 @@ func (a *Application) BootstrapServer() error {
 	}
 	a.EmailService = emails.New(a.Config.Emails)
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
-	a.Service = domain.New(a.Repo, a.Storage, a.EmailService)
+	a.Service = domain.New(a.Repo, a.Storage)
 	a.Cron, err = cron.New(a.Config.Cron, a.Service, a.EmailService)
 	if err != nil {
 		return err

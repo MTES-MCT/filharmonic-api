@@ -49,7 +49,7 @@ func (repo *Repository) CreateMessage(ctx *domain.UserContext, idPointDeControle
 		} else {
 			typeEvenement = models.EvenementCreationMessage
 		}
-		err = repo.CreateEvenement(tx, ctx, typeEvenement, pointDeControle.InspectionId, map[string]interface{}{
+		err = repo.CreateEvenementTx(tx, ctx, typeEvenement, pointDeControle.InspectionId, map[string]interface{}{
 			"message_id":           messageId,
 			"point_de_controle_id": idPointDeControle,
 		})
@@ -86,7 +86,7 @@ func (repo *Repository) LireMessage(ctx *domain.UserContext, idMessage int64) er
 		if err != nil {
 			return err
 		}
-		err = repo.CreateEvenement(tx, ctx, models.EvenementLectureMessage, message.PointDeControle.InspectionId, map[string]interface{}{
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementLectureMessage, message.PointDeControle.InspectionId, map[string]interface{}{
 			"message_id":           idMessage,
 			"point_de_controle_id": message.PointDeControleId,
 		})

@@ -34,8 +34,8 @@ func (repo *Repository) CreateCommentaire(ctx *domain.UserContext, idInspection 
 				return err
 			}
 		}
-		err = repo.CreateEvenement(tx, ctx, models.EvenementCommentaireGeneral, idInspection, map[string]interface{}{
-			"commentaire_id":           commentaireId,
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementCommentaireGeneral, idInspection, map[string]interface{}{
+			"commentaire_id": commentaireId,
 		})
 		return err
 	})

@@ -25,7 +25,7 @@ func (repo *Repository) CreateConstat(ctx *domain.UserContext, idPointDeControle
 		if err != nil {
 			return err
 		}
-		err = repo.CreateEvenement(tx, ctx, models.EvenementCreationConstat, pointDeControle.InspectionId, map[string]interface{}{
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementCreationConstat, pointDeControle.InspectionId, map[string]interface{}{
 			"constat_id":           constat.Id,
 			"point_de_controle_id": idPointDeControle,
 		})
@@ -50,7 +50,7 @@ func (repo *Repository) DeleteConstat(ctx *domain.UserContext, idPointDeControle
 		if err != nil {
 			return err
 		}
-		err = repo.CreateEvenement(tx, ctx, models.EvenementSuppressionConstat, pointDeControle.InspectionId, map[string]interface{}{
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementSuppressionConstat, pointDeControle.InspectionId, map[string]interface{}{
 			"constat_id":           pointDeControle.ConstatId,
 			"point_de_controle_id": idPointDeControle,
 		})

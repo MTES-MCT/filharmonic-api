@@ -22,6 +22,26 @@ func Init(t *testing.T) (*httpexpect.Expect, func()) {
 	return e, close
 }
 
+func InitService(t *testing.T) (*require.Assertions, *app.Application, func()) {
+	assert, a := InitDB(t)
+
+	var err error
+	a.Storage, err = storage.New(a.Config.Storage)
+	assert.NoError(err)
+	a.Sessions = sessions.NewMemory()
+	sso := new(mocks.Sso)
+	a.Sso = sso
+	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
+	a.Service = domain.New(a.Repo, a.Storage)
+
+	return assert, a, func() {
+		err := a.Shutdown()
+		if err != nil {
+			log.Fatal().Msg(err.Error())
+		}
+	}
+}
+
 func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
 	assert, a := InitDB(t)
 
@@ -32,7 +52,7 @@ func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
 	sso := new(mocks.Sso)
 	a.Sso = sso
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
-	a.Service = domain.New(a.Repo, a.Storage, a.EmailService)
+	a.Service = domain.New(a.Repo, a.Storage)
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
 	assert.NoError(a.Server.Start())
 	assert.NoError(initSessions(a.Sessions))

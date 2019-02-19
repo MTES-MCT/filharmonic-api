@@ -24,7 +24,7 @@ func (repo *Repository) CreateSuite(ctx *domain.UserContext, idInspection int64,
 		if err != nil {
 			return err
 		}
-		err = repo.CreateEvenement(tx, ctx, models.EvenementCreationSuite, idInspection, nil)
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementCreationSuite, idInspection, nil)
 		return err
 	})
 	return suiteId, err
@@ -38,7 +38,7 @@ func (repo *Repository) UpdateSuite(ctx *domain.UserContext, idInspection int64,
 			return err
 		}
 
-		err = repo.CreateEvenement(tx, ctx, models.EvenementModificationSuite, idInspection, nil)
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementModificationSuite, idInspection, nil)
 		return err
 	})
 	return err
@@ -61,7 +61,7 @@ func (repo *Repository) DeleteSuite(ctx *domain.UserContext, idInspection int64)
 			return err
 		}
 
-		err = repo.CreateEvenement(tx, ctx, models.EvenementSuppressionSuite, idInspection, nil)
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementSuppressionSuite, idInspection, nil)
 		return err
 	})
 	return err

@@ -17,7 +17,7 @@ func (repo *Repository) ListEvenements(ctx *domain.UserContext, filter domain.Li
 	return evenements, err
 }
 
-func (repo *Repository) CreateEvenement(tx *pg.Tx, ctx *domain.UserContext, typeEvenement models.TypeEvenement, idInspection int64, data map[string]interface{}) error {
+func (repo *Repository) CreateEvenementTx(tx *pg.Tx, ctx *domain.UserContext, typeEvenement models.TypeEvenement, idInspection int64, data map[string]interface{}) error {
 	evenement := models.Evenement{
 		AuteurId:     ctx.User.Id,
 		CreatedAt:    time.Now(),
@@ -32,4 +32,10 @@ func (repo *Repository) CreateEvenement(tx *pg.Tx, ctx *domain.UserContext, type
 
 	err = repo.createNotifications(tx, ctx, evenement)
 	return err
+}
+
+func (repo *Repository) CreateEvenement(ctx *domain.UserContext, typeEvenement models.TypeEvenement, idInspection int64, data map[string]interface{}) error {
+	return repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
+		return repo.CreateEvenementTx(tx, ctx, typeEvenement, idInspection, data)
+	})
 }
