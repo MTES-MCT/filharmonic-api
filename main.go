@@ -13,6 +13,7 @@ import (
 func main() {
 	importEtablissements := flag.String("import-etablissements", "", "Importe des établissements à partir d'un CSV")
 	importInspecteurs := flag.String("import-inspecteurs", "", "Importe des inspecteurs à partir d'un CSV")
+	importExploitants := flag.String("import-exploitants", "", "Importe des exploitants à partir d'un CSV")
 	flag.Parse()
 
 	config := app.LoadConfig()
@@ -32,6 +33,14 @@ func main() {
 
 	if *importInspecteurs != "" {
 		err = importcsv.LoadInspecteursCSV(*importInspecteurs, application.DB)
+		if err != nil {
+			log.Fatal().Err(err).Msg("could not import CSV")
+		}
+		os.Exit(0)
+	}
+
+	if *importExploitants != "" {
+		err = importcsv.LoadExploitantsCSV(*importExploitants, application.DB)
 		if err != nil {
 			log.Fatal().Err(err).Msg("could not import CSV")
 		}
