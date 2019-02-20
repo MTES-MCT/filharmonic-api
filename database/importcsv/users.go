@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// nolint: gocyclo
 func LoadInspecteursCSV(filepath string, db *database.Database) error {
 	indexesInspecteur := map[string]int{
 		"nom":         0,
@@ -65,13 +66,15 @@ func LoadInspecteursCSV(filepath string, db *database.Database) error {
 			iterations++
 			nbInspecteursImportes += 1
 		}
-		_, err = db.Model(&inspecteurs).
-			OnConflict("(email) DO UPDATE").
-			Insert()
-		if err != nil {
-			log.Error().Err(err).Msg("failed to save inspecteurs")
+		if len(inspecteurs) > 0 {
+			_, err = db.Model(&inspecteurs).
+				OnConflict("(email) DO UPDATE").
+				Insert()
+			if err != nil {
+				log.Error().Err(err).Msg("failed to save inspecteurs")
+			}
+			inspecteurs = inspecteurs[:0]
 		}
-		inspecteurs = inspecteurs[:0]
 	}
 	log.Warn().Msgf("%d inspecteurs importés", nbInspecteursImportes)
 
@@ -151,24 +154,26 @@ func LoadExploitantsCSV(filepath string, db *database.Database) error {
 			iterations++
 			nbExploitantsImportes += 1
 		}
-		_, err = db.Model(&exploitants).
-			OnConflict("(email) DO UPDATE").
-			Insert()
-		if err != nil {
-			log.Error().Err(err).Msg("failed to save exploitants")
-		}
+		if len(exploitants) > 0 {
+			_, err = db.Model(&exploitants).
+				OnConflict("(email) DO UPDATE").
+				Insert()
+			if err != nil {
+				log.Error().Err(err).Msg("failed to save exploitants")
+			}
 
-		for index, _ := range etablissementToExploitants {
-			etablissementToExploitants[index].UserId = exploitants[index].Id
-		}
+			for index, _ := range etablissementToExploitants {
+				etablissementToExploitants[index].UserId = exploitants[index].Id
+			}
 
-		_, err = db.Model(&etablissementToExploitants).Insert()
-		if err != nil {
-			log.Error().Err(err).Msg("failed to save etablissementToExploitants")
-		}
+			_, err = db.Model(&etablissementToExploitants).Insert()
+			if err != nil {
+				log.Error().Err(err).Msg("failed to save etablissementToExploitants")
+			}
 
-		exploitants = exploitants[:0]
-		etablissementToExploitants = etablissementToExploitants[:0]
+			exploitants = exploitants[:0]
+			etablissementToExploitants = etablissementToExploitants[:0]
+		}
 	}
 	log.Warn().Msgf("%d exploitants importés", nbExploitantsImportes)
 

@@ -71,13 +71,15 @@ func LoadEtablissementsCSV(filepath string, db *database.Database) error {
 			iterations++
 			nbEtablissementsImportes += 1
 		}
-		_, err = db.Model(&etablissements).
-			OnConflict("(s3ic) DO UPDATE").
-			Insert()
-		if err != nil {
-			log.Error().Err(err).Msg("failed to save etablissements")
+		if len(etablissements) > 0 {
+			_, err = db.Model(&etablissements).
+				OnConflict("(s3ic) DO UPDATE").
+				Insert()
+			if err != nil {
+				log.Error().Err(err).Msg("failed to save etablissements")
+			}
+			etablissements = etablissements[:0]
 		}
-		etablissements = etablissements[:0]
 	}
 	log.Warn().Msgf("%d établissements importés", nbEtablissementsImportes)
 
