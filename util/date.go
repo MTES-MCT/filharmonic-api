@@ -1,6 +1,7 @@
 package util
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
@@ -52,4 +53,8 @@ func DateTime(datestr string) time.Time {
 		log.Fatal().Msgf("unable to parse date: %v", err)
 	}
 	return date
+}
+
+func FormatDate(date time.Time) string {
+	return strconv.Itoa(date.Day()) + "/" + strconv.Itoa(int(date.Month())) + "/" + strconv.Itoa(date.Year())
 }

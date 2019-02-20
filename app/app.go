@@ -14,6 +14,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/emails"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/storage"
+	"github.com/MTES-MCT/filharmonic-api/templates"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -28,6 +29,7 @@ type Application struct {
 	Sso                   authentication.Sso
 	Sessions              sessions.Sessions
 	AuthenticationService *authentication.AuthenticationService
+	TemplateService       *templates.TemplateService
 	Service               *domain.Service
 	Storage               *storage.FileStorage
 	Server                *httpserver.HttpServer
@@ -87,8 +89,12 @@ func (a *Application) BootstrapServer() error {
 	}
 	a.EmailService = emails.New(a.Config.Emails)
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
-	a.Service = domain.New(a.Repo, a.Storage)
-	a.Cron, err = cron.New(a.Config.Cron, a.Service, a.EmailService)
+	a.TemplateService, err = templates.New(a.Config.Templates)
+	if err != nil {
+		return err
+	}
+	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService)
+	a.Cron, err = cron.New(a.Config.Cron, a.Service, a.EmailService, a.TemplateService)
 	if err != nil {
 		return err
 	}

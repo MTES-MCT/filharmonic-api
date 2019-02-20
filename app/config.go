@@ -8,6 +8,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/emails"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/storage"
+	"github.com/MTES-MCT/filharmonic-api/templates"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/rs/zerolog/log"
 )
@@ -29,6 +30,7 @@ type Config struct {
 	Sso        authentication.SsoConfig
 	Redis      sessions.RedisConfig
 	Storage    storage.Config
+	Templates  templates.Config
 	LogLevel   string  `default:"info"`
 	Mode       ModeEnv `default:"prod"`
 }

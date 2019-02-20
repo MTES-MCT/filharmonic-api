@@ -1,13 +1,15 @@
 package domain
 
 type Service struct {
-	repo    Repository
-	storage Storage
+	repo            Repository
+	storage         Storage
+	templateService TemplateService
 }
 
-func New(repo Repository, storage Storage) *Service {
+func New(repo Repository, storage Storage, templateService TemplateService) *Service {
 	return &Service{
-		repo:    repo,
-		storage: storage,
+		repo:            repo,
+		storage:         storage,
+		templateService: templateService,
 	}
 }

@@ -74,3 +74,8 @@ type Storage interface {
 type EmailService interface {
 	Send(email emails.Email) error
 }
+
+type TemplateService interface {
+	RenderHTMLEmailNouveauxMessages(data interface{}) (string, error)
+	RenderLettreAnnonce(data interface{}) (string, error)
+}

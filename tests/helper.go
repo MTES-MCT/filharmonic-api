@@ -13,6 +13,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/storage"
+	"github.com/MTES-MCT/filharmonic-api/templates"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
@@ -32,7 +33,9 @@ func InitService(t *testing.T) (*require.Assertions, *app.Application, func()) {
 	sso := new(mocks.Sso)
 	a.Sso = sso
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
-	a.Service = domain.New(a.Repo, a.Storage)
+	a.TemplateService, err = templates.New(a.Config.Templates)
+	assert.NoError(err)
+	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService)
 
 	return assert, a, func() {
 		err := a.Shutdown()
@@ -52,7 +55,9 @@ func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
 	sso := new(mocks.Sso)
 	a.Sso = sso
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
-	a.Service = domain.New(a.Repo, a.Storage)
+	a.TemplateService, err = templates.New(a.Config.Templates)
+	assert.NoError(err)
+	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService)
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
 	assert.NoError(a.Server.Start())
 	assert.NoError(initSessions(a.Sessions))
@@ -95,7 +100,7 @@ func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	config.Database.InitSchema = true
 	config.Http.Host = "localhost"
 	config.Http.Logger = false
-	// config.Cron.TemplatesDir = "../../cron/templates"
+	config.Templates.Dir = "../../templates/templates/"
 	config.LogLevel = ""
 	application := app.New(config)
 	err := application.BootstrapDB()
