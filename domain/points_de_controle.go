@@ -3,7 +3,7 @@ package domain
 import "github.com/MTES-MCT/filharmonic-api/models"
 
 func (s *Service) CreatePointDeControle(ctx *UserContext, idInspection int64, pointDeControle models.PointDeControle) (int64, error) {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return 0, ErrBesoinProfilInspecteur
 	}
 	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
@@ -18,7 +18,7 @@ func (s *Service) CreatePointDeControle(ctx *UserContext, idInspection int64, po
 }
 
 func (s *Service) UpdatePointDeControle(ctx *UserContext, idPointDeControle int64, pointDeControle models.PointDeControle) error {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
 
@@ -34,7 +34,7 @@ func (s *Service) UpdatePointDeControle(ctx *UserContext, idPointDeControle int6
 }
 
 func (s *Service) DeletePointDeControle(ctx *UserContext, idPointDeControle int64) error {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
 
@@ -50,7 +50,7 @@ func (s *Service) DeletePointDeControle(ctx *UserContext, idPointDeControle int6
 }
 
 func (s *Service) PublishPointDeControle(ctx *UserContext, idPointDeControle int64) error {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
 

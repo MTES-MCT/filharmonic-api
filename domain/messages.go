@@ -5,6 +5,9 @@ import (
 )
 
 func (s *Service) CreateMessage(ctx *UserContext, idPointDeControle int64, message models.Message) (int64, error) {
+	if ctx.IsApprobateur() {
+		return 0, ErrInvalidInput
+	}
 	ok, err := s.repo.CheckUserAllowedPointDeControle(ctx, idPointDeControle)
 	if err != nil {
 		return 0, err

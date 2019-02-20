@@ -15,7 +15,7 @@ func (s *Service) ListInspectionsFavorites(ctx *UserContext) ([]models.Inspectio
 }
 
 func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error) {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return 0, ErrBesoinProfilInspecteur
 	}
 	inspecteursIds := make([]int64, 0)
@@ -41,7 +41,7 @@ func (s *Service) GetInspection(ctx *UserContext, id int64) (*models.Inspection,
 }
 
 func (s *Service) UpdateInspection(ctx *UserContext, inspection models.Inspection) error {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
 	inspecteursIds := make([]int64, 0)

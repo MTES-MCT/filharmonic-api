@@ -3,7 +3,7 @@ package domain
 import "github.com/MTES-MCT/filharmonic-api/models"
 
 func (s *Service) CreateSuite(ctx *UserContext, idInspection int64, suite models.Suite) (int64, error) {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return 0, ErrBesoinProfilInspecteur
 	}
 
@@ -25,7 +25,7 @@ func (s *Service) CreateSuite(ctx *UserContext, idInspection int64, suite models
 }
 
 func (s *Service) UpdateSuite(ctx *UserContext, idInspection int64, suite models.Suite) error {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
 
@@ -47,7 +47,7 @@ func (s *Service) UpdateSuite(ctx *UserContext, idInspection int64, suite models
 }
 
 func (s *Service) DeleteSuite(ctx *UserContext, idInspection int64) error {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
 

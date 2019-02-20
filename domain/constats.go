@@ -3,7 +3,7 @@ package domain
 import "github.com/MTES-MCT/filharmonic-api/models"
 
 func (s *Service) CreateConstat(ctx *UserContext, idPointDeControle int64, constat models.Constat) (int64, error) {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return 0, ErrBesoinProfilInspecteur
 	}
 
@@ -25,7 +25,7 @@ func (s *Service) CreateConstat(ctx *UserContext, idPointDeControle int64, const
 }
 
 func (s *Service) DeleteConstat(ctx *UserContext, idPointDeControle int64) error {
-	if ctx.IsExploitant() {
+	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
 
