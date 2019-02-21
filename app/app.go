@@ -50,6 +50,7 @@ func (a *Application) BootstrapDB() error {
 
 	log.Info().Msgf("starting in mode %s", a.Config.Mode)
 	if a.Config.Mode == ModeTest {
+		a.Config.Database.InitSchema = true
 		a.Config.Database.Seeds = true
 	}
 

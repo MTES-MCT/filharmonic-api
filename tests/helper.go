@@ -97,7 +97,6 @@ func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	assert := require.New(t)
 	config := app.LoadConfig()
 	config.Mode = app.ModeTest
-	config.Database.InitSchema = true
 	config.Http.Host = "localhost"
 	config.Http.Logger = false
 	config.Templates.Dir = "../../templates/templates/"
