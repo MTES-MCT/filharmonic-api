@@ -8,13 +8,13 @@ import (
 
 func main() {
 	db, err := database.New(database.Config{
-		Host:       "localhost",
-		Port:       5432,
-		Name:       "filharmonic",
-		User:       "filharmonic",
-		Password:   "filharmonic",
-		LogSQL:     true,
-		InitSchema: false,
+		Host:            "localhost",
+		Port:            5432,
+		Name:            "filharmonic",
+		User:            "filharmonic",
+		Password:        "filharmonic",
+		LogSQL:          true,
+		ApplyMigrations: true,
 	})
 	if err != nil {
 		log.Fatalf("unable to connect to db, error: %v", err)
