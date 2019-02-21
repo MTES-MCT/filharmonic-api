@@ -37,5 +37,8 @@ func (sso *CerbereSso) ValidateTicket(ticket string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if userInfos.Email == "" {
+		return "", authentication.ErrTicketValidationFailed
+	}
 	return userInfos.Email, nil
 }

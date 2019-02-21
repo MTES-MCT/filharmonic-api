@@ -1,6 +1,12 @@
 package domain
 
-import "github.com/MTES-MCT/filharmonic-api/models"
+import (
+	"github.com/MTES-MCT/filharmonic-api/models"
+)
+
+var (
+	ErrInspectionNotFound = NewErrForbidden("Inspection non trouvée")
+)
 
 type ListInspectionsFilter struct {
 	Assigned bool `form:"assigned"`
@@ -37,7 +43,14 @@ func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspectio
 }
 
 func (s *Service) GetInspection(ctx *UserContext, id int64) (*models.Inspection, error) {
-	return s.repo.GetInspectionByID(ctx, id)
+	inspection, err := s.repo.GetInspectionByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if inspection == nil {
+		return nil, ErrInspectionNotFound
+	}
+	return inspection, nil
 }
 
 func (s *Service) UpdateInspection(ctx *UserContext, inspection models.Inspection) error {

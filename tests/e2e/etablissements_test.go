@@ -112,5 +112,5 @@ func TestGetEtablissementByIdNotOwnedByExploitant(t *testing.T) {
 
 	tests.AuthExploitant(e.GET("/etablissements/{id}")).WithPath("id", "3").
 		Expect().
-		Status(http.StatusNotFound)
+		Status(http.StatusForbidden)
 }

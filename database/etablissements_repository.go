@@ -8,6 +8,10 @@ import (
 	"github.com/go-pg/pg/orm"
 )
 
+var (
+	ErrEtablissementNotFound = domain.NewErrForbidden("Établissement non trouvé")
+)
+
 // utilisé seulement dans les tests
 func (repo *Repository) ListEtablissements() ([]models.Etablissement, error) {
 	etablissements := []models.Etablissement{}
@@ -70,7 +74,7 @@ func (repo *Repository) GetEtablissementByID(ctx *domain.UserContext, id int64) 
 	}
 	err := query.Select()
 	if err == pg.ErrNoRows {
-		return nil, nil
+		return nil, ErrEtablissementNotFound
 	}
 	return &etablissement, err
 }

@@ -4,6 +4,10 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
+var (
+	ErrPieceJointeNotFound = NewErrForbidden("Pièce-jointe non trouvée")
+)
+
 func (s *Service) CreatePieceJointe(ctx *UserContext, pieceJointeFile models.PieceJointeFile) (int64, error) {
 	storageId, err := s.storage.Put(pieceJointeFile)
 	if err != nil {
@@ -29,7 +33,7 @@ func (s *Service) GetPieceJointe(ctx *UserContext, idPieceJointe int64) (*models
 		return nil, err
 	}
 	if pieceJointe == nil {
-		return nil, ErrInvalidInput
+		return nil, ErrPieceJointeNotFound
 	}
 	reader, err := s.storage.Get(pieceJointe.StorageId)
 	if err != nil {

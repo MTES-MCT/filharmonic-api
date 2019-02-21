@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/MTES-MCT/filharmonic-api/authentication"
-
 	"github.com/MTES-MCT/filharmonic-api/database"
 )
 
@@ -30,7 +29,7 @@ func (sso *StubSso) ValidateTicket(ticket string) (string, error) {
 		return "", err
 	}
 	if user == nil {
-		return "", authentication.ErrMissingUser
+		return "", authentication.ErrTicketValidationFailed
 	}
 	return user.Email, nil
 }

@@ -1,8 +1,6 @@
 package authentication
 
 import (
-	"errors"
-
 	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
@@ -10,8 +8,7 @@ import (
 )
 
 var (
-	ErrUnauthorized = errors.New("unauthorized user")
-	ErrMissingUser  = errors.New("missing user")
+	ErrUnauthorized = domain.NewErrUnauthorized("Accès non autorisé")
 )
 
 type SsoConfig struct {
@@ -50,7 +47,7 @@ func (service *AuthenticationService) Login(ticket string) (*LoginResult, error)
 		return nil, err
 	}
 	if user == nil {
-		return nil, ErrMissingUser
+		return nil, domain.ErrUserNotFound
 	}
 	token, err := service.sessions.Add(user.Id)
 	if err != nil {
@@ -76,7 +73,7 @@ func (service *AuthenticationService) ValidateToken(token string) (*domain.UserC
 		return nil, err
 	}
 	if user == nil {
-		return nil, ErrMissingUser
+		return nil, domain.ErrUserNotFound
 	}
 	return &domain.UserContext{User: user}, nil
 }

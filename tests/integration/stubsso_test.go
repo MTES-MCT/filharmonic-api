@@ -22,6 +22,6 @@ func TestValidateTicketFailed(t *testing.T) {
 	sso := stubsso.New(application.Repo)
 
 	email, err := sso.ValidateTicket("ticket-9000000000000000000")
-	assert.Equal(authentication.ErrMissingUser, err)
+	assert.Equal(authentication.ErrTicketValidationFailed, err)
 	assert.Equal("", email)
 }

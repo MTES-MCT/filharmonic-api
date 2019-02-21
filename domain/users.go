@@ -1,9 +1,15 @@
 package domain
 
-import "github.com/MTES-MCT/filharmonic-api/models"
+import (
+	"github.com/MTES-MCT/filharmonic-api/models"
+)
+
+var (
+	ErrUserNotFound = NewErrForbidden("Utilisateur non trouvé")
+)
 
 type ListUsersFilters struct {
-	Inspecteurs bool `form:"inspecteurs"`
+	Inspecteurs  bool `form:"inspecteurs"`
 	Approbateurs bool `form:"approbateurs"`
 }
 

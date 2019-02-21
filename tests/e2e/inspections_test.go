@@ -101,11 +101,10 @@ func TestGetInspectionAsExploitantNotAllowed(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	result := tests.AuthExploitant(e.GET("/inspections/{id}")).WithPath("id", "2").
+	tests.AuthExploitant(e.GET("/inspections/{id}")).WithPath("id", "2").
 		Expect().
-		Status(http.StatusNotFound).
+		Status(http.StatusForbidden).
 		JSON().Object()
-	result.ValueEqual("message", "not_found")
 }
 
 func TestGetInspectionAsExploitantAllowed(t *testing.T) {
