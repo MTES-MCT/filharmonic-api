@@ -43,6 +43,9 @@ func NewRedis(config RedisConfig) (*RedisSessions, error) {
 func (redisSessions *RedisSessions) Get(sessionToken string) (int64, error) {
 	id, err := redisSessions.client.Get(Prefix + sessionToken).Int64()
 	if err != nil {
+		if err == redis.Nil {
+			return int64(0), nil
+		}
 		return int64(0), err
 	}
 	err = redisSessions.client.Expire(Prefix+sessionToken, redisSessions.config.Expiration).Err()
