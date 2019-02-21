@@ -13,15 +13,16 @@ import (
 )
 
 type Config struct {
-	Host           string `default:"localhost"`
-	Port           int    `default:"5432"`
-	User           string `default:"filharmonic"`
-	Password       string `default:"filharmonic"`
-	Name           string `default:"filharmonic"`
-	InitSchema     bool   `default:"false"`
-	Seeds          bool   `default:"false"`
-	LogSQL         bool   `default:"false"`
-	PaginationSize int    `default:"50"`
+	Host            string `default:"localhost"`
+	Port            int    `default:"5432"`
+	User            string `default:"filharmonic"`
+	Password        string `default:"filharmonic"`
+	Name            string `default:"filharmonic"`
+	ApplyMigrations bool   `default:"true"`
+	InitSchema      bool   `default:"false"`
+	Seeds           bool   `default:"false"`
+	LogSQL          bool   `default:"false"`
+	PaginationSize  int    `default:"50"`
 }
 
 type Database struct {
@@ -72,7 +73,7 @@ func New(config Config) (*Database, error) {
 	if config.InitSchema {
 		log.Warn().Msg("clearing and creating database schema")
 		err = db.createSchema()
-	} else {
+	} else if config.ApplyMigrations {
 		err = migrations.MigrateDB(client)
 	}
 	if err != nil {
