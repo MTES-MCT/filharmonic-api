@@ -14,14 +14,18 @@ const AuthorizationHeader = "Authorization"
 func (server *HttpServer) authRequired(c *gin.Context) {
 	token := c.Request.Header.Get(AuthorizationHeader)
 	if token == "" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
-		log.Warn().Msg("token empty")
+		log.Warn().Msg("empty token")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"message": "Accès non autorisé",
+		})
 		return
 	}
 	userContext, err := server.authenticationService.ValidateToken(token)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
-		log.Error().Err(err)
+		log.Error().Err(err).Msg("could not validate token")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"message": "Accès non autorisé",
+		})
 		return
 	}
 	c.Set(userContextKey, userContext)
