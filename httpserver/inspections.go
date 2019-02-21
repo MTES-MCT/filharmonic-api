@@ -1,229 +1,98 @@
 package httpserver
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 )
 
-func (server *HttpServer) listInspections(c *gin.Context) {
+func (server *HttpServer) listInspections(c *gin.Context) (interface{}, error) {
 	filter := domain.ListInspectionsFilter{}
 	if err := c.ShouldBindQuery(&filter); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputErrorN(err)
 	}
-	inspections, err := server.service.ListInspections(server.retrieveUserContext(c), filter)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, inspections)
+	return server.service.ListInspections(server.retrieveUserContext(c), filter)
 }
 
-func (server *HttpServer) getInspection(c *gin.Context) {
+func (server *HttpServer) getInspection(c *gin.Context) (interface{}, error) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputErrorN(err)
 	}
-	inspection, err := server.service.GetInspection(server.retrieveUserContext(c), id)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	if inspection == nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "not_found",
-		})
-		return
-	}
-	c.JSON(http.StatusOK, inspection)
+	return server.service.GetInspection(server.retrieveUserContext(c), id)
 }
 
-func (server *HttpServer) createInspection(c *gin.Context) {
+func (server *HttpServer) createInspection(c *gin.Context) (int64, error) {
 	var inspection models.Inspection
 	if err := c.ShouldBindJSON(&inspection); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputErrorI(err)
 	}
-	inspectionId, err := server.service.CreateInspection(server.retrieveUserContext(c), inspection)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"id": inspectionId,
-	})
+	return server.service.CreateInspection(server.retrieveUserContext(c), inspection)
 }
 
-func (server *HttpServer) updateInspection(c *gin.Context) {
+func (server *HttpServer) updateInspection(c *gin.Context) error {
 	var inspection models.Inspection
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
 	if err = c.ShouldBindJSON(&inspection); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
 	inspection.Id = id
-	err = server.service.UpdateInspection(server.retrieveUserContext(c), inspection)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "updated"})
+	return server.service.UpdateInspection(server.retrieveUserContext(c), inspection)
 }
 
-func (server *HttpServer) publishInspection(c *gin.Context) {
+func (server *HttpServer) publishInspection(c *gin.Context) error {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
-	err = server.service.PublishInspection(server.retrieveUserContext(c), idInspection)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "published"})
+	return server.service.PublishInspection(server.retrieveUserContext(c), idInspection)
 }
 
-func (server *HttpServer) askValidateInspection(c *gin.Context) {
+func (server *HttpServer) askValidateInspection(c *gin.Context) error {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
-	err = server.service.AskValidateInspection(server.retrieveUserContext(c), idInspection)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "validation asked"})
+	return server.service.AskValidateInspection(server.retrieveUserContext(c), idInspection)
 }
 
-func (server *HttpServer) rejectInspection(c *gin.Context) {
+func (server *HttpServer) rejectInspection(c *gin.Context) error {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
-	err = server.service.RejectInspection(server.retrieveUserContext(c), idInspection)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "rejected"})
+	return server.service.RejectInspection(server.retrieveUserContext(c), idInspection)
 }
 
-func (server *HttpServer) validateInspection(c *gin.Context) {
+func (server *HttpServer) validateInspection(c *gin.Context) error {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
-	err = server.service.ValidateInspection(server.retrieveUserContext(c), idInspection)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "validated"})
+	return server.service.ValidateInspection(server.retrieveUserContext(c), idInspection)
 }
 
-func (server *HttpServer) addFavoriToInspection(c *gin.Context) {
+func (server *HttpServer) addFavoriToInspection(c *gin.Context) error {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
-	err = server.service.AddFavoriToInspection(server.retrieveUserContext(c), idInspection)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "created"})
+	return server.service.AddFavoriToInspection(server.retrieveUserContext(c), idInspection)
 }
 
-func (server *HttpServer) removeFavoriToInspection(c *gin.Context) {
+func (server *HttpServer) removeFavoriToInspection(c *gin.Context) error {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
-	err = server.service.RemoveFavoriToInspection(server.retrieveUserContext(c), idInspection)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "deleted"})
+	return server.service.RemoveFavoriToInspection(server.retrieveUserContext(c), idInspection)
 }
 
-func (server *HttpServer) listInspectionsFavorites(c *gin.Context) {
-	inspections, err := server.service.ListInspectionsFavorites(server.retrieveUserContext(c))
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, inspections)
+func (server *HttpServer) listInspectionsFavorites(c *gin.Context) (interface{}, error) {
+	return server.service.ListInspectionsFavorites(server.retrieveUserContext(c))
 }

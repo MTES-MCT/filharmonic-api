@@ -1,36 +1,20 @@
 package httpserver
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 )
 
-func (server *HttpServer) addCommentaire(c *gin.Context) {
-	var commentaire models.Commentaire
+func (server *HttpServer) addCommentaire(c *gin.Context) (int64, error) {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputErrorI(err)
 	}
+	var commentaire models.Commentaire
 	if err = c.ShouldBindJSON(&commentaire); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputErrorI(err)
 	}
-	idCommentaire, err := server.service.CreateCommentaire(server.retrieveUserContext(c), idInspection, commentaire)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"id": idCommentaire})
+	return server.service.CreateCommentaire(server.retrieveUserContext(c), idInspection, commentaire)
 }

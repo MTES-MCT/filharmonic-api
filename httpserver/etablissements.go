@@ -1,46 +1,24 @@
 package httpserver
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 )
 
-func (server *HttpServer) listEtablissements(c *gin.Context) {
+func (server *HttpServer) listEtablissements(c *gin.Context) (interface{}, error) {
 	filter := domain.ListEtablissementsFilter{}
 	if err := c.ShouldBindQuery(&filter); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputErrorN(err)
 	}
-	searchResults, err := server.service.ListEtablissements(server.retrieveUserContext(c), filter)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	c.JSON(http.StatusOK, searchResults)
+	return server.service.ListEtablissements(server.retrieveUserContext(c), filter)
 }
 
-func (server *HttpServer) getEtablissement(c *gin.Context) {
+func (server *HttpServer) getEtablissement(c *gin.Context) (interface{}, error) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
+		return badInputErrorN(err)
 	}
-	etablissement, err := server.service.GetEtablissement(server.retrieveUserContext(c), id)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	if etablissement == nil {
-		c.JSON(http.StatusNotFound, nil)
-		return
-	}
-	c.JSON(http.StatusOK, etablissement)
+	return server.service.GetEtablissement(server.retrieveUserContext(c), id)
 }

@@ -1,12 +1,10 @@
 package httpserver
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
-func (server *HttpServer) getUser(c *gin.Context) {
+func (server *HttpServer) getUser(c *gin.Context) (interface{}, error) {
 	ctx := server.retrieveUserContext(c)
-	c.JSON(http.StatusOK, ctx.User)
+	return ctx.User, nil
 }

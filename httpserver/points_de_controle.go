@@ -1,100 +1,48 @@
 package httpserver
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 )
 
-func (server *HttpServer) addPointDeControle(c *gin.Context) {
-	var pointDeControle models.PointDeControle
+func (server *HttpServer) addPointDeControle(c *gin.Context) (int64, error) {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputErrorI(err)
 	}
-	if err = c.ShouldBindJSON(&pointDeControle); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	idPointDeControle, err := server.service.CreatePointDeControle(server.retrieveUserContext(c), idInspection, pointDeControle)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"id": idPointDeControle})
-}
-
-func (server *HttpServer) updatePointDeControle(c *gin.Context) {
 	var pointDeControle models.PointDeControle
-	idPointDeControle, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
 	if err = c.ShouldBindJSON(&pointDeControle); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputErrorI(err)
 	}
-	err = server.service.UpdatePointDeControle(server.retrieveUserContext(c), idPointDeControle, pointDeControle)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "updated"})
+	return server.service.CreatePointDeControle(server.retrieveUserContext(c), idInspection, pointDeControle)
 }
 
-func (server *HttpServer) deletePointDeControle(c *gin.Context) {
+func (server *HttpServer) updatePointDeControle(c *gin.Context) error {
 	idPointDeControle, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
-	err = server.service.DeletePointDeControle(server.retrieveUserContext(c), idPointDeControle)
-	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+	var pointDeControle models.PointDeControle
+	if err = c.ShouldBindJSON(&pointDeControle); err != nil {
+		return badInputError(err)
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "deleted"})
+	return server.service.UpdatePointDeControle(server.retrieveUserContext(c), idPointDeControle, pointDeControle)
 }
 
-func (server *HttpServer) publishPointDeControle(c *gin.Context) {
+func (server *HttpServer) deletePointDeControle(c *gin.Context) error {
 	idPointDeControle, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
-	err = server.service.PublishPointDeControle(server.retrieveUserContext(c), idPointDeControle)
+	return server.service.DeletePointDeControle(server.retrieveUserContext(c), idPointDeControle)
+}
+
+func (server *HttpServer) publishPointDeControle(c *gin.Context) error {
+	idPointDeControle, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		log.Error().Err(err).Msg("Bad service response")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return badInputError(err)
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "published"})
+	return server.service.PublishPointDeControle(server.retrieveUserContext(c), idPointDeControle)
 }
