@@ -1,4 +1,5 @@
 database/scripts/.tmp
 filharmonic-api
 vendor
+.tmp/
 .vscode/

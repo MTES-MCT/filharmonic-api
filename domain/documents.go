@@ -88,3 +88,52 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 		Content: strings.NewReader(contenuLettre),
 	}, nil
 }
+
+type Rapport struct {
+	Inspection       models.Inspection
+	DateInspection   string
+	DateRapport      string
+	VilleUnite       string
+	DepartementUnite string
+	NomDirection     string
+	URLDirection     string
+	Prefet           string
+	Auteur           Person
+	AutresAuteurs    []Person
+	Exploitant       Person
+}
+
+func NewRapport(inspection *models.Inspection) Rapport {
+	rapport := Rapport{}
+	rapport.Inspection = *inspection
+	rapport.DateRapport = util.FormatDate(time.Now())
+	rapport.DateInspection = util.FormatDate(inspection.Date.Time)
+	rapport.Prefet = "PRÉFET DU RHÔNE"
+	rapport.DepartementUnite = "Rhône"
+	rapport.NomDirection = "DREAL Auvergne-Rhône-Alpes"
+	rapport.URLDirection = "www.auvergne.rhone-alpes.developpement-durable.gouv.fr"
+	rapport.VilleUnite = "Lyon"
+
+	if len(inspection.Inspecteurs) > 0 {
+		rapport.Auteur = Person{
+			Nom:       inspection.Inspecteurs[0].Prenom + " " + inspection.Inspecteurs[0].Nom,
+			Telephone: "04 01 02 03 04",
+			Email:     inspection.Inspecteurs[0].Email,
+		}
+	}
+	if len(inspection.Etablissement.Exploitants) > 0 {
+		rapport.Exploitant = Person{
+			Nom: inspection.Etablissement.Exploitants[0].Prenom + " " + inspection.Etablissement.Exploitants[0].Nom,
+		}
+	}
+
+	rapport.AutresAuteurs = []Person{}
+	if len(inspection.Inspecteurs) > 1 {
+		for _, inspecteur := range inspection.Inspecteurs[1:] {
+			rapport.AutresAuteurs = append(rapport.AutresAuteurs, Person{
+				Nom: inspecteur.Prenom + " " + inspecteur.Nom,
+			})
+		}
+	}
+	return rapport
+}

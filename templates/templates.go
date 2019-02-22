@@ -4,6 +4,8 @@ import (
 	"bytes"
 	html "html/template"
 	text "text/template"
+
+	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
 type Config struct {
@@ -15,7 +17,30 @@ type TemplateService struct {
 
 	emailNouveauxMessagesTemplate *html.Template
 	lettreAnnonceTemplate         *text.Template
+	rapportTemplate               *text.Template
 }
+
+var (
+	templateHelpers = text.FuncMap{
+		"type_suite": func(value models.TypeSuite) string {
+			switch value {
+			case models.TypeSuiteAucune:
+				return "Aucune"
+			case models.TypeSuiteObservation:
+				return "Observation ou non conformités à traiter par courrier"
+			case models.TypeSuitePropositionMiseEnDemeure:
+				return "Proposition de suites administratives"
+			case models.TypeSuitePropositionRenforcement:
+				return "Proposition de renforcement, modification ou mise à jour des prescription"
+			case models.TypeSuiteAutre:
+				return "Autre"
+			default:
+				return string(value)
+			}
+		},
+		// TODO reste des helpers
+	}
+)
 
 func New(config Config) (*TemplateService, error) {
 	service := &TemplateService{
@@ -27,7 +52,16 @@ func New(config Config) (*TemplateService, error) {
 		return nil, err
 	}
 
-	service.lettreAnnonceTemplate, err = text.ParseFiles(config.Dir + "modele_de_lettre_annonce_inspection.fodt")
+	service.lettreAnnonceTemplate, err = text.New("modele_de_lettre_annonce_inspection.fodt").
+		Funcs(templateHelpers).
+		ParseFiles(config.Dir + "modele_de_lettre_annonce_inspection.fodt")
+	if err != nil {
+		return nil, err
+	}
+
+	service.rapportTemplate, err = text.New("modele_de_rapport_inspection.fodt").
+		Funcs(templateHelpers).
+		ParseFiles(config.Dir + "modele_de_rapport_inspection.fodt")
 	if err != nil {
 		return nil, err
 	}
@@ -41,6 +75,10 @@ func (s *TemplateService) RenderHTMLEmailNouveauxMessages(data interface{}) (str
 
 func (s *TemplateService) RenderLettreAnnonce(data interface{}) (string, error) {
 	return s.renderTextTemplate(s.lettreAnnonceTemplate, data)
+}
+
+func (s *TemplateService) RenderRapport(data interface{}) (string, error) {
+	return s.renderTextTemplate(s.rapportTemplate, data)
 }
 
 func (s *TemplateService) renderHTMLTemplate(tmpl *html.Template, data interface{}) (string, error) {
