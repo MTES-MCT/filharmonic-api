@@ -1,30 +1,72 @@
 <html>
+  <head>
+    <style>
+    a[href] {
+      color: #1050c0;
+      text-decoration: none;
+    }
+    .label {
+      color: #8c8c8c;
+    }
+    .message {
+      margin-top: 12px;
+      border-left: 4px solid black;
+      padding-left: 16px;
+    }
+    .maincontent {
+      padding: 32px;
+      background-color: #ffffff;
+      border: 1px solid #ededed;
+      border-radius: 3px;
+    }
+    </style>
+  </head>
 <body>
-<div style="background-color: white; color: black; padding-left: 10px; padding-right: 10px;">
+<table style="background-color: #fafafa; border-collapse: collapse; margin: 0 auto">
+  <tr>
+    <td style="text-align: center; padding: 32px"><h2>Fil'Harmonic</h2></td>
+  </tr>
 
-Bonjour {{ .Destinataire.Nom }},
+  <tr>
+      <td class="maincontent">
 
-Vous avez {{ len .Messages }} messages non lus.<br>
-Vous pouvez les consulter en ligne sur https://filharmonic.beta.gouv.fr.
-{{ range .Messages }}
-<ul>
-  <li>
-    Etablissement : {{ .RaisonEtablissement }}
-  </li>
-  <li>
-    Date Inspection : {{ .DateInspection }}
-  </li>
-  <li>
-    Point de contrôle : {{ .SujetPointDeControle }}
-  </li>
-  <li>
-    Auteur : {{ .NomAuteur }}
-  </li>
-  <li>
-    Message : {{ .Message }}
-  </li>
-</ul>
-{{ end }}
-</div>
+        <p>Bonjour {{ .Destinataire.Nom }},</p>
+
+        <p>Vous avez {{ len .Messages }} message(s) non lu(s) sur <a href="https://filharmonic.beta.gouv.fr">Fil'Harmonic</a>.</p>
+
+
+        {{ range .Messages }}
+        <hr style="margin-top: 12px">
+        <div class="message">
+          <table style="border-collapse: collapse;">
+            <tr>
+                <td style="padding-right: 16px">Établissement : <strong>{{ .RaisonEtablissement }}</strong></td>
+                <td style="padding-left: 16px; text-align: right; border-left: 1px solid #cecece">Inspection du <strong>{{ .DateInspection }}</strong></td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding-top: 6px;"><strong>Sujet :</strong> {{ .SujetPointDeControle }}</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding-left: 12px; padding-top: 12px">
+                <strong>{{ .NomAuteur }}</strong>, <em>le {{ .DateMessage }}</em><br>
+                {{ .Message }}
+              </td>
+            </tr>
+          </table>
+        </div>
+        {{ end }}
+      </td>
+  </tr>
+
+  <tr>
+      <td style="text-align: center; color: #5c5c5c; padding-top: 16px; padding-bottom: 32px;">
+        <p>Vous recevez cet email car vous avez un compte sur <a href="https://filharmonic.beta.gouv.fr">filharmonic.beta.gouv.fr</a>.</p>
+        <p >Pour plus d'informations sur le service Fil'Harmonic et ses ambitions,<br>
+        vous pouvez consulter la <a href="https://beta.gouv.fr/startups/filharmonic.html">page de produit de Fil'Harmonic</a>.</p>
+      </td>
+  </tr>
+</table>
+<!-- <div style="background-color: white; color: black; padding-left: 10px; padding-right: 10px;"> -->
+
 </body>
 </html>

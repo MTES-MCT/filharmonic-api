@@ -28,14 +28,14 @@ func TestRenderEmailTemplate(t *testing.T) {
 		},
 		Messages: []domain.NouveauMessage{
 			domain.NouveauMessage{
-				DateInspection:       "2018-02-24",
+				DateInspection:       "24/02/2018",
 				RaisonEtablissement:  "Etablissement 1",
 				SujetPointDeControle: "Rejets Eau",
 				Message:              "Il faut des photos",
 				NomAuteur:            "Alain Champion",
 			},
 			domain.NouveauMessage{
-				DateInspection:       "2018-02-26",
+				DateInspection:       "26/02/2018",
 				RaisonEtablissement:  "Etablissement 2",
 				SujetPointDeControle: "Rejets Air",
 				Message:              "Il faut des documents",
@@ -48,6 +48,7 @@ func TestRenderEmailTemplate(t *testing.T) {
 	assert.NoError(err)
 	assert.Contains(htmlPart, "Il faut des photos")
 	assert.Contains(htmlPart, "Il faut des documents")
+	assert.NoError(ioutil.WriteFile("../.tmp/email-new-messages.html", []byte(htmlPart), 0644))
 }
 
 func TestRenderLettreAnnonce(t *testing.T) {

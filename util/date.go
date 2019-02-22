@@ -57,3 +57,7 @@ func DateTime(datestr string) time.Time {
 func FormatDate(date time.Time) string {
 	return date.Format("02/01/2006")
 }
+
+func FormatDateTime(date time.Time) string {
+	return date.Format("02/01/2006 à 15h04")
+}

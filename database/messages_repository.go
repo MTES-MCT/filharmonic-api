@@ -5,6 +5,7 @@ import (
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 )
@@ -206,6 +207,7 @@ func (repo *Repository) toNouveauxMessageUsers(rows []RowNouveauMessageUser) []d
 			RaisonEtablissement:  row.RaisonEtablissement,
 			SujetPointDeControle: row.SujetPointDeControle,
 			Message:              row.Message,
+			DateMessage:          util.FormatDateTime(row.DateMessage),
 			NomAuteur:            row.NomAuteur,
 		})
 	}
@@ -221,6 +223,7 @@ type RowNouveauMessageUser struct {
 	RaisonEtablissement  string
 	SujetPointDeControle string
 	Message              string
+	DateMessage          time.Time
 	NomAuteur            string
 }
 
@@ -232,6 +235,7 @@ func (repo *Repository) buildQueryNouveauxMessage(joinFunc func(*orm.Query) (*or
 		ColumnExpr(`etablissement.raison as raison_etablissement`).
 		ColumnExpr(`p.sujet as sujet_point_de_controle`).
 		ColumnExpr(`m.message as message`).
+		ColumnExpr(`m.date as date_message`).
 		ColumnExpr(`auteur.prenom || ' ' || auteur.nom as nom_auteur`).
 		Apply(joinFunc).
 		Join("JOIN point_de_controles AS p").

@@ -52,7 +52,7 @@ func (cron *CronManager) sendEmailsNouveauxMessages() {
 			Subject:        "Fil'Harmonic : Nouveaux messages",
 			RecipientEmail: nouveauxMessagesUser.Destinataire.Email,
 			RecipientName:  nouveauxMessagesUser.Destinataire.Nom,
-			TextPart:       "TEMPLATE TEXT",
+			TextPart:       "Vous avez des nouveaux messages sur Fil'Harmonic",
 			HTMLPart:       htmlPart,
 		})
 		if err != nil {
