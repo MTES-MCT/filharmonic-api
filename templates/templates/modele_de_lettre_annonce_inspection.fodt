@@ -1625,8 +1625,8 @@
     <table:table-row table:style-name="Tableau1.1">
      <table:table-cell table:style-name="Tableau1.A1" office:value-type="string">
       <text:p text:style-name="P21">{{ .Inspection.Etablissement.Nom }}</text:p>
-      <text:p text:style-name="P21">{{ .Inspection.Etablissement.Adresse1 }}</text:p>
-      <text:p text:style-name="P21">{{ .Inspection.Etablissement.Adresse2 }}</text:p>
+      {{ if .Inspection.Etablissement.Adresse1 }}<text:p text:style-name="P21">{{ .Inspection.Etablissement.Adresse1 }}</text:p>{{ end }}
+      {{ if .Inspection.Etablissement.Adresse2 }}<text:p text:style-name="P21">{{ .Inspection.Etablissement.Adresse2 }}</text:p>{{ end }}
       <text:p text:style-name="P21">{{ .Inspection.Etablissement.CodePostal }} {{ .Inspection.Etablissement.Commune }}</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Tableau1.A1" office:value-type="string">
