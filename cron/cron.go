@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	Activity string `default:"0 0 1 * * *"`
+	Activity string `default:"0 0 1 * * 1-5"` // every day from monday to friday, at 1
 }
 
 type CronManager struct {
