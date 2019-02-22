@@ -26,7 +26,7 @@ type CirconstanceInspection string
 const (
 	CirconstanceIncident CirconstanceInspection = "incident"
 	CirconstancePlainte  CirconstanceInspection = "plainte"
-	CirconstanceAutres   CirconstanceInspection = "autres"
+	CirconstanceAutre    CirconstanceInspection = "autre"
 )
 
 type EtatInspection string
