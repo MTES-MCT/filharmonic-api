@@ -22,10 +22,10 @@ type CronManager struct {
 
 func New(config Config, service *domain.Service, emailService *emails.EmailService, templateService *templates.TemplateService) (*CronManager, error) {
 	cronmanager := &CronManager{
-		config:       config,
-		cron:         cron.New(),
-		service:      service,
-		emailService: emailService,
+		config:          config,
+		cron:            cron.New(),
+		service:         service,
+		emailService:    emailService,
 		templateService: templateService,
 	}
 	err := cronmanager.cron.AddFunc(config.Activity, cronmanager.sendEmailsNouveauxMessages)
