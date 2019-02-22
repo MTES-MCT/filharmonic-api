@@ -48,8 +48,10 @@ func (a *Application) BootstrapDB() error {
 	}
 	zerolog.SetGlobalLevel(logLevel)
 
-	log.Info().Msgf("starting in mode %s", a.Config.Mode)
-	if a.Config.Mode == ModeTest {
+	log.Info().Msgf("starting in %s mode", a.Config.Mode)
+	if a.Config.Mode == ModeDev {
+		a.Config.Database.ApplyMigrations = false
+	} else if a.Config.Mode == ModeTest {
 		a.Config.Database.InitSchema = true
 		a.Config.Database.Seeds = true
 	}
