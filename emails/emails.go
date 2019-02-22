@@ -31,14 +31,26 @@ type emailTemplate struct {
 }
 
 func New(config Config) *EmailService {
+	mailjetClient := mailjet.NewMailjetClient(config.APIPublicKey, config.APIPrivateKey)
+
+	if config.APIPublicKey != "" {
+		_, _, err := mailjetClient.List("metadata", nil)
+		if err != nil {
+			log.Error().Err(err).Msg("invalid email configuration")
+		}
+	}
+
 	return &EmailService{
 		config: config,
-		client: mailjet.NewMailjetClient(config.APIPublicKey, config.APIPrivateKey),
+		client: mailjetClient,
 	}
 }
 
 // See https://dev.mailjet.com/guides/#send-api-v3-1
 func (em *EmailService) Send(email Email) error {
+	if em.config.APIPublicKey == "" {
+		return nil
+	}
 	log.Debug().
 		Str("recipient", email.RecipientEmail).
 		Msg("send email")
