@@ -1617,7 +1617,7 @@
    <text:p text:style-name="P18"><text:span text:style-name="T20">Dans le cas où cette date ne vous conviendrait pas, je vous invite à me contacter dans les meilleurs délais, afin que nous convenions éventuellement d’une autre date&gt;</text:span>.</text:p>
    <text:p text:style-name="P18"/>
    <text:p text:style-name="P18"/>
-   <text:p text:style-name="P18">Je vous prie d’agréer, Madame, Monsieur {{ .Exploitant.Nom }}, l’expression de ma considération distinguée.</text:p>
+   <text:p text:style-name="P18">Je vous prie d’agréer, Madame, Monsieur, l’expression de ma considération distinguée.</text:p>
    <text:p text:style-name="P8"/>
    <table:table table:name="Tableau1" table:style-name="Tableau1">
     <table:table-column table:style-name="Tableau1.A"/>
