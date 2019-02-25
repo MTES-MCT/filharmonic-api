@@ -21,6 +21,7 @@ func TestLoadEtablissementsFromCSV(t *testing.T) {
 		Adresse2:   "",
 		CodePostal: "56000",
 		Commune:    "Vannes",
+		Regime:     models.RegimeEnregistrement,
 	}))
 
 	err := importcsv.LoadEtablissementsCSV("s3ic_ic_gen_fabnum.mini.csv", application.DB)
@@ -39,5 +40,6 @@ func TestLoadEtablissementsFromCSV(t *testing.T) {
 	assert.Equal("21460", etablissement.CodePostal)
 	assert.Equal("EPOISSES", etablissement.Commune)
 	assert.Equal("Non Seveso", etablissement.Seveso)
+	assert.Equal(models.RegimeDeclaration, etablissement.Regime)
 	assert.False(etablissement.Iedmtd)
 }
