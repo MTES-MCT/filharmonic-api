@@ -69,6 +69,13 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
+	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, ErrNonAssigneInspection
+	}
 	filter := InspectionFilter{
 		OmitPointsDeControleNonPublies: true,
 	}
@@ -98,6 +105,13 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*models.PieceJointeFile, error) {
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
+	}
+	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, ErrNonAssigneInspection
 	}
 	inspection, err := s.repo.GetInspectionByID(ctx, idInspection, InspectionFilter{})
 	if err != nil {
@@ -178,6 +192,13 @@ func NewRapport(inspection *models.Inspection) Rapport {
 func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.PieceJointeFile, error) {
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
+	}
+	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, ErrNonAssigneInspection
 	}
 	filter := InspectionFilter{
 		OmitPointsDeControleNonPublies: true,

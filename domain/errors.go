@@ -50,5 +50,6 @@ var (
 	ErrBesoinProfilApprobateur = NewErrForbidden("Il faut être approbateur")
 	ErrBesoinProfilExploitant  = NewErrForbidden("Il faut être exploitant")
 	ErrBesoinProfilInspecteur  = NewErrForbidden("Il faut être inspecteur")
+	ErrNonAssigneInspection    = NewErrForbidden("Il faut être assigné à l'inspection")
 	ErrInvalidInput            = NewErrBadInput("Données invalides")
 )

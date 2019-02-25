@@ -68,7 +68,14 @@ func (s *Service) UpdateInspection(ctx *UserContext, inspection models.Inspectio
 	if len(inspecteursIds) == 0 {
 		return ErrInvalidInput
 	}
-	ok, err := s.repo.CheckUsersInspecteurs(inspecteursIds)
+	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, inspection.Id)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrNonAssigneInspection
+	}
+	ok, err = s.repo.CheckUsersInspecteurs(inspecteursIds)
 	if err != nil {
 		return err
 	}
@@ -86,7 +93,14 @@ func (s *Service) PublishInspection(ctx *UserContext, idInspection int64) error 
 	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
-	err := s.changeEtatInspection(ctx, idInspection, models.EtatPreparation, models.EtatEnCours)
+	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrNonAssigneInspection
+	}
+	err = s.changeEtatInspection(ctx, idInspection, models.EtatPreparation, models.EtatEnCours)
 	if err != nil {
 		return err
 	}
@@ -98,7 +112,14 @@ func (s *Service) AskValidateInspection(ctx *UserContext, idInspection int64) er
 	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
-	err := s.changeEtatInspection(ctx, idInspection, models.EtatEnCours, models.EtatAttenteValidation)
+	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrNonAssigneInspection
+	}
+	err = s.changeEtatInspection(ctx, idInspection, models.EtatEnCours, models.EtatAttenteValidation)
 	if err != nil {
 		return err
 	}
