@@ -277,6 +277,20 @@ func (_m *Repository) CreateConstat(ctx *domain.UserContext, idPointDeControle i
 	return r0, r1
 }
 
+// CreateEvenement provides a mock function with given fields: ctx, typeEvenement, idInspection, data
+func (_m *Repository) CreateEvenement(ctx *domain.UserContext, typeEvenement models.TypeEvenement, idInspection int64, data map[string]interface{}) error {
+	ret := _m.Called(ctx, typeEvenement, idInspection, data)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, models.TypeEvenement, int64, map[string]interface{}) error); ok {
+		r0 = rf(ctx, typeEvenement, idInspection, data)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // CreateInspection provides a mock function with given fields: ctx, inspection
 func (_m *Repository) CreateInspection(ctx *domain.UserContext, inspection models.Inspection) (int64, error) {
 	ret := _m.Called(ctx, inspection)
@@ -460,15 +474,15 @@ func (_m *Repository) DeleteTheme(idTheme int64) error {
 }
 
 // FindEtablissements provides a mock function with given fields: ctx, filter
-func (_m *Repository) FindEtablissements(ctx *domain.UserContext, filter domain.ListEtablissementsFilter) ([]models.Etablissement, error) {
+func (_m *Repository) FindEtablissements(ctx *domain.UserContext, filter domain.ListEtablissementsFilter) (*models.FindEtablissementResults, error) {
 	ret := _m.Called(ctx, filter)
 
-	var r0 []models.Etablissement
-	if rf, ok := ret.Get(0).(func(*domain.UserContext, domain.ListEtablissementsFilter) []models.Etablissement); ok {
+	var r0 *models.FindEtablissementResults
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, domain.ListEtablissementsFilter) *models.FindEtablissementResults); ok {
 		r0 = rf(ctx, filter)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]models.Etablissement)
+			r0 = ret.Get(0).(*models.FindEtablissementResults)
 		}
 	}
 
@@ -528,13 +542,13 @@ func (_m *Repository) GetEtablissementByID(ctx *domain.UserContext, id int64) (*
 	return r0, r1
 }
 
-// GetInspectionByID provides a mock function with given fields: ctx, id
-func (_m *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*models.Inspection, error) {
-	ret := _m.Called(ctx, id)
+// GetInspectionByID provides a mock function with given fields: ctx, id, filter
+func (_m *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, filter domain.InspectionFilter) (*models.Inspection, error) {
+	ret := _m.Called(ctx, id, filter)
 
 	var r0 *models.Inspection
-	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) *models.Inspection); ok {
-		r0 = rf(ctx, id)
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64, domain.InspectionFilter) *models.Inspection); ok {
+		r0 = rf(ctx, id, filter)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Inspection)
@@ -542,8 +556,8 @@ func (_m *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*mod
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*domain.UserContext, int64) error); ok {
-		r1 = rf(ctx, id)
+	if rf, ok := ret.Get(1).(func(*domain.UserContext, int64, domain.InspectionFilter) error); ok {
+		r1 = rf(ctx, id, filter)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -694,6 +708,29 @@ func (_m *Repository) ListInspections(ctx *domain.UserContext, filter domain.Lis
 	return r0, r1
 }
 
+// ListInspectionsFavorites provides a mock function with given fields: ctx
+func (_m *Repository) ListInspectionsFavorites(ctx *domain.UserContext) ([]models.Inspection, error) {
+	ret := _m.Called(ctx)
+
+	var r0 []models.Inspection
+	if rf, ok := ret.Get(0).(func(*domain.UserContext) []models.Inspection); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.Inspection)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*domain.UserContext) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListNotifications provides a mock function with given fields: ctx, filter
 func (_m *Repository) ListNotifications(ctx *domain.UserContext, filter *domain.ListNotificationsFilter) ([]models.Notification, error) {
 	ret := _m.Called(ctx, filter)
@@ -710,6 +747,29 @@ func (_m *Repository) ListNotifications(ctx *domain.UserContext, filter *domain.
 	var r1 error
 	if rf, ok := ret.Get(1).(func(*domain.UserContext, *domain.ListNotificationsFilter) error); ok {
 		r1 = rf(ctx, filter)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListNouveauxMessages provides a mock function with given fields:
+func (_m *Repository) ListNouveauxMessages() ([]domain.NouveauxMessagesUser, error) {
+	ret := _m.Called()
+
+	var r0 []domain.NouveauxMessagesUser
+	if rf, ok := ret.Get(0).(func() []domain.NouveauxMessagesUser); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.NouveauxMessagesUser)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
 	} else {
 		r1 = ret.Error(1)
 	}

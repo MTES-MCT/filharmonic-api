@@ -42,8 +42,12 @@ func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspectio
 	return inspectionId, s.addMissingThemes(inspection.Themes)
 }
 
+type InspectionFilter struct {
+	OmitPointsDeControleNonPublies bool
+}
+
 func (s *Service) GetInspection(ctx *UserContext, id int64) (*models.Inspection, error) {
-	inspection, err := s.repo.GetInspectionByID(ctx, id)
+	inspection, err := s.repo.GetInspectionByID(ctx, id, InspectionFilter{})
 	if err != nil {
 		return nil, err
 	}

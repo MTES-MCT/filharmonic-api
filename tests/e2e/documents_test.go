@@ -17,6 +17,7 @@ func TestGenererLettreAnnonce(t *testing.T) {
 
 	lettreBody.NotEmpty()
 	lettreBody.Contains("Mesure des émissions atmosphériques canalisées par un organisme extérieur")
+	lettreBody.NotContains("Autosurveillance des émissions canalisées de COV")
 }
 
 func TestGenererLettreSuite(t *testing.T) {
@@ -44,4 +45,5 @@ func TestGenererRapport(t *testing.T) {
 
 	lettreBody.NotEmpty()
 	lettreBody.Contains("Mesure des émissions atmosphériques canalisées par un organisme extérieur")
+	lettreBody.NotContains("Autosurveillance des émissions canalisées de COV")
 }

@@ -30,6 +30,20 @@ func (_m *Sessions) Add(userId int64) (string, error) {
 	return r0, r1
 }
 
+// Close provides a mock function with given fields:
+func (_m *Sessions) Close() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Delete provides a mock function with given fields: sessionToken
 func (_m *Sessions) Delete(sessionToken string) error {
 	ret := _m.Called(sessionToken)

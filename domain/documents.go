@@ -69,7 +69,10 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
-	inspection, err := s.repo.GetInspectionByID(ctx, idInspection)
+	filter := InspectionFilter{
+		OmitPointsDeControleNonPublies: true,
+	}
+	inspection, err := s.repo.GetInspectionByID(ctx, idInspection, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +99,7 @@ func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*mod
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
-	inspection, err := s.repo.GetInspectionByID(ctx, idInspection)
+	inspection, err := s.repo.GetInspectionByID(ctx, idInspection, InspectionFilter{})
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +179,10 @@ func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
-	inspection, err := s.repo.GetInspectionByID(ctx, idInspection)
+	filter := InspectionFilter{
+		OmitPointsDeControleNonPublies: true,
+	}
+	inspection, err := s.repo.GetInspectionByID(ctx, idInspection, filter)
 	if err != nil {
 		return nil, err
 	}

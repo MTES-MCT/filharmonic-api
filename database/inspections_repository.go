@@ -104,12 +104,12 @@ func (repo *Repository) UpdateInspection(ctx *domain.UserContext, inspection mod
 	})
 }
 
-func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64) (*models.Inspection, error) {
+func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, filter domain.InspectionFilter) (*models.Inspection, error) {
 	var inspection models.Inspection
 	query := repo.db.client.Model(&inspection).
 		Relation("Etablissement").
 		Relation("PointsDeControle", func(q *orm.Query) (*orm.Query, error) {
-			if ctx.IsExploitant() {
+			if ctx.IsExploitant() || filter.OmitPointsDeControleNonPublies {
 				q.Where("publie = TRUE")
 			}
 			return q, nil

@@ -21,7 +21,7 @@ type Repository interface {
 	ListInspectionsFavorites(ctx *UserContext) ([]models.Inspection, error)
 	CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error)
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
-	GetInspectionByID(ctx *UserContext, id int64) (*models.Inspection, error)
+	GetInspectionByID(ctx *UserContext, id int64, filter InspectionFilter) (*models.Inspection, error)
 	CheckEtatInspection(idInspection int64, etats []models.EtatInspection) (bool, error)
 	UpdateEtatInspection(ctx *UserContext, id int64, etat models.EtatInspection) error
 	AddFavoriToInspection(ctx *UserContext, idInspection int64) error
