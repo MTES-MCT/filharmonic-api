@@ -17,6 +17,7 @@ type TemplateService struct {
 
 	emailNouveauxMessagesTemplate *html.Template
 	lettreAnnonceTemplate         *text.Template
+	lettreSuiteTemplate           *text.Template
 	rapportTemplate               *text.Template
 }
 
@@ -127,6 +128,13 @@ func New(config Config) (*TemplateService, error) {
 		return nil, err
 	}
 
+	service.lettreSuiteTemplate, err = text.New("modele_de_lettre_suite_inspection.fodt").
+		Funcs(templateHelpers).
+		ParseFiles(config.Dir + "modele_de_lettre_suite_inspection.fodt")
+	if err != nil {
+		return nil, err
+	}
+
 	service.rapportTemplate, err = text.New("modele_de_rapport_inspection.fodt").
 		Funcs(templateHelpers).
 		ParseFiles(config.Dir + "modele_de_rapport_inspection.fodt")
@@ -143,6 +151,10 @@ func (s *TemplateService) RenderHTMLEmailNouveauxMessages(data interface{}) (str
 
 func (s *TemplateService) RenderLettreAnnonce(data interface{}) (string, error) {
 	return s.renderTextTemplate(s.lettreAnnonceTemplate, data)
+}
+
+func (s *TemplateService) RenderLettreSuite(data interface{}) (string, error) {
+	return s.renderTextTemplate(s.lettreSuiteTemplate, data)
 }
 
 func (s *TemplateService) RenderRapport(data interface{}) (string, error) {

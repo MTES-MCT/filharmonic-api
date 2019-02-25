@@ -77,6 +77,7 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.POST("/inspections/:id/favori", returnOk(s.addFavoriToInspection))
 		authorized.DELETE("/inspections/:id/favori", returnOk(s.removeFavoriToInspection))
 		authorized.GET("/inspections/:id/lettreannonce", returnFile(s.genererLettreAnnonce))
+		authorized.GET("/inspections/:id/lettresuite", returnFile(s.genererLettreSuite))
 		authorized.GET("/inspections/:id/rapport", returnFile(s.genererRapport))
 		authorized.PUT("/pointsdecontrole/:id", returnOk(s.updatePointDeControle))
 		authorized.POST("/pointsdecontrole/:id/constat", returnId(s.addConstat))

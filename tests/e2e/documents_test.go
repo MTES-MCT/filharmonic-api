@@ -19,6 +19,17 @@ func TestGenererLettreAnnonce(t *testing.T) {
 	lettreBody.Contains("Mesure des émissions atmosphériques canalisées par un organisme extérieur")
 }
 
+func TestGenererLettreSuite(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	lettreBody := tests.AuthInspecteur(e.GET("/inspections/{id}/lettresuite")).WithPath("id", 1).
+		Expect().
+		Status(http.StatusOK).Body()
+
+	lettreBody.NotEmpty()
+}
+
 func TestGenererRapport(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()

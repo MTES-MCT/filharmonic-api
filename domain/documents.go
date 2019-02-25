@@ -14,7 +14,7 @@ type Person struct {
 	Email     string
 }
 
-type LettreAnnonce struct {
+type Lettre struct {
 	Inspection       models.Inspection
 	DateInspection   string
 	DateLettre       string
@@ -29,8 +29,8 @@ type LettreAnnonce struct {
 	Exploitant       Person
 }
 
-func NewLettreAnnonce(inspection *models.Inspection) LettreAnnonce {
-	lettre := LettreAnnonce{}
+func NewLettre(inspection *models.Inspection) Lettre {
+	lettre := Lettre{}
 	lettre.Inspection = *inspection
 	lettre.DateLettre = util.FormatDate(time.Now())
 	lettre.DateInspection = util.FormatDate(inspection.Date.Time)
@@ -76,13 +76,47 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 	if inspection == nil {
 		return nil, ErrInvalidInput
 	}
+	if inspection.Etat != models.EtatEnCours {
+		return nil, NewErrForbidden("L'inspection doit être à l'état en cours.")
+	}
 
-	contenuLettre, err := s.templateService.RenderLettreAnnonce(NewLettreAnnonce(inspection))
+	contenuLettre, err := s.templateService.RenderLettreAnnonce(NewLettre(inspection))
 	if err != nil {
 		return nil, err
 	}
 	return &models.PieceJointeFile{
 		Nom:     "lettre-annonce.odt",
+		Type:    "application/vnd.oasis.opendocument.text",
+		Taille:  int64(len(contenuLettre)),
+		Content: strings.NewReader(contenuLettre),
+	}, nil
+}
+
+func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*models.PieceJointeFile, error) {
+	if !ctx.IsInspecteur() {
+		return nil, ErrBesoinProfilInspecteur
+	}
+	inspection, err := s.repo.GetInspectionByID(ctx, idInspection)
+	if err != nil {
+		return nil, err
+	}
+	if inspection == nil {
+		return nil, ErrInvalidInput
+	}
+	if inspection.Etat != models.EtatValide {
+		return nil, NewErrForbidden("L'inspection doit être validée.")
+	}
+
+	if inspection.Suite == nil {
+		return nil, ErrInvalidInput
+	}
+
+	contenuLettre, err := s.templateService.RenderLettreSuite(NewLettre(inspection))
+	if err != nil {
+		return nil, err
+	}
+	return &models.PieceJointeFile{
+		Nom:     "lettre-suite.odt",
 		Type:    "application/vnd.oasis.opendocument.text",
 		Taille:  int64(len(contenuLettre)),
 		Content: strings.NewReader(contenuLettre),
@@ -148,6 +182,9 @@ func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.
 	}
 	if inspection == nil {
 		return nil, ErrInvalidInput
+	}
+	if inspection.Etat != models.EtatEnCours {
+		return nil, NewErrForbidden("L'inspection doit être à l'état en cours.")
 	}
 
 	contenuRapport, err := s.templateService.RenderRapport(NewRapport(inspection))

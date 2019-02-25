@@ -51,7 +51,7 @@ func TestRenderEmailTemplate(t *testing.T) {
 	assert.NoError(ioutil.WriteFile("../.tmp/email-new-messages.html", []byte(htmlPart), 0644))
 }
 
-func TestRenderLettreAnnonce(t *testing.T) {
+func TestRenderLettre(t *testing.T) {
 	assert, service := initTest(t)
 
 	inspection := &models.Inspection{
@@ -111,7 +111,7 @@ func TestRenderLettreAnnonce(t *testing.T) {
 		},
 	}
 
-	data, err := service.RenderLettreAnnonce(domain.NewLettreAnnonce(inspection))
+	data, err := service.RenderLettreAnnonce(domain.NewLettre(inspection))
 	assert.NoError(err)
 	assert.NoError(ioutil.WriteFile("../.tmp/lettre-annonce.fodt", []byte(data), 0644))
 }
@@ -235,4 +235,75 @@ func TestRenderRapport(t *testing.T) {
 	data, err := service.RenderRapport(domain.NewRapport(inspection))
 	assert.NoError(err)
 	assert.NoError(ioutil.WriteFile("../.tmp/rapport.fodt", []byte(data), 0644))
+}
+
+func TestRenderLettreSuite(t *testing.T) {
+	assert, service := initTest(t)
+
+	inspection := &models.Inspection{
+		Date: util.Date("2019-02-24"),
+		Etablissement: &models.Etablissement{
+			S3IC:       "1234",
+			Nom:        "Nom 1",
+			Raison:     "Raison sociale",
+			Adresse1:   "1 rue des fleurs",
+			Adresse2:   "",
+			CodePostal: "75000",
+			Commune:    "Paris",
+			Exploitants: []models.User{
+				models.User{
+					Prenom:  "Michel",
+					Nom:     "Exploitant1",
+					Email:   "exploitant1@filharmonic.com",
+					Profile: models.ProfilExploitant,
+				},
+			},
+		},
+		Suite: &models.Suite{
+			Delai:       15,
+			PenalEngage: true,
+			Type:        models.TypeSuiteAucune,
+			Synthese:    "blah blah",
+		},
+		Inspecteurs: []models.User{
+			models.User{
+				Prenom:  "Alain",
+				Nom:     "Champion",
+				Email:   "inspecteur1@filharmonic.com",
+				Profile: models.ProfilInspecteur,
+			},
+			models.User{
+				Prenom:  "Corine",
+				Nom:     "Dupont",
+				Email:   "inspecteur2@filharmonic.com",
+				Profile: models.ProfilInspecteur,
+			},
+			models.User{
+				Prenom:  "Michel",
+				Nom:     "Gérard",
+				Email:   "inspecteur3@filharmonic.com",
+				Profile: models.ProfilInspecteur,
+			},
+		},
+		PointsDeControle: []models.PointDeControle{
+			models.PointDeControle{
+				Sujet: "Mesure des émissions atmosphériques canalisées par un organisme extérieur",
+				ReferencesReglementaires: []string{
+					"Article 3.2.3. de l'arrêté préfectoral du 28 juin 2017",
+					"Article 3.2.8. de l'arrêté préfectoral du 28 juin 2017",
+					"Article 8.2.1.2. de l'arrêté préfectoral du 28 juin 2017",
+				},
+			},
+			models.PointDeControle{
+				Sujet: "Autosurveillance des émissions canalisées de COV",
+				ReferencesReglementaires: []string{
+					"Article 8.2.1.1. de l'arrêté préfectoral du 28 juin 2017",
+				},
+			},
+		},
+	}
+
+	data, err := service.RenderLettreSuite(domain.NewLettre(inspection))
+	assert.NoError(err)
+	assert.NoError(ioutil.WriteFile("../.tmp/lettre-suite.fodt", []byte(data), 0644))
 }
