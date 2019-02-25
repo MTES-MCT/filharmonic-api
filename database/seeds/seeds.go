@@ -110,6 +110,7 @@ func SeedsTestDB(db *pg.DB) error {
 			Adresse2:   "",
 			CodePostal: "75000",
 			Commune:    "Paris",
+			Regime:     models.RegimeAutorisation,
 		},
 		&models.Etablissement{
 			// Id:      2,
@@ -120,6 +121,7 @@ func SeedsTestDB(db *pg.DB) error {
 			Adresse2:   "parcelle 207",
 			CodePostal: "44000",
 			Commune:    "Nantes",
+			Regime:     models.RegimeDeclaration,
 		},
 		&models.Etablissement{
 			// Id:      3,
@@ -130,6 +132,7 @@ func SeedsTestDB(db *pg.DB) error {
 			Adresse2:   "",
 			CodePostal: "69000",
 			Commune:    "Lyon",
+			Regime:     models.RegimeAucun,
 		},
 		&models.Etablissement{
 			// Id:      4,
@@ -140,6 +143,7 @@ func SeedsTestDB(db *pg.DB) error {
 			Adresse2:   "",
 			CodePostal: "63000",
 			Commune:    "Clermont-Ferrand",
+			Regime:     models.RegimeEnregistrement,
 		},
 	}
 	err = db.Insert(etablissements...)
