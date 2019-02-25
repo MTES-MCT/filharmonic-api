@@ -139,6 +139,7 @@ func TestRenderRapport(t *testing.T) {
 			CodePostal: "75000",
 			Commune:    "Paris",
 			Activite:   "Abattoirs",
+			Regime:     models.RegimeAutorisation,
 			Seveso:     "haut",
 			Iedmtd:     false,
 			Exploitants: []models.User{
@@ -178,11 +179,49 @@ func TestRenderRapport(t *testing.T) {
 					"Article 3.2.8. de l'arrêté préfectoral du 28 juin 2017",
 					"Article 8.2.1.2. de l'arrêté préfectoral du 28 juin 2017",
 				},
+				Messages: []models.Message{
+					models.Message{
+						Auteur: &models.User{
+							Prenom:  "Alain",
+							Nom:     "Champion",
+							Email:   "inspecteur1@filharmonic.com",
+							Profile: models.ProfilInspecteur,
+						},
+						Message: "Merci de me donner le document.",
+						Date:    util.DateTime("2018-02-15T13:57:00"),
+					},
+					models.Message{
+						Auteur: &models.User{
+							Prenom:  "Michel",
+							Nom:     "Exploitant1",
+							Email:   "exploitant1@filharmonic.com",
+							Profile: models.ProfilExploitant,
+						},
+						Message: "Voici le document demandé.",
+						Date:    util.DateTime("2018-02-25T13:57:00"),
+						PiecesJointes: []models.PieceJointe{
+							models.PieceJointe{
+								Nom: "rapport-2018.pdf",
+							},
+							models.PieceJointe{
+								Nom: "rapport-2017.pdf",
+							},
+						},
+					},
+				},
+				Constat: &models.Constat{
+					Type:      models.TypeConstatObservation,
+					Delai:     "3 mois",
+					Remarques: "Vous devez réparer la cuve.",
+				},
 			},
 			models.PointDeControle{
 				Sujet: "Autosurveillance des émissions canalisées de COV",
 				ReferencesReglementaires: []string{
 					"Article 8.2.1.1. de l'arrêté préfectoral du 28 juin 2017",
+				},
+				Constat: &models.Constat{
+					Type: models.TypeConstatConforme,
 				},
 			},
 		},

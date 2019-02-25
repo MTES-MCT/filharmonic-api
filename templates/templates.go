@@ -38,7 +38,75 @@ var (
 				return string(value)
 			}
 		},
-		// TODO reste des helpers
+		"type_constat": func(value models.TypeConstat) string {
+			switch value {
+			case models.TypeConstatConforme:
+				return "Conforme"
+			case models.TypeConstatNonConforme:
+				return "Non conforme"
+			case models.TypeConstatObservation:
+				return "Observation"
+			default:
+				return string(value)
+			}
+		},
+		"type_inspection": func(value models.TypeInspection) string {
+			switch value {
+			case models.TypeApprofondi:
+				return "Approfondi"
+			case models.TypeCourant:
+				return "Courant"
+			case models.TypePonctuel:
+				return "Ponctuel"
+			default:
+				return string(value)
+			}
+		},
+		"ouinon": func(value bool) string {
+			if value {
+				return "Oui"
+			}
+			return "Non"
+		},
+		"origine_inspection": func(value models.OrigineInspection) string {
+			switch value {
+			case models.OrigineCirconstancielle:
+				return "Circonstancielle"
+			case models.OriginePlanControle:
+				return "Plan de contrôle"
+			default:
+				return string(value)
+			}
+		},
+		"circonstance_inspection": func(value models.CirconstanceInspection) string {
+			switch value {
+			case models.CirconstanceAutre:
+				return "Autre"
+			case models.CirconstanceIncident:
+				return "Incident"
+			case models.CirconstancePlainte:
+				return "Plainte"
+			default:
+				return string(value)
+			}
+		},
+		"regime_etablissement": func(value models.RegimeEtablissement) string {
+			switch value {
+			case models.RegimeAucun:
+				return "Aucun"
+			case models.RegimeAutorisation:
+				return "Autorisation"
+			case models.RegimeDeclaration:
+				return "Déclaration"
+			case models.RegimeEnregistrement:
+				return "Enregistrement"
+			default:
+				return string(value)
+			}
+		},
+		"add": func(a int, b int) int {
+			return a + b
+		},
 	}
 )
 
