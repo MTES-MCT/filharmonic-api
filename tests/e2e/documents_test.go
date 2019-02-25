@@ -23,7 +23,11 @@ func TestGenererLettreSuite(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	lettreBody := tests.AuthInspecteur(e.GET("/inspections/{id}/lettresuite")).WithPath("id", 1).
+	tests.AuthApprobateur(e.POST("/inspections/{id}/valider")).WithPath("id", 3).
+		Expect().
+		Status(http.StatusOK).Body()
+
+	lettreBody := tests.AuthInspecteur(e.GET("/inspections/{id}/lettresuite")).WithPath("id", 3).
 		Expect().
 		Status(http.StatusOK).Body()
 

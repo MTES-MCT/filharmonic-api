@@ -69,7 +69,6 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	inspecteurs.Last().Object().ValueEqual("email", "inspecteur2@filharmonic.com")
 	suite := inspection.Value("suite").Object()
-	suite.ValueEqual("delai", 30)
 	suite.ValueEqual("type", "observation")
 	suite.ValueEqual("synthese", "Observations à traiter")
 	firstPointDeControle := inspection.Value("points_de_controle").Array().First().Object()

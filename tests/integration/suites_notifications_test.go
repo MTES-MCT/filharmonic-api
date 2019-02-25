@@ -29,7 +29,6 @@ func TestCreateSuiteHasCreatedNotification(t *testing.T) {
 	suite := models.Suite{
 		// Id: 3,
 		Type:     models.TypeSuiteObservation,
-		Delai:    30,
 		Synthese: "Observations à traiter",
 	}
 

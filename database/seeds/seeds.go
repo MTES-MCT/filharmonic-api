@@ -174,7 +174,6 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.Suite{
 			// Id: 1,
 			Type:     models.TypeSuiteObservation,
-			Delai:    30,
 			Synthese: "Observations à traiter",
 		},
 		&models.Suite{

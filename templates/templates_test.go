@@ -260,7 +260,6 @@ func TestRenderLettreSuite(t *testing.T) {
 			},
 		},
 		Suite: &models.Suite{
-			Delai:       15,
 			PenalEngage: true,
 			Type:        models.TypeSuiteAucune,
 			Synthese:    "blah blah",

@@ -14,7 +14,6 @@ func TestAddSuite(t *testing.T) {
 
 	suiteInput := models.Suite{
 		Type:     models.TypeSuiteObservation,
-		Delai:    3,
 		Synthese: "Il manque des choses",
 	}
 
@@ -28,7 +27,6 @@ func TestAddSuite(t *testing.T) {
 		JSON().Object()
 
 	suiteOutput := inspection.Value("suite").Object()
-	suiteOutput.ValueEqual("delai", suiteInput.Delai)
 	suiteOutput.ValueEqual("type", suiteInput.Type)
 	suiteOutput.ValueEqual("synthese", suiteInput.Synthese)
 }
@@ -53,7 +51,6 @@ func TestUpdateSuite(t *testing.T) {
 		JSON().Object()
 
 	suiteOutput := inspection.Value("suite").Object()
-	suiteOutput.ValueEqual("delai", suiteInput.Delai)
 	suiteOutput.ValueEqual("type", suiteInput.Type)
 	suiteOutput.ValueEqual("synthese", suiteInput.Synthese)
 }
