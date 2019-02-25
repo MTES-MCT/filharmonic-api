@@ -78,4 +78,5 @@ type EmailService interface {
 type TemplateService interface {
 	RenderHTMLEmailNouveauxMessages(data interface{}) (string, error)
 	RenderLettreAnnonce(data interface{}) (string, error)
+	RenderRapport(data interface{}) (string, error)
 }

@@ -137,3 +137,27 @@ func NewRapport(inspection *models.Inspection) Rapport {
 	}
 	return rapport
 }
+
+func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.PieceJointeFile, error) {
+	if !ctx.IsInspecteur() {
+		return nil, ErrBesoinProfilInspecteur
+	}
+	inspection, err := s.repo.GetInspectionByID(ctx, idInspection)
+	if err != nil {
+		return nil, err
+	}
+	if inspection == nil {
+		return nil, ErrInvalidInput
+	}
+
+	contenuRapport, err := s.templateService.RenderRapport(NewRapport(inspection))
+	if err != nil {
+		return nil, err
+	}
+	return &models.PieceJointeFile{
+		Nom:     "rapport.odt",
+		Type:    "application/vnd.oasis.opendocument.text",
+		Taille:  int64(len(contenuRapport)),
+		Content: strings.NewReader(contenuRapport),
+	}, nil
+}
