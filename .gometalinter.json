@@ -1,5 +1,6 @@
 {
   "Vendor": true,
+  "Cyclo": 14,
   "Deadline": "5m",
   "Fast": true,
   "Linters": {
