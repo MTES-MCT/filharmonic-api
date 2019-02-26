@@ -1,11 +1,12 @@
 package domain
 
 import (
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
 var (
-	ErrUserNotFound = NewErrForbidden("Utilisateur non trouvé")
+	ErrUserNotFound = errors.NewErrForbidden("Utilisateur non trouvé")
 )
 
 type ListUsersFilters struct {

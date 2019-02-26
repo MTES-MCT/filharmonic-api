@@ -4,9 +4,7 @@ import (
 	"testing"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
-
 	"github.com/MTES-MCT/filharmonic-api/models"
-
 	"github.com/MTES-MCT/filharmonic-api/tests"
 )
 
@@ -27,14 +25,14 @@ func TestCreateConstatHasCreatedNotification(t *testing.T) {
 	idPointDeControle := int64(1)
 
 	constat := models.Constat{
-		// Id: 4,
+		// Id: 5,
 		Type:      models.TypeConstatNonConforme,
 		Remarques: "Ne respecte pas la réglementation",
 	}
 
 	idConstat, err := application.Repo.CreateConstat(ctx, idPointDeControle, constat)
 	assert.NoError(err)
-	assert.Equal(int64(4), idConstat)
+	assert.Equal(int64(5), idConstat)
 
 	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
@@ -44,7 +42,7 @@ func TestCreateConstatHasCreatedNotification(t *testing.T) {
 	assert.Equal(models.EvenementCreationConstat, notification.Evenement.Type)
 	assert.Equal(int64(1), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(float64(4), notification.Evenement.Data["constat_id"])
+	assert.Equal(float64(5), notification.Evenement.Data["constat_id"])
 	assert.Equal(float64(1), notification.Evenement.Data["point_de_controle_id"])
 }
 

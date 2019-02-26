@@ -9,12 +9,9 @@ func (s *Service) CreateCommentaire(ctx *UserContext, idInspection int64, commen
 		return 0, ErrBesoinProfilInspecteur
 	}
 	if ctx.IsInspecteur() {
-		ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+		err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
 		if err != nil {
 			return 0, err
-		}
-		if !ok {
-			return 0, ErrInvalidInput
 		}
 	}
 

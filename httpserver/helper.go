@@ -3,7 +3,7 @@ package httpserver
 import (
 	"net/http"
 
-	"github.com/MTES-MCT/filharmonic-api/domain"
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
@@ -78,13 +78,13 @@ func handleError(c *gin.Context, err error) {
 	statusCode := 0
 	logEvent := log.Error().Err(err)
 	switch err.(type) {
-	case *domain.ErrBadInput:
+	case *errors.ErrBadInput:
 		logEvent.Msg("service returned a bad input error")
 		statusCode = http.StatusBadRequest
-	case *domain.ErrUnauthorized:
+	case *errors.ErrUnauthorized:
 		logEvent.Msg("service returned an unauthorized error")
 		statusCode = http.StatusUnauthorized
-	case *domain.ErrForbidden:
+	case *errors.ErrForbidden:
 		logEvent.Msg("service returned an forbidden error")
 		statusCode = http.StatusForbidden
 	default:
@@ -98,20 +98,20 @@ func handleError(c *gin.Context, err error) {
 
 // shorthand to return a bad input error
 func badInputError(err error) error {
-	return domain.NewErrBadInput(err.Error())
+	return errors.NewErrBadInput(err.Error())
 }
 
 // shorthand to return 0 and a bad input error
 func badInputErrorI(err error) (int64, error) {
-	return 0, domain.NewErrBadInput(err.Error())
+	return 0, errors.NewErrBadInput(err.Error())
 }
 
 // shorthand to return a nil result and a bad input error
 func badInputErrorN(err error) (interface{}, error) {
-	return nil, domain.NewErrBadInput(err.Error())
+	return nil, errors.NewErrBadInput(err.Error())
 }
 
 // shorthand to return a nil file and a bad input error
 func badInputErrorF(err error) (*models.PieceJointeFile, error) {
-	return nil, domain.NewErrBadInput(err.Error())
+	return nil, errors.NewErrBadInput(err.Error())
 }

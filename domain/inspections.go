@@ -1,11 +1,12 @@
 package domain
 
 import (
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
 var (
-	ErrInspectionNotFound = NewErrForbidden("Inspection non trouvée")
+	ErrInspectionNotFound = errors.NewErrForbidden("Inspection non trouvée")
 )
 
 type ListInspectionsFilter struct {
@@ -68,14 +69,11 @@ func (s *Service) UpdateInspection(ctx *UserContext, inspection models.Inspectio
 	if len(inspecteursIds) == 0 {
 		return ErrInvalidInput
 	}
-	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, inspection.Id)
+	err := s.repo.CheckInspecteurAllowedInspection(ctx, inspection.Id)
 	if err != nil {
 		return err
 	}
-	if !ok {
-		return ErrNonAssigneInspection
-	}
-	ok, err = s.repo.CheckUsersInspecteurs(inspecteursIds)
+	ok, err := s.repo.CheckUsersInspecteurs(inspecteursIds)
 	if err != nil {
 		return err
 	}
@@ -93,12 +91,9 @@ func (s *Service) PublishInspection(ctx *UserContext, idInspection int64) error 
 	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
-	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
 	if err != nil {
 		return err
-	}
-	if !ok {
-		return ErrNonAssigneInspection
 	}
 	err = s.changeEtatInspection(ctx, idInspection, models.EtatPreparation, models.EtatEnCours)
 	if err != nil {
@@ -112,12 +107,18 @@ func (s *Service) AskValidateInspection(ctx *UserContext, idInspection int64) er
 	if !ctx.IsInspecteur() {
 		return ErrBesoinProfilInspecteur
 	}
-	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
 	if err != nil {
 		return err
 	}
-	if !ok {
-		return ErrNonAssigneInspection
+
+	inspection, err := s.repo.GetInspectionTypesConstatsSuiteByID(idInspection)
+	if err != nil {
+		return err
+	}
+	err = inspection.CheckCoherenceSuiteConstats()
+	if err != nil {
+		return err
 	}
 	err = s.changeEtatInspection(ctx, idInspection, models.EtatEnCours, models.EtatAttenteValidation)
 	if err != nil {
@@ -131,7 +132,16 @@ func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64) error
 	if !ctx.IsApprobateur() {
 		return ErrBesoinProfilApprobateur
 	}
-	err := s.changeEtatInspection(ctx, idInspection, models.EtatAttenteValidation, models.EtatValide)
+
+	hasNonConformites, err := s.repo.CheckInspectionHasNonConformites(idInspection)
+	if err != nil {
+		return err
+	}
+	etatCible := models.EtatClos
+	if hasNonConformites {
+		etatCible = models.EtatTraitementNonConformites
+	}
+	err = s.changeEtatInspection(ctx, idInspection, models.EtatAttenteValidation, etatCible)
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/util"
 )
@@ -69,12 +70,9 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
-	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
 	if err != nil {
 		return nil, err
-	}
-	if !ok {
-		return nil, ErrNonAssigneInspection
 	}
 	filter := InspectionFilter{
 		OmitPointsDeControleNonPublies: true,
@@ -87,7 +85,7 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 		return nil, ErrInvalidInput
 	}
 	if inspection.Etat != models.EtatEnCours {
-		return nil, NewErrForbidden("L'inspection doit être à l'état en cours.")
+		return nil, errors.NewErrForbidden("L'inspection doit être à l'état en cours.")
 	}
 
 	contenuLettre, err := s.templateService.RenderLettreAnnonce(NewLettre(inspection))
@@ -106,12 +104,9 @@ func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*mod
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
-	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
 	if err != nil {
 		return nil, err
-	}
-	if !ok {
-		return nil, ErrNonAssigneInspection
 	}
 	inspection, err := s.repo.GetInspectionByID(ctx, idInspection, InspectionFilter{})
 	if err != nil {
@@ -120,8 +115,8 @@ func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*mod
 	if inspection == nil {
 		return nil, ErrInvalidInput
 	}
-	if inspection.Etat != models.EtatValide {
-		return nil, NewErrForbidden("L'inspection doit être validée.")
+	if inspection.Etat != models.EtatTraitementNonConformites && inspection.Etat != models.EtatClos {
+		return nil, errors.NewErrForbidden("L'inspection ne doit pas être à l'état de traitement des non conformités ni clos.")
 	}
 
 	if inspection.Suite == nil {
@@ -193,12 +188,9 @@ func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
-	ok, err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
+	err := s.repo.CheckInspecteurAllowedInspection(ctx, idInspection)
 	if err != nil {
 		return nil, err
-	}
-	if !ok {
-		return nil, ErrNonAssigneInspection
 	}
 	filter := InspectionFilter{
 		OmitPointsDeControleNonPublies: true,
@@ -211,7 +203,7 @@ func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.
 		return nil, ErrInvalidInput
 	}
 	if inspection.Etat != models.EtatEnCours {
-		return nil, NewErrForbidden("L'inspection doit être à l'état en cours.")
+		return nil, errors.NewErrForbidden("L'inspection doit être à l'état en cours.")
 	}
 
 	contenuRapport, err := s.templateService.RenderRapport(NewRapport(inspection))

@@ -146,12 +146,46 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, fil
 	return &inspection, err
 }
 
-func (repo *Repository) CheckInspecteurAllowedInspection(ctx *domain.UserContext, id int64) (bool, error) {
+func (repo *Repository) CheckInspecteurAllowedInspection(ctx *domain.UserContext, id int64) error {
 	count, err := repo.db.client.Model(&models.InspectionToInspecteur{}).
 		Where("inspection_id = ?", id).
 		Where("user_id = ?", ctx.User.Id).
 		Count()
+	if err != nil {
+		return err
+	}
+	if count != 1 {
+		return domain.ErrInspecteurNonAffecte
+	}
+	return nil
+}
+
+func (repo *Repository) CheckInspectionHasNonConformites(id int64) (bool, error) {
+	count, err := repo.db.client.Model(&models.Inspection{}).
+		Relation("Suite.Type").
+		Where(`"inspection".id = ?`, id).
+		Where(`"suite".type <> ?`, models.TypeSuiteAucune).
+		Count()
 	return count == 1, err
+}
+
+func (repo *Repository) GetInspectionTypesConstatsSuiteByID(id int64) (*models.Inspection, error) {
+	inspection := &models.Inspection{
+		Id: id,
+	}
+	err := repo.db.client.Model(inspection).
+		Column("_").
+		Relation("PointsDeControle.inspection_id").
+		Relation("PointsDeControle.constat_id").
+		Relation("PointsDeControle.publie").
+		Relation("PointsDeControle.Constat.type").
+		Relation("Suite.type").
+		WherePK().
+		Select()
+	if err != nil {
+		return nil, err
+	}
+	return inspection, nil
 }
 
 func (repo *Repository) CheckEtatInspection(id int64, etats []models.EtatInspection) (bool, error) {

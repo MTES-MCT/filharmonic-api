@@ -34,7 +34,7 @@ func TestCreateSuiteHasCreatedNotification(t *testing.T) {
 
 	idSuite, err := application.Repo.CreateSuite(ctx, idInspection, suite)
 	assert.NoError(err)
-	assert.Equal(int64(3), idSuite)
+	assert.Equal(int64(4), idSuite)
 
 	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)

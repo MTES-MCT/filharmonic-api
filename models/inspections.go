@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/util"
 )
 
@@ -32,11 +33,11 @@ const (
 type EtatInspection string
 
 const (
-	EtatPreparation       EtatInspection = "preparation"
-	EtatEnCours           EtatInspection = "en_cours"
-	EtatAttenteValidation EtatInspection = "attente_validation"
-	EtatValide            EtatInspection = "valide"
-	EtatNonValide         EtatInspection = "non_valide"
+	EtatPreparation              EtatInspection = "preparation"
+	EtatEnCours                  EtatInspection = "en_cours"
+	EtatAttenteValidation        EtatInspection = "attente_validation"
+	EtatTraitementNonConformites EtatInspection = "traitement_non_conformites"
+	EtatClos                     EtatInspection = "close"
 )
 
 type Inspection struct {
@@ -98,4 +99,51 @@ type Suite struct {
 	Type        TypeSuite `json:"type"`
 	Synthese    string    `json:"synthese"`
 	PenalEngage bool      `json:"penal_engage"`
+}
+
+var (
+	ErrSuiteManquante             = errors.NewErrBadInput("Pas de suite")
+	ErrConstatManquant            = errors.NewErrBadInput("Un constat est manquant")
+	ErrPointDeControleNonPublie   = errors.NewErrBadInput("Un point de contrôle n'est pas publié")
+	ErrPresenceConstatNonConforme = errors.NewErrBadInput("Un constat n'est pas conforme")
+	ErrAbsenceConstatNonConforme  = errors.NewErrBadInput("Aucun constat n'est non-conforme")
+)
+
+func (inspection *Inspection) CheckCoherenceSuiteConstats() error {
+	if inspection.Suite == nil {
+		return ErrSuiteManquante
+	}
+	if inspection.Suite.Type == TypeSuiteAucune {
+		// si suite = aucune, tous les constats doivent être conformes
+		for _, pointDeControle := range inspection.PointsDeControle {
+			if !pointDeControle.Publie {
+				return ErrPointDeControleNonPublie
+			}
+			if pointDeControle.Constat == nil {
+				return ErrConstatManquant
+			}
+			if pointDeControle.Constat.Type != TypeConstatConforme {
+				return ErrPresenceConstatNonConforme
+			}
+		}
+	} else {
+		// si suite <> aucune, au moins un constat doit être non-conforme
+		auMoinsUnConstatNonConforme := false
+		for _, pointDeControle := range inspection.PointsDeControle {
+			if !pointDeControle.Publie {
+				return ErrPointDeControleNonPublie
+			}
+			if pointDeControle.Constat == nil {
+				return ErrConstatManquant
+			}
+			if pointDeControle.Constat.Type != TypeConstatConforme {
+				auMoinsUnConstatNonConforme = true
+				break
+			}
+		}
+		if !auMoinsUnConstatNonConforme {
+			return ErrAbsenceConstatNonConforme
+		}
+	}
+	return nil
 }

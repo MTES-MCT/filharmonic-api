@@ -63,6 +63,13 @@ func SeedsTestDB(db *pg.DB) error {
 			Email:   "approbateur2@filharmonic.com",
 			Profile: models.ProfilApprobateur,
 		},
+		&models.User{
+			// Id:      8,
+			Prenom:  "Hubert",
+			Nom:     "Inspecte",
+			Email:   "inspecteur4@filharmonic.com",
+			Profile: models.ProfilInspecteur,
+		},
 	}
 	err := db.Insert(users...)
 	if err != nil {
@@ -178,6 +185,10 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 		&models.Suite{
 			// Id: 2,
+			Type: models.TypeSuitePropositionMiseEnDemeure,
+		},
+		&models.Suite{
+			// Id: 3,
 			Type: models.TypeSuiteAucune,
 		},
 	}
@@ -242,6 +253,20 @@ func SeedsTestDB(db *pg.DB) error {
 			Contexte:        "Inspection en cours",
 			EtablissementId: 4,
 		},
+		&models.Inspection{
+			// Id:   5,
+			Date: util.Date("2019-02-26"),
+			Type: models.TypeApprofondi,
+			Themes: []string{
+				"Rejets dans l'air",
+			},
+			Annonce:         true,
+			Origine:         models.OriginePlanControle,
+			Etat:            models.EtatAttenteValidation,
+			Contexte:        "Rejets CO2 de l'usine",
+			EtablissementId: 4,
+			SuiteId:         3,
+		},
 	}
 	err = db.Insert(inspections...)
 	if err != nil {
@@ -276,6 +301,10 @@ func SeedsTestDB(db *pg.DB) error {
 		&models.InspectionToInspecteur{
 			InspectionId: 2,
 			UserId:       5,
+		},
+		&models.InspectionToInspecteur{
+			InspectionId: 5,
+			UserId:       3,
 		},
 	}
 	err = db.Insert(inspectionToInspecteurs...)
@@ -313,6 +342,11 @@ func SeedsTestDB(db *pg.DB) error {
 			// Id: 3,
 			Type:      models.TypeConstatNonConforme,
 			Remarques: "Ne respecte pas la réglementation",
+		},
+		&models.Constat{
+			// Id: 4,
+			Type:      models.TypeConstatConforme,
+			Remarques: "Respecte bien la réglementation",
 		},
 	}
 	err = db.Insert(constats...)
@@ -375,10 +409,20 @@ func SeedsTestDB(db *pg.DB) error {
 			// Id:    6,
 			Sujet: "Santé 2",
 			ReferencesReglementaires: []string{
-				"Article 1 de l'Arrêté ministériel du 28 avril 2014",
+				"Article 1 de l'Arrêté ministériel du 228 avril 2014",
 			},
 			Publie:       true,
 			InspectionId: 4,
+		},
+		&models.PointDeControle{
+			// Id:    7,
+			Sujet: "Rejets Air",
+			ReferencesReglementaires: []string{
+				"Article 1 de l'Arrêté ministériel du 28 avril 2015",
+			},
+			Publie:       true,
+			InspectionId: 5,
+			ConstatId:    4,
 		},
 	}
 	err = db.Insert(pointsDeControle...)

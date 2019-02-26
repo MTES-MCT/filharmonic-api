@@ -93,7 +93,7 @@ func TestAddCommentaireNotAllowed(t *testing.T) {
 
 	tests.AuthUser(e.POST("/inspections/{id}/commentaires"), 5).WithPath("id", 1).WithJSON(commentaire).
 		Expect().
-		Status(http.StatusBadRequest)
+		Status(http.StatusForbidden)
 
 	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
 		Expect().

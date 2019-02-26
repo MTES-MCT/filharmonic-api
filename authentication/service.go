@@ -3,12 +3,13 @@ package authentication
 import (
 	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
 	"github.com/MTES-MCT/filharmonic-api/domain"
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/rs/zerolog/log"
 )
 
 var (
-	ErrUnauthorized = domain.NewErrUnauthorized("Accès non autorisé")
+	ErrUnauthorized = errors.NewErrUnauthorized("Accès non autorisé")
 )
 
 type SsoConfig struct {

@@ -12,6 +12,15 @@ func TestAddSuite(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
+	constat := models.Constat{
+		// Id: 5,
+		Type: models.TypeConstatObservation,
+	}
+
+	tests.AuthInspecteur(e.POST("/pointsdecontrole/{id}/constat")).WithPath("id", 6).WithJSON(constat).
+		Expect().
+		Status(http.StatusOK)
+
 	suiteInput := models.Suite{
 		Type:     models.TypeSuiteObservation,
 		Synthese: "Il manque des choses",

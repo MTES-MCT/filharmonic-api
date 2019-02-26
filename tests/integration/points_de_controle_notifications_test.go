@@ -27,7 +27,7 @@ func TestCreatePointDeControleHasCreatedNotification(t *testing.T) {
 	idInspection := int64(1)
 
 	pointDeControle := models.PointDeControle{
-		// Id:    7,
+		// Id:    8,
 		Sujet: "Santé 3",
 		ReferencesReglementaires: []string{
 			"Article 1 de l'Arrêté ministériel du 28 avril 2014",
@@ -36,7 +36,7 @@ func TestCreatePointDeControleHasCreatedNotification(t *testing.T) {
 
 	idPointDeControle, err := application.Repo.CreatePointDeControle(ctx, idInspection, pointDeControle)
 	assert.NoError(err)
-	assert.Equal(int64(7), idPointDeControle)
+	assert.Equal(int64(8), idPointDeControle)
 
 	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
@@ -46,7 +46,7 @@ func TestCreatePointDeControleHasCreatedNotification(t *testing.T) {
 	assert.Equal(models.EvenementCreationPointDeControle, notification.Evenement.Type)
 	assert.Equal(int64(1), notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
-	assert.Equal(float64(7), notification.Evenement.Data["point_de_controle_id"])
+	assert.Equal(float64(8), notification.Evenement.Data["point_de_controle_id"])
 }
 func TestUpdatePointDeControleHasCreatedNotification(t *testing.T) {
 	assert, application := tests.InitDB(t)

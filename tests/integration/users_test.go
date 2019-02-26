@@ -20,7 +20,7 @@ func TestLoadInspecteursFromCSV(t *testing.T) {
 	})
 	assert.NoError(err)
 	assert.NotEmpty(inspecteurs)
-	const nbUsersInSeeds = 5
+	const nbUsersInSeeds = 6
 	assert.Len(inspecteurs, 30+nbUsersInSeeds)
 	inspecteur := inspecteurs[len(inspecteurs)-1]
 	assert.Equal("Rachel", inspecteur.Prenom)
@@ -40,7 +40,7 @@ func TestLoadExploitantsFromCSV(t *testing.T) {
 	exploitants, err := application.Repo.FindUsers(domain.ListUsersFilters{})
 	assert.NoError(err)
 	assert.NotEmpty(exploitants)
-	const nbUsersInSeeds = 7
+	const nbUsersInSeeds = 8
 	assert.Len(exploitants, 2+nbUsersInSeeds)
 	exploitant := exploitants[len(exploitants)-1]
 	assert.Equal("Anne", exploitant.Prenom)

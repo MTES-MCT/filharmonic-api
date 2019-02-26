@@ -67,16 +67,44 @@ func (repo *Repository) DeleteSuite(ctx *domain.UserContext, idInspection int64)
 	return err
 }
 
-func (repo *Repository) CheckCanCreateSuite(ctx *domain.UserContext, idInspection int64) (bool, error) {
-	count, err := repo.db.client.Model(&models.Inspection{}).
+type InspectionWithNombrePointsDeControle struct {
+	Count                         int
+	NbPointsDeControleNonPublies  int
+	NbPointsDeControleSansConstat int
+}
+
+func (repo *Repository) CheckCanCreateSuite(ctx *domain.UserContext, idInspection int64) error {
+	results := &InspectionWithNombrePointsDeControle{}
+	err := repo.db.client.Model(&models.Inspection{}).
 		Join("JOIN inspection_to_inspecteurs AS u").
 		JoinOn("u.inspection_id = inspection.id").
 		JoinOn("u.user_id = ?", ctx.User.Id).
 		Where("inspection.id = ?", idInspection).
 		Where("inspection.suite_id IS NULL").
 		Where("inspection.etat = ?", models.EtatEnCours).
-		Count()
-	return count == 1, err
+		ColumnExpr("COUNT(inspection.id) as count").
+		ColumnExpr(`(SELECT count(*)
+		            FROM point_de_controles AS point_de_controle
+					WHERE point_de_controle.inspection_id = ?
+						AND point_de_controle.publie = FALSE) AS nb_points_de_controle_non_publies`, idInspection).
+		ColumnExpr(`(SELECT count(*)
+		            FROM point_de_controles AS point_de_controle
+					WHERE point_de_controle.inspection_id = ?
+						AND point_de_controle.constat_id IS NULL) AS nb_points_de_controle_sans_constat`, idInspection).
+		Select(results)
+	if err != nil {
+		return err
+	}
+	if results.Count == 0 {
+		return domain.ErrCreationSuiteImpossible
+	}
+	if results.NbPointsDeControleNonPublies > 0 {
+		return models.ErrPointDeControleNonPublie
+	}
+	if results.NbPointsDeControleSansConstat > 0 {
+		return models.ErrConstatManquant
+	}
+	return nil
 }
 
 func (repo *Repository) CheckCanDeleteSuite(ctx *domain.UserContext, idInspection int64) (bool, error) {

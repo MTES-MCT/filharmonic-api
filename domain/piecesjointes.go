@@ -1,11 +1,12 @@
 package domain
 
 import (
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
 var (
-	ErrPieceJointeNotFound = NewErrForbidden("Pièce-jointe non trouvée")
+	ErrPieceJointeNotFound = errors.NewErrForbidden("Pièce-jointe non trouvée")
 )
 
 func (s *Service) CreatePieceJointe(ctx *UserContext, pieceJointeFile models.PieceJointeFile) (int64, error) {

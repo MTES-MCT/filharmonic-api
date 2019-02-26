@@ -3,13 +3,14 @@ package database
 import (
 	"github.com/MTES-MCT/filharmonic-api/database/helper"
 	"github.com/MTES-MCT/filharmonic-api/domain"
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 )
 
 var (
-	ErrEtablissementNotFound = domain.NewErrForbidden("Établissement non trouvé")
+	ErrEtablissementNotFound = errors.NewErrForbidden("Établissement non trouvé")
 )
 
 // utilisé seulement dans les tests

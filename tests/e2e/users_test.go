@@ -16,7 +16,7 @@ func TestListInspecteurs(t *testing.T) {
 		Status(http.StatusOK).
 		JSON().Array()
 
-	users.Length().Equal(3)
+	users.Length().Equal(4)
 	firstUser := users.First().Object()
 	firstUser.ValueEqual("id", 3)
 	firstUser.ValueEqual("email", "inspecteur1@filharmonic.com")

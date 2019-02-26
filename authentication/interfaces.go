@@ -1,7 +1,7 @@
 package authentication
 
 import (
-	"github.com/MTES-MCT/filharmonic-api/domain"
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
@@ -17,5 +17,5 @@ type Sso interface {
 }
 
 var (
-	ErrTicketValidationFailed = domain.NewErrUnauthorized("La validation du ticket a échoué.")
+	ErrTicketValidationFailed = errors.NewErrUnauthorized("La validation du ticket a échoué.")
 )

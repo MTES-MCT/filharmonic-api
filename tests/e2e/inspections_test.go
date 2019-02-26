@@ -17,7 +17,7 @@ func TestListAllInspections(t *testing.T) {
 		Expect().
 		Status(http.StatusOK).
 		JSON().Array()
-	results.Length().Equal(4)
+	results.Length().Equal(5)
 	results.First().Object().ValueEqual("id", 1)
 	results.First().Object().Value("etablissement").Object().ValueEqual("id", 1)
 	results.Element(2).Object().ValueEqual("id", 3)
@@ -253,7 +253,24 @@ func TestGetInspectionAsExploitantPointDeControleNonPublie(t *testing.T) {
 	inspection.Value("points_de_controle").Array().Length().Equal(1)
 }
 
-func TestValidateInspection(t *testing.T) {
+func TestValidateInspectionSansNonConformites(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthApprobateur(e.POST("/inspections/{id}/valider")).WithPath("id", 5).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection := tests.AuthApprobateur(e.GET("/inspections/{id}")).WithPath("id", 5).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection.ValueEqual("etat", models.EtatClos)
+}
+
+func TestValidateInspectionAvecNonConformites(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
@@ -267,8 +284,9 @@ func TestValidateInspection(t *testing.T) {
 		Status(http.StatusOK).
 		JSON().Object()
 
-	inspection.ValueEqual("etat", models.EtatValide)
+	inspection.ValueEqual("etat", models.EtatTraitementNonConformites)
 }
+
 func TestPublishInspection(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
@@ -288,6 +306,11 @@ func TestPublishInspection(t *testing.T) {
 func TestAskValidateInspection(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
+
+	tests.AuthInspecteur(e.POST("/pointsdecontrole/{id}/publier")).WithPath("id", 2).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
 
 	tests.AuthInspecteur(e.POST("/inspections/{id}/demandervalidation")).WithPath("id", 1).
 		Expect().

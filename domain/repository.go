@@ -23,10 +23,12 @@ type Repository interface {
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64, filter InspectionFilter) (*models.Inspection, error)
 	CheckEtatInspection(idInspection int64, etats []models.EtatInspection) (bool, error)
+	CheckInspectionHasNonConformites(idInspection int64) (bool, error)
+	GetInspectionTypesConstatsSuiteByID(idInspection int64) (*models.Inspection, error)
 	UpdateEtatInspection(ctx *UserContext, id int64, etat models.EtatInspection) error
 	AddFavoriToInspection(ctx *UserContext, idInspection int64) error
 	RemoveFavoriToInspection(ctx *UserContext, idInspection int64) error
-	CheckCanCreateSuite(ctx *UserContext, idInspection int64) (bool, error)
+	CheckCanCreateSuite(ctx *UserContext, idInspection int64) error
 	CheckCanDeleteSuite(ctx *UserContext, idInspection int64) (bool, error)
 
 	CreateSuite(ctx *UserContext, idInspection int64, suite models.Suite) (int64, error)
@@ -52,7 +54,7 @@ type Repository interface {
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByID(id int64) (*models.User, error)
 	CheckUsersInspecteurs(ids []int64) (bool, error)
-	CheckInspecteurAllowedInspection(ctx *UserContext, idInspection int64) (bool, error)
+	CheckInspecteurAllowedInspection(ctx *UserContext, idInspection int64) error
 	CheckUserAllowedPointDeControle(ctx *UserContext, idPointDeControle int64) (bool, error)
 	FindUsers(filters ListUsersFilters) ([]models.User, error)
 

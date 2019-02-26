@@ -47,7 +47,7 @@ func TestAddPointDeControleWithInspecteurNotAllowed(t *testing.T) {
 
 	tests.AuthUser(e.POST("/inspections/{id}/pointsdecontrole"), 5).WithPath("id", 1).WithJSON(pointControle).
 		Expect().
-		Status(http.StatusBadRequest)
+		Status(http.StatusForbidden)
 
 	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
 		Expect().
