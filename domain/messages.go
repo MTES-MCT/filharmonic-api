@@ -19,6 +19,11 @@ func (s *Service) CreateMessage(ctx *UserContext, idPointDeControle int64, messa
 	if ctx.IsExploitant() {
 		message.Interne = false
 	}
+	etatInspection, err := s.repo.GetEtatInspectionByPointDeControleID(idPointDeControle)
+	if err != nil {
+		return 0, err
+	}
+	message.EtapeTraitementNonConformites = etatInspection == models.EtatTraitementNonConformites
 	return s.repo.CreateMessage(ctx, idPointDeControle, message)
 }
 

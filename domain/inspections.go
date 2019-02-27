@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	ErrInspectionNotFound = errors.NewErrForbidden("Inspection non trouvée")
+	ErrInspectionNotFound          = errors.NewErrForbidden("Inspection non trouvée")
+	ErrClotureInspectionImpossible = errors.NewErrForbidden("Impossible de clore l'inspection")
 )
 
 type ListInspectionsFilter struct {
@@ -159,6 +160,29 @@ func (s *Service) RejectInspection(ctx *UserContext, idInspection int64) error {
 	}
 	err = s.repo.CreateEvenement(ctx, models.EvenementRejetValidationInspection, idInspection, nil)
 	return err
+}
+
+func (s *Service) CloreInspection(ctx *UserContext, idInspection int64) error {
+	if !ctx.IsInspecteur() {
+		return ErrBesoinProfilInspecteur
+	}
+	ok, err := s.repo.CheckEtatInspection(idInspection, []models.EtatInspection{models.EtatTraitementNonConformites})
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrBesoinEtatTraitementNonConformites
+	}
+	err = s.repo.CanCloreInspection(ctx, idInspection)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.UpdateEtatInspection(ctx, idInspection, models.EtatClos)
+	if err != nil {
+		return err
+	}
+	return s.repo.CreateEvenement(ctx, models.EvenementClotureInspection, idInspection, nil)
 }
 
 func (s *Service) changeEtatInspection(ctx *UserContext, idInspection int64, fromEtat models.EtatInspection, toEtat models.EtatInspection) error {

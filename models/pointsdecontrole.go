@@ -17,13 +17,14 @@ type PointDeControle struct {
 }
 
 type Message struct {
-	Id                int64     `json:"id"`
-	Message           string    `json:"message"`
-	Date              time.Time `json:"date"`
-	Lu                bool      `json:"lu" sql:",notnull"`
-	Interne           bool      `json:"interne" sql:",notnull"`
-	AuteurId          int64     `json:"-" sql:",notnull"`
-	PointDeControleId int64     `json:"-" sql:",notnull"`
+	Id                            int64     `json:"id"`
+	Message                       string    `json:"message"`
+	Date                          time.Time `json:"date"`
+	Lu                            bool      `json:"lu" sql:",notnull"`
+	Interne                       bool      `json:"interne" sql:",notnull"`
+	AuteurId                      int64     `json:"-" sql:",notnull"`
+	PointDeControleId             int64     `json:"-" sql:",notnull"`
+	EtapeTraitementNonConformites bool      `json:"etape_traitement_non_conformites" sql:",notnull"`
 
 	Auteur          *User            `json:"auteur,omitempty"`
 	PointDeControle *PointDeControle `json:"-"`
@@ -33,14 +34,16 @@ type Message struct {
 type TypeConstat string
 
 const (
+	TypeConstatInconnu     TypeConstat = "inconnu"
 	TypeConstatObservation TypeConstat = "observation"
 	TypeConstatConforme    TypeConstat = "conforme"
 	TypeConstatNonConforme TypeConstat = "non_conforme"
 )
 
 type Constat struct {
-	Id        int64       `json:"id"`
-	Type      TypeConstat `json:"type"`
-	Remarques string      `json:"remarques"`
-	Delai     string      `json:"delai"`
+	Id             int64       `json:"id"`
+	Type           TypeConstat `json:"type"`
+	Remarques      string      `json:"remarques"`
+	Delai          string      `json:"delai"`
+	DateResolution time.Time   `json:"date_resolution"`
 }

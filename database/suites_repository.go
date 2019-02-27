@@ -32,8 +32,13 @@ func (repo *Repository) CreateSuite(ctx *domain.UserContext, idInspection int64,
 
 func (repo *Repository) UpdateSuite(ctx *domain.UserContext, idInspection int64, suite models.Suite) error {
 	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
-		_, err := tx.Model(&suite).
-			WherePK().Update()
+		_, err := tx.ExecOne(`UPDATE suites as s
+											 SET type = ?, synthese = ?, penal_engage = ?
+											 FROM
+											 inspections as i
+											 WHERE
+											 i.suite_id = s.id
+											 AND i.id = ?`, suite.Type, suite.Synthese, suite.PenalEngage, idInspection)
 		if err != nil {
 			return err
 		}

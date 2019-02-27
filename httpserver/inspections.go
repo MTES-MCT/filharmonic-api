@@ -77,6 +77,14 @@ func (server *HttpServer) validateInspection(c *gin.Context) error {
 	return server.service.ValidateInspection(server.retrieveUserContext(c), idInspection)
 }
 
+func (server *HttpServer) cloreInspection(c *gin.Context) error {
+	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return badInputError(err)
+	}
+	return server.service.CloreInspection(server.retrieveUserContext(c), idInspection)
+}
+
 func (server *HttpServer) addFavoriToInspection(c *gin.Context) error {
 	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

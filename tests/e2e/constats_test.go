@@ -48,3 +48,21 @@ func TestDeleteConstat(t *testing.T) {
 	firstPointDeControle := inspection.Value("points_de_controle").Array().First().Object()
 	firstPointDeControle.NotContainsKey("constat")
 }
+
+func TestResoudreConstat(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthInspecteur(e.POST("/pointsdecontrole/{id}/constat/resoudre")).WithPath("id", 7).
+		Expect().
+		Status(http.StatusOK)
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 5).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	lastPointDeControle := inspection.Value("points_de_controle").Array().First().Object()
+	constatOutput := lastPointDeControle.Value("constat").Object()
+	constatOutput.ValueNotEqual("date_resolution", "")
+}

@@ -43,6 +43,9 @@ func init() {
 	NotificationsEvenements[models.EvenementValidationInspection] = func(ctx *UserContext) []string {
 		return []string{"inspecteurs", "exploitants"}
 	}
+	NotificationsEvenements[models.EvenementClotureInspection] = func(ctx *UserContext) []string {
+		return []string{"inspecteurs", "exploitants"}
+	}
 	NotificationsEvenements[models.EvenementCreationPointDeControle] = func(ctx *UserContext) []string {
 		return []string{"inspecteurs"}
 	}
@@ -60,6 +63,9 @@ func init() {
 	}
 	NotificationsEvenements[models.EvenementSuppressionConstat] = func(ctx *UserContext) []string {
 		return []string{"inspecteurs"}
+	}
+	NotificationsEvenements[models.EvenementResolutionConstat] = func(ctx *UserContext) []string {
+		return []string{"inspecteurs", "exploitants"}
 	}
 	NotificationsEvenements[models.EvenementCreationSuite] = func(ctx *UserContext) []string {
 		return []string{"inspecteurs"}

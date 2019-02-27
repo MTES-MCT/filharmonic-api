@@ -119,6 +119,10 @@ func (d *Database) Model(model ...interface{}) *orm.Query {
 	return d.client.Model(model...)
 }
 
+func (d *Database) Exec(query interface{}, params ...interface{}) (pg.Result, error) {
+	return d.client.Exec(query, params...)
+}
+
 type dbLogger struct{}
 
 func (d dbLogger) BeforeQuery(q *pg.QueryEvent) {}

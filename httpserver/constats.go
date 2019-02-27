@@ -26,3 +26,11 @@ func (server *HttpServer) deleteConstat(c *gin.Context) error {
 	}
 	return server.service.DeleteConstat(server.retrieveUserContext(c), idPointDeControle)
 }
+
+func (server *HttpServer) resolveConstat(c *gin.Context) error {
+	idPointDeControle, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return badInputError(err)
+	}
+	return server.service.ResolveConstat(server.retrieveUserContext(c), idPointDeControle)
+}

@@ -197,6 +197,38 @@ func (repo *Repository) CheckEtatInspection(id int64, etats []models.EtatInspect
 	return count == 1, err
 }
 
+func (repo *Repository) CanCloreInspection(ctx *domain.UserContext, idInspection int64) error {
+	count, err := repo.db.client.Model(&models.Inspection{}).
+		Join("JOIN point_de_controles AS point_de_controle").
+		JoinOn("inspection.id = point_de_controle.inspection_id").
+		Join("JOIN constats as constat").
+		JoinOn("constat.id = point_de_controle.constat_id").
+		Where("inspection.id = ?", idInspection).
+		WhereGroup(func(q *orm.Query) (*orm.Query, error) {
+			q.WhereOrGroup(func(q *orm.Query) (*orm.Query, error) {
+				// si tous les constats sont résolus
+				q.Where("constat.date_resolution IS NULL")
+				return q, nil
+			})
+			q.WhereOrGroup(func(q *orm.Query) (*orm.Query, error) {
+				// si délais constats dépassés
+				// now := time.Now()
+				// attendre la date de validation de l'inspection + découpage champ délai
+				// q.Where("inspection.date_validation + constat.delai > now") // erreur
+				return q, nil
+			})
+			return q, nil
+		}).
+		Count()
+	if err != nil {
+		return err
+	}
+	if count >= 1 {
+		return domain.ErrClotureInspectionImpossible
+	}
+	return nil
+}
+
 func (repo *Repository) UpdateEtatInspection(ctx *domain.UserContext, id int64, etat models.EtatInspection) error {
 	inspection := models.Inspection{
 		Id:   id,

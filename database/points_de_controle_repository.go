@@ -101,14 +101,18 @@ func (repo *Repository) CheckUserAllowedPointDeControle(ctx *domain.UserContext,
 	}
 }
 
-func (repo *Repository) CheckEtatPointDeControle(id int64, etats []models.EtatInspection) (bool, error) {
-	count, err := repo.db.client.Model(&models.PointDeControle{}).
+func (repo *Repository) GetEtatInspectionByPointDeControleID(idPointDeControle int64) (models.EtatInspection, error) {
+	inspection := &models.Inspection{}
+	err := repo.db.client.Model(&models.PointDeControle{}).
+		Column("i.etat").
 		Join("JOIN inspections AS i").
 		JoinOn("i.id = point_de_controle.inspection_id").
-		Where("i.etat in (?)", pg.In(etats)).
-		Where("point_de_controle.id = ?", id).
-		Count()
-	return count == 1, err
+		Where("point_de_controle.id = ?", idPointDeControle).
+		Select(inspection)
+	if err != nil {
+		return models.EtatInconnu, err
+	}
+	return inspection.Etat, err
 }
 
 func (repo *Repository) CanCreatePointDeControle(ctx *domain.UserContext, idInspection int64) error {

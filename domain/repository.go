@@ -23,8 +23,10 @@ type Repository interface {
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64, filter InspectionFilter) (*models.Inspection, error)
 	CheckEtatInspection(idInspection int64, etats []models.EtatInspection) (bool, error)
+	GetEtatInspectionByPointDeControleID(idPointDeControle int64) (models.EtatInspection, error)
 	CheckInspectionHasNonConformites(idInspection int64) (bool, error)
 	GetInspectionTypesConstatsSuiteByID(idInspection int64) (*models.Inspection, error)
+	CanCloreInspection(ctx *UserContext, idInspection int64) error
 	UpdateEtatInspection(ctx *UserContext, id int64, etat models.EtatInspection) error
 	AddFavoriToInspection(ctx *UserContext, idInspection int64) error
 	RemoveFavoriToInspection(ctx *UserContext, idInspection int64) error
@@ -52,6 +54,8 @@ type Repository interface {
 
 	CreateConstat(ctx *UserContext, idPointDeControle int64, constat models.Constat) (int64, error)
 	DeleteConstat(ctx *UserContext, idPointDeControle int64) error
+	ResolveConstat(ctx *UserContext, idPointDeControle int64) error
+	GetTypeConstatByPointDeControleID(idPointDeControle int64) (models.TypeConstat, error)
 
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByID(id int64) (*models.User, error)

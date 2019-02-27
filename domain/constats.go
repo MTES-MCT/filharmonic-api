@@ -6,8 +6,10 @@ import (
 )
 
 var (
-	ErrCreationConstatImpossible    = errors.NewErrForbidden("Impossible de créer le constat")
-	ErrSuppressionConstatImpossible = errors.NewErrForbidden("Impossible de supprimer le constat")
+	ErrCreationConstatImpossible          = errors.NewErrForbidden("Impossible de créer le constat")
+	ErrSuppressionConstatImpossible       = errors.NewErrForbidden("Impossible de supprimer le constat")
+	ErrBesoinEtatTraitementNonConformites = errors.NewErrForbidden("L'inspection doit être à l'étape de traitement des non-conformités")
+	ErrBesoinTypeConstatNonConforme       = errors.NewErrForbidden("Impossible de résoudre un constat conforme")
 )
 
 func (s *Service) CreateConstat(ctx *UserContext, idPointDeControle int64, constat models.Constat) (int64, error) {
@@ -40,4 +42,34 @@ func (s *Service) DeleteConstat(ctx *UserContext, idPointDeControle int64) error
 	}
 
 	return s.repo.DeleteConstat(ctx, idPointDeControle)
+}
+
+func (s *Service) ResolveConstat(ctx *UserContext, idPointDeControle int64) error {
+	if !ctx.IsInspecteur() {
+		return ErrBesoinProfilInspecteur
+	}
+
+	ok, err := s.repo.CheckUserAllowedPointDeControle(ctx, idPointDeControle)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrInvalidInput
+	}
+	etatInspection, err := s.repo.GetEtatInspectionByPointDeControleID(idPointDeControle)
+	if err != nil {
+		return err
+	}
+	if etatInspection != models.EtatTraitementNonConformites {
+		return ErrBesoinEtatTraitementNonConformites
+	}
+	typeConstat, err := s.repo.GetTypeConstatByPointDeControleID(idPointDeControle)
+	if err != nil {
+		return err
+	}
+	if typeConstat != models.TypeConstatNonConforme {
+		return ErrBesoinTypeConstatNonConforme
+	}
+
+	return s.repo.ResolveConstat(ctx, idPointDeControle)
 }

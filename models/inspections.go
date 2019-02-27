@@ -33,6 +33,7 @@ const (
 type EtatInspection string
 
 const (
+	EtatInconnu                  EtatInspection = "inconnu"
 	EtatPreparation              EtatInspection = "preparation"
 	EtatEnCours                  EtatInspection = "en_cours"
 	EtatAttenteValidation        EtatInspection = "attente_validation"

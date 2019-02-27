@@ -263,12 +263,29 @@ func TestValidateInspectionSansNonConformites(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	tests.AuthApprobateur(e.POST("/inspections/{id}/valider")).WithPath("id", 5).
+	tests.AuthApprobateur(e.POST("/inspections/{id}/rejeter")).WithPath("id", 3).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 
-	inspection := tests.AuthApprobateur(e.GET("/inspections/{id}")).WithPath("id", 5).
+	suite := models.Suite{
+		Type: models.TypeSuiteAucune,
+	}
+	tests.AuthInspecteur(e.PUT("/inspections/{id}/suite")).WithPath("id", 3).WithJSON(suite).
+		Expect().
+		Status(http.StatusOK)
+
+	tests.AuthInspecteur(e.POST("/inspections/{id}/demandervalidation")).WithPath("id", 3).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	tests.AuthApprobateur(e.POST("/inspections/{id}/valider")).WithPath("id", 3).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection := tests.AuthApprobateur(e.GET("/inspections/{id}")).WithPath("id", 3).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -313,17 +330,26 @@ func TestAskValidateInspection(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	tests.AuthApprobateur(e.POST("/inspections/{id}/rejeter")).WithPath("id", 5).
+	constat := models.Constat{
+		Type: models.TypeConstatConforme,
+	}
+	tests.AuthInspecteur(e.POST("/pointsdecontrole/{id}/constat")).WithPath("id", 6).WithJSON(constat).
+		Expect().
+		Status(http.StatusOK)
+
+	suite := models.Suite{
+		Type: models.TypeSuiteObservation,
+	}
+	tests.AuthInspecteur(e.POST("/inspections/{id}/suite")).WithPath("id", 4).WithJSON(suite).
+		Expect().
+		Status(http.StatusOK)
+
+	tests.AuthInspecteur(e.POST("/inspections/{id}/demandervalidation")).WithPath("id", 4).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 
-	tests.AuthInspecteur(e.POST("/inspections/{id}/demandervalidation")).WithPath("id", 5).
-		Expect().
-		Status(http.StatusOK).
-		JSON().Object()
-
-	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 5).
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 4).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -345,6 +371,27 @@ func TestRejectInspection(t *testing.T) {
 		JSON().Object()
 
 	inspection.ValueEqual("etat", models.EtatEnCours)
+}
+
+func TestCloreInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	tests.AuthInspecteur(e.POST("/pointsdecontrole/{id}/constat/resoudre")).WithPath("id", 7).
+		Expect().
+		Status(http.StatusOK)
+
+	tests.AuthInspecteur(e.POST("/inspections/{id}/clore")).WithPath("id", 5).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 5).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection.ValueEqual("etat", models.EtatClos)
 }
 
 func TestAddFavoriToInspection(t *testing.T) {

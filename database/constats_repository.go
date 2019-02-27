@@ -1,6 +1,8 @@
 package database
 
 import (
+	"time"
+
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
@@ -98,4 +100,41 @@ func (repo *Repository) CanDeleteConstat(ctx *domain.UserContext, idPointDeContr
 		return domain.ErrSuppressionConstatImpossible
 	}
 	return nil
+}
+
+func (repo *Repository) ResolveConstat(ctx *domain.UserContext, idPointDeControle int64) error {
+	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
+		pointDeControle := models.PointDeControle{}
+		_, err := tx.QueryOne(&pointDeControle, `UPDATE constats as c
+											 SET date_resolution = ?
+											 FROM
+											 point_de_controles as p
+											 WHERE
+											 p.constat_id = c.id
+											 AND p.id = ?
+											 RETURNING p.inspection_id`, time.Now(), idPointDeControle)
+		if err != nil {
+			return err
+		}
+
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementResolutionConstat, pointDeControle.InspectionId, map[string]interface{}{
+			"point_de_controle_id": idPointDeControle,
+		})
+		return err
+	})
+	return err
+}
+
+func (repo *Repository) GetTypeConstatByPointDeControleID(idPointDeControle int64) (models.TypeConstat, error) {
+	constat := &models.Constat{}
+	err := repo.db.client.Model(&models.PointDeControle{}).
+		Column("c.type").
+		Join("JOIN constats AS c").
+		JoinOn("c.id = point_de_controle.constat_id").
+		Where("point_de_controle.id = ?", idPointDeControle).
+		Select(constat)
+	if err != nil {
+		return models.TypeConstatInconnu, err
+	}
+	return constat.Type, err
 }

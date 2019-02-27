@@ -171,6 +171,10 @@ func SeedsTestDB(db *pg.DB) error {
 			EtablissementId: 3,
 			UserId:          2,
 		},
+		&models.EtablissementToExploitant{
+			EtablissementId: 4,
+			UserId:          2,
+		},
 	}
 	err = db.Insert(etablissementToExploitants...)
 	if err != nil {
@@ -189,7 +193,7 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 		&models.Suite{
 			// Id: 3,
-			Type: models.TypeSuiteAucune,
+			Type: models.TypeSuitePropositionMiseEnDemeure,
 		},
 	}
 	err = db.Insert(suites...)
@@ -262,7 +266,7 @@ func SeedsTestDB(db *pg.DB) error {
 			},
 			Annonce:         true,
 			Origine:         models.OriginePlanControle,
-			Etat:            models.EtatAttenteValidation,
+			Etat:            models.EtatTraitementNonConformites,
 			Contexte:        "Rejets CO2 de l'usine",
 			EtablissementId: 4,
 			SuiteId:         3,
@@ -345,8 +349,8 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 		&models.Constat{
 			// Id: 4,
-			Type:      models.TypeConstatConforme,
-			Remarques: "Respecte bien la réglementation",
+			Type:      models.TypeConstatNonConforme,
+			Remarques: "Ne respecte pas la réglementation",
 		},
 	}
 	err = db.Insert(constats...)
