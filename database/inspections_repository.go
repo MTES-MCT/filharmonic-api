@@ -108,6 +108,7 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, fil
 	var inspection models.Inspection
 	query := repo.db.client.Model(&inspection).
 		Relation("Etablissement").
+		Relation("Etablissement.Exploitants").
 		Relation("PointsDeControle", func(q *orm.Query) (*orm.Query, error) {
 			if ctx.IsExploitant() || filter.OmitPointsDeControleNonPublies {
 				q.Where("publie = TRUE")

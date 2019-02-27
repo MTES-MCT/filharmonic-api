@@ -84,13 +84,15 @@ func (repo *Repository) CheckCanCreateSuite(ctx *domain.UserContext, idInspectio
 		Where("inspection.etat = ?", models.EtatEnCours).
 		ColumnExpr("COUNT(inspection.id) as count").
 		ColumnExpr(`(SELECT count(*)
-		            FROM point_de_controles AS point_de_controle
-					WHERE point_de_controle.inspection_id = ?
-						AND point_de_controle.publie = FALSE) AS nb_points_de_controle_non_publies`, idInspection).
+			FROM point_de_controles AS point_de_controle
+			WHERE point_de_controle.inspection_id = ?
+			AND point_de_controle.deleted_at IS NULL
+			AND point_de_controle.publie = FALSE) AS nb_points_de_controle_non_publies`, idInspection).
 		ColumnExpr(`(SELECT count(*)
-		            FROM point_de_controles AS point_de_controle
-					WHERE point_de_controle.inspection_id = ?
-						AND point_de_controle.constat_id IS NULL) AS nb_points_de_controle_sans_constat`, idInspection).
+			FROM point_de_controles AS point_de_controle
+			WHERE point_de_controle.inspection_id = ?
+			AND point_de_controle.deleted_at IS NULL
+			AND point_de_controle.constat_id IS NULL) AS nb_points_de_controle_sans_constat`, idInspection).
 		Select(results)
 	if err != nil {
 		return err

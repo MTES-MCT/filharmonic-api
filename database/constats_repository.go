@@ -1,7 +1,6 @@
 package database
 
 import (
-
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
