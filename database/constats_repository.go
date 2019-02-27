@@ -58,7 +58,7 @@ func (repo *Repository) DeleteConstat(ctx *domain.UserContext, idPointDeControle
 	return err
 }
 
-func (repo *Repository) CheckCanCreateConstat(ctx *domain.UserContext, idPointDeControle int64) (bool, error) {
+func (repo *Repository) CanCreateConstat(ctx *domain.UserContext, idPointDeControle int64) error {
 	count, err := repo.db.client.Model(&models.PointDeControle{}).
 		Join("JOIN inspections AS i").
 		JoinOn("i.id = point_de_controle.inspection_id").
@@ -68,11 +68,18 @@ func (repo *Repository) CheckCanCreateConstat(ctx *domain.UserContext, idPointDe
 		Where("point_de_controle.id = ?", idPointDeControle).
 		Where("point_de_controle.constat_id IS NULL").
 		Where("i.etat = ?", models.EtatEnCours).
+		Where("i.suite_id IS NULL").
 		Count()
-	return count == 1, err
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.ErrCreationConstatImpossible
+	}
+	return nil
 }
 
-func (repo *Repository) CheckCanDeleteConstat(ctx *domain.UserContext, idPointDeControle int64) (bool, error) {
+func (repo *Repository) CanDeleteConstat(ctx *domain.UserContext, idPointDeControle int64) error {
 	count, err := repo.db.client.Model(&models.PointDeControle{}).
 		Join("JOIN inspections AS i").
 		JoinOn("i.id = point_de_controle.inspection_id").
@@ -82,6 +89,13 @@ func (repo *Repository) CheckCanDeleteConstat(ctx *domain.UserContext, idPointDe
 		Where("point_de_controle.id = ?", idPointDeControle).
 		Where("point_de_controle.constat_id IS NOT NULL").
 		Where("i.etat = ?", models.EtatEnCours).
+		Where("i.suite_id IS NULL").
 		Count()
-	return count == 1, err
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.ErrSuppressionConstatImpossible
+	}
+	return nil
 }

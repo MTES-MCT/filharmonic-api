@@ -100,6 +100,7 @@ func (repo *Repository) CheckUserAllowedPointDeControle(ctx *domain.UserContext,
 		return count == 1, err
 	}
 }
+
 func (repo *Repository) CheckEtatPointDeControle(id int64, etats []models.EtatInspection) (bool, error) {
 	count, err := repo.db.client.Model(&models.PointDeControle{}).
 		Join("JOIN inspections AS i").
@@ -108,4 +109,36 @@ func (repo *Repository) CheckEtatPointDeControle(id int64, etats []models.EtatIn
 		Where("point_de_controle.id = ?", id).
 		Count()
 	return count == 1, err
+}
+
+func (repo *Repository) CanCreatePointDeControle(ctx *domain.UserContext, idInspection int64) error {
+	count, err := repo.db.client.Model(&models.Inspection{}).
+		Where("id = ?", idInspection).
+		Where("etat in (?)", pg.In([]models.EtatInspection{models.EtatPreparation, models.EtatEnCours})).
+		Where("suite_id IS NULL").
+		Count()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.ErrCreationPointDeControleImpossible
+	}
+	return nil
+}
+
+func (repo *Repository) CanUpdatePointDeControle(ctx *domain.UserContext, idPointDeControle int64) error {
+	count, err := repo.db.client.Model(&models.PointDeControle{}).
+		Join("JOIN inspections as i ").
+		JoinOn("i.id = point_de_controle.inspection_id").
+		JoinOn("etat in (?)", pg.In([]models.EtatInspection{models.EtatPreparation, models.EtatEnCours})).
+		JoinOn("suite_id IS NULL").
+		Where("point_de_controle.id = ?", idPointDeControle).
+		Count()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.ErrModificationPointDeControleImpossible
+	}
+	return nil
 }

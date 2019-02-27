@@ -198,7 +198,7 @@ func SeedsTestDB(db *pg.DB) error {
 	}
 
 	inspections := []interface{}{
-		&models.Inspection{
+		&models.Inspection{ // (non cohérent) en cours, avec suite, 1 point de contrôle publié avec constat, 1 point de contrôle non publié
 			// Id:   1,
 			Date: util.Date("2018-09-01"),
 			Type: models.TypeApprofondi,
@@ -212,7 +212,7 @@ func SeedsTestDB(db *pg.DB) error {
 			EtablissementId: 1,
 			SuiteId:         1,
 		},
-		&models.Inspection{
+		&models.Inspection{ // (non cohérent) en préparation, pas de suite, 2 points de contrôle publiés dont un avec constat
 			// Id:   2,
 			Date: util.Date("2018-11-15"),
 			Type: models.TypeCourant,
@@ -226,7 +226,7 @@ func SeedsTestDB(db *pg.DB) error {
 			Contexte:        "Incident cuve gaz le 30/12/2017",
 			EtablissementId: 3,
 		},
-		&models.Inspection{
+		&models.Inspection{ // en attente validation, avec suite, 1 point de contrôle publié avec constat
 			// Id:   3,
 			Date: util.Date("2018-11-15"),
 			Type: models.TypeApprofondi,
@@ -240,7 +240,7 @@ func SeedsTestDB(db *pg.DB) error {
 			EtablissementId: 4,
 			SuiteId:         2,
 		},
-		&models.Inspection{
+		&models.Inspection{ // en cours, pas de suite, 2 points de contrôle publiés dont un sans constat
 			// Id:   4,
 			Date: util.Date("2019-01-15"),
 			Type: models.TypeApprofondi,
@@ -253,7 +253,7 @@ func SeedsTestDB(db *pg.DB) error {
 			Contexte:        "Inspection en cours",
 			EtablissementId: 4,
 		},
-		&models.Inspection{
+		&models.Inspection{ // en attente validation, avec suite, 1 point de contrôle publié avec constat
 			// Id:   5,
 			Date: util.Date("2019-02-26"),
 			Type: models.TypeApprofondi,

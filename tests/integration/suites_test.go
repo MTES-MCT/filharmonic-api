@@ -81,8 +81,6 @@ func TestCreateSuitePointsDeControleSansConstat(t *testing.T) {
 			Profile: models.ProfilInspecteur,
 		},
 	}
-	err := application.Service.PublishPointDeControle(ctx, int64(2))
-	assert.NoError(err)
 
 	suite := models.Suite{
 		// Id: 4,
@@ -90,6 +88,6 @@ func TestCreateSuitePointsDeControleSansConstat(t *testing.T) {
 		Synthese: "Observations à traiter",
 	}
 
-	_, err = application.Service.CreateSuite(ctx, int64(4), suite)
+	_, err := application.Service.CreateSuite(ctx, int64(4), suite)
 	assert.Equal(models.ErrConstatManquant, err)
 }

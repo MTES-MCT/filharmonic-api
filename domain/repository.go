@@ -41,12 +41,14 @@ type Repository interface {
 	UpdatePointDeControle(ctx *UserContext, idPointDeControle int64, pointDeControle models.PointDeControle) error
 	DeletePointDeControle(ctx *UserContext, idPointDeControle int64) error
 	PublishPointDeControle(ctx *UserContext, idPointDeControle int64) error
+	CanCreatePointDeControle(ctx *UserContext, idInspection int64) error
+	CanUpdatePointDeControle(ctx *UserContext, idPointDeControle int64) error
 	CreateMessage(ctx *UserContext, idPointDeControle int64, message models.Message) (int64, error)
 	LireMessage(ctx *UserContext, idMessage int64) error
 	CheckUserAllowedMessage(ctx *UserContext, idMessage int64) (bool, error)
 	CheckUserIsRecipient(ctx *UserContext, idMessage int64) (bool, error)
-	CheckCanCreateConstat(ctx *UserContext, idPointDeControle int64) (bool, error)
-	CheckCanDeleteConstat(ctx *UserContext, idPointDeControle int64) (bool, error)
+	CanCreateConstat(ctx *UserContext, idPointDeControle int64) error
+	CanDeleteConstat(ctx *UserContext, idPointDeControle int64) error
 
 	CreateConstat(ctx *UserContext, idPointDeControle int64, constat models.Constat) (int64, error)
 	DeleteConstat(ctx *UserContext, idPointDeControle int64) error

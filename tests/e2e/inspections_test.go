@@ -64,11 +64,11 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	inspection.ValueEqual("date", "2018-09-01")
 	etablissement := inspection.Value("etablissement").Object()
 	etablissement.ValueEqual("id", 1)
-	responsables := etablissement.Value("exploitants").Array()
-	responsables.Length().Equal(1)
-	responsable = responsables.First().Object()
-	responsable.ValueEqual("id", 1)
-	responsable.ValueEqual("email", "exploitant1@filharmonic.com")
+	exploitants := etablissement.Value("exploitants").Array()
+	exploitants.Length().Equal(1)
+	exploitant := exploitants.First().Object()
+	exploitant.ValueEqual("id", 1)
+	exploitant.ValueEqual("email", "exploitant1@filharmonic.com")
 	inspection.Value("themes").Array().Contains("Produits chimiques")
 	inspecteurs := inspection.Value("inspecteurs").Array()
 	inspecteurs.Length().Equal(2)
@@ -313,17 +313,17 @@ func TestAskValidateInspection(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	tests.AuthInspecteur(e.POST("/pointsdecontrole/{id}/publier")).WithPath("id", 2).
+	tests.AuthApprobateur(e.POST("/inspections/{id}/rejeter")).WithPath("id", 5).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 
-	tests.AuthInspecteur(e.POST("/inspections/{id}/demandervalidation")).WithPath("id", 1).
+	tests.AuthInspecteur(e.POST("/inspections/{id}/demandervalidation")).WithPath("id", 5).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 
-	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 5).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()

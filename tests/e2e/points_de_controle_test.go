@@ -20,11 +20,11 @@ func TestAddPointDeControle(t *testing.T) {
 		},
 	}
 
-	tests.AuthInspecteur(e.POST("/inspections/{id}/pointsdecontrole")).WithPath("id", 1).WithJSON(pointControle).
+	tests.AuthInspecteur(e.POST("/inspections/{id}/pointsdecontrole")).WithPath("id", 4).WithJSON(pointControle).
 		Expect().
 		Status(http.StatusOK)
 
-	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 4).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -69,11 +69,11 @@ func TestUpdatePointDeControle(t *testing.T) {
 		},
 	}
 
-	tests.AuthInspecteur(e.PUT("/pointsdecontrole/{id}")).WithPath("id", 2).WithJSON(pointControle).
+	tests.AuthInspecteur(e.PUT("/pointsdecontrole/{id}")).WithPath("id", 5).WithJSON(pointControle).
 		Expect().
 		Status(http.StatusOK)
 
-	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 4).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -81,7 +81,7 @@ func TestUpdatePointDeControle(t *testing.T) {
 	pointsControle.Length().Equal(2)
 	pointsControle.Last().Object().ValueEqual("sujet", "Emissions de NOx")
 	pointsControle.Last().Object().ValueEqual("references_reglementaires", []string{"Article 1 de l'arrêté préfectoral du 2/10/2010"})
-	pointsControle.Last().Object().ValueEqual("publie", false)
+	pointsControle.Last().Object().ValueEqual("publie", true)
 }
 
 func TestUpdatePointDeControleNotAllowed(t *testing.T) {
@@ -114,30 +114,42 @@ func TestDeletePointDeControle(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	tests.AuthInspecteur(e.DELETE("/pointsdecontrole/{id}")).WithPath("id", 2).
+	tests.AuthInspecteur(e.DELETE("/pointsdecontrole/{id}")).WithPath("id", 5).
 		Expect().
 		Status(http.StatusOK)
 
-	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 4).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 	pointsControle := inspection.Value("points_de_controle").Array()
 	pointsControle.Length().Equal(1)
 }
+
 func TestPublishPointDeControle(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	tests.AuthInspecteur(e.POST("/pointsdecontrole/{id}/publier")).WithPath("id", 2).
+	pointControle := models.PointDeControle{
+		Sujet: "Emissions de NOx",
+		ReferencesReglementaires: []string{
+			"Article 1 de l'arrêté préfectoral du 2/10/2010",
+		},
+	}
+
+	pointDeControleId := tests.AuthInspecteur(e.POST("/inspections/{id}/pointsdecontrole")).WithPath("id", 4).WithJSON(pointControle).
+		Expect().
+		Status(http.StatusOK).JSON().Object().Value("id").Raw()
+
+	tests.AuthInspecteur(e.POST("/pointsdecontrole/{id}/publier")).WithPath("id", pointDeControleId).
 		Expect().
 		Status(http.StatusOK)
 
-	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 1).
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 4).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 	pointsControle := inspection.Value("points_de_controle").Array()
-	pointsControle.Length().Equal(2)
+	pointsControle.Length().Equal(3)
 	pointsControle.Last().Object().ValueEqual("publie", true)
 }
