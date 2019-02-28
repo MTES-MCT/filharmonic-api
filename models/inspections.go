@@ -45,7 +45,7 @@ type Inspection struct {
 	Id                 int64                  `json:"id"`
 	Date               util.DateString        `json:"date" sql:"type:date"`
 	Type               TypeInspection         `json:"type"`
-	Annonce            bool                   `json:"annonce" sql:",notnull"`
+	Annonce            bool                   `json:"annonce" sql:",notnull,default:false"`
 	Origine            OrigineInspection      `json:"origine"`
 	Circonstance       CirconstanceInspection `json:"circonstance"`
 	DetailCirconstance string                 `json:"detail_circonstance"`
@@ -99,7 +99,7 @@ type Suite struct {
 	Id          int64     `json:"id"`
 	Type        TypeSuite `json:"type"`
 	Synthese    string    `json:"synthese"`
-	PenalEngage bool      `json:"penal_engage"`
+	PenalEngage bool      `json:"penal_engage" sql:",notnull,default:false"`
 }
 
 var (
