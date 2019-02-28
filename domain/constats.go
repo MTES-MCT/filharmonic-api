@@ -67,7 +67,7 @@ func (s *Service) ResolveConstat(ctx *UserContext, idPointDeControle int64) erro
 	if err != nil {
 		return err
 	}
-	if typeConstat != models.TypeConstatNonConforme {
+	if typeConstat == models.TypeConstatConforme {
 		return ErrBesoinTypeConstatNonConforme
 	}
 

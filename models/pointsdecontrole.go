@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/go-pg/pg/types"
+)
 
 type PointDeControle struct {
 	Id                       int64     `json:"id"`
@@ -41,9 +45,9 @@ const (
 )
 
 type Constat struct {
-	Id             int64       `json:"id"`
-	Type           TypeConstat `json:"type"`
-	Remarques      string      `json:"remarques"`
-	Delai          string      `json:"delai"`
-	DateResolution time.Time   `json:"date_resolution"`
+	Id             int64          `json:"id"`
+	Type           TypeConstat    `json:"type"`
+	Remarques      string         `json:"remarques"`
+	Delai          string         `json:"delai"`
+	DateResolution types.NullTime `json:"date_resolution" sql:"type:timestamptz"`
 }
