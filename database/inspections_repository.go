@@ -207,6 +207,7 @@ func (repo *Repository) CanCloreInspection(ctx *domain.UserContext, idInspection
 		WhereGroup(func(q *orm.Query) (*orm.Query, error) {
 			q.WhereOrGroup(func(q *orm.Query) (*orm.Query, error) {
 				// si tous les constats sont résolus
+				q.Where("constat.type <> ?", models.TypeConstatConforme)
 				q.Where("constat.date_resolution IS NULL")
 				return q, nil
 			})
