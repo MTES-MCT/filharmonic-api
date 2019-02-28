@@ -4338,8 +4338,8 @@
           <table:table-cell table:style-name="Tableau6.B2" office:value-type="string">
             <text:p text:style-name="P126">
               Délai de mise en conformité :
-              {{ if .Constat.Delai }}
-              {{ .Constat.Delai }}
+              {{ if .Constat.DelaiNombre }}
+              {{ .Constat.DelaiNombre }} {{ .Constat.DelaiUnite }}
               {{ else }}
               Aucun
               {{ end }}

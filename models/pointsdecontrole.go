@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/go-pg/pg/types"
 )
 
@@ -45,9 +46,11 @@ const (
 )
 
 type Constat struct {
-	Id             int64          `json:"id"`
-	Type           TypeConstat    `json:"type"`
-	Remarques      string         `json:"remarques"`
-	Delai          string         `json:"delai"`
-	DateResolution types.NullTime `json:"date_resolution" sql:"type:timestamptz"`
+	Id                 int64           `json:"id"`
+	Type               TypeConstat     `json:"type"`
+	Remarques          string          `json:"remarques"`
+	DateResolution     types.NullTime  `json:"date_resolution" sql:"type:timestamptz"`
+	EcheanceResolution util.DateString `json:"echeance_resolution,omitempty" sql:"type:date"`
+	DelaiNombre        int64           `json:"delai_nombre"`
+	DelaiUnite         string          `json:"delai_unite"`
 }

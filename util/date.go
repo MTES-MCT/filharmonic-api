@@ -25,11 +25,17 @@ func (date *DateString) UnmarshalJSON(input []byte) error {
 }
 
 func (date *DateString) MarshalJSON() ([]byte, error) {
+	if date.IsZero() {
+		return []byte("null"), nil
+	}
 	return []byte("\"" + date.Format(DateStringFormat) + "\""), nil
 }
 
 // Scan permet à go-pg de bien décoder la valeur en base
 func (date *DateString) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
 	newTime, err := time.Parse(DateStringFormat, string(value.([]byte)))
 	if err != nil {
 		return err

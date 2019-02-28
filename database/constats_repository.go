@@ -12,7 +12,11 @@ func (repo *Repository) CreateConstat(ctx *domain.UserContext, idPointDeControle
 	constatId := int64(0)
 	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
 		constat.Id = 0
-		err := tx.Insert(&constat)
+		columns := []string{"type", "remarques"}
+		if constat.Type != models.TypeConstatConforme {
+			columns = append(columns, "delai_nombre", "delai_unite")
+		}
+		_, err := tx.Model(&constat).Column(columns...).Returning("id").Insert()
 		if err != nil {
 			return err
 		}
@@ -21,7 +25,7 @@ func (repo *Repository) CreateConstat(ctx *domain.UserContext, idPointDeControle
 			Id:        idPointDeControle,
 			ConstatId: constatId,
 		}
-		columns := []string{"constat_id"}
+		columns = []string{"constat_id"}
 		_, err = tx.Model(&pointDeControle).Column(columns...).WherePK().Returning("inspection_id").Update()
 		if err != nil {
 			return err

@@ -210,9 +210,11 @@ func TestRenderRapport(t *testing.T) {
 					},
 				},
 				Constat: &models.Constat{
-					Type:      models.TypeConstatObservation,
-					Delai:     "3 mois",
-					Remarques: "Vous devez réparer la cuve.",
+					Type:               models.TypeConstatObservation,
+					DelaiNombre:        3,
+					DelaiUnite:         "mois",
+					EcheanceResolution: util.Date("2019-04-30"),
+					Remarques:          "Vous devez réparer la cuve.",
 				},
 			},
 			models.PointDeControle{

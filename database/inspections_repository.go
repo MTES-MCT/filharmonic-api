@@ -1,6 +1,8 @@
 package database
 
 import (
+	"time"
+
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
@@ -204,22 +206,9 @@ func (repo *Repository) CanCloreInspection(ctx *domain.UserContext, idInspection
 		Join("JOIN constats as constat").
 		JoinOn("constat.id = point_de_controle.constat_id").
 		Where("inspection.id = ?", idInspection).
-		WhereGroup(func(q *orm.Query) (*orm.Query, error) {
-			q.WhereOrGroup(func(q *orm.Query) (*orm.Query, error) {
-				// si tous les constats sont résolus
-				q.Where("constat.type <> ?", models.TypeConstatConforme)
-				q.Where("constat.date_resolution IS NULL")
-				return q, nil
-			})
-			q.WhereOrGroup(func(q *orm.Query) (*orm.Query, error) {
-				// si délais constats dépassés
-				// now := time.Now()
-				// attendre la date de validation de l'inspection + découpage champ délai
-				// q.Where("inspection.date_validation + constat.delai > now") // erreur
-				return q, nil
-			})
-			return q, nil
-		}).
+		Where("constat.type <> ?", models.TypeConstatConforme).
+		Where("constat.date_resolution IS NULL").
+		Where("constat.echeance_resolution > ?", time.Now()).
 		Count()
 	if err != nil {
 		return err
