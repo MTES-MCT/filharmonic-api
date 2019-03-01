@@ -7,7 +7,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/tests"
 )
 
-func TestGetRapportFinalInspection(t *testing.T) {
+func TestGetRapportInspection(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
@@ -17,11 +17,11 @@ func TestGetRapportFinalInspection(t *testing.T) {
 		Status(http.StatusOK).
 		JSON().Object()
 
-	tests.AuthInspecteur(e.GET("/inspections/{id}/rapportfinal")).WithPath("id", 3).
+	tests.AuthInspecteur(e.GET("/inspections/{id}/rapport")).WithPath("id", 3).
 		Expect().
 		Status(http.StatusOK).ContentType("application/octet-stream")
 
-	tests.AuthUser(e.GET("/inspections/{id}/rapportfinal"), 2).WithPath("id", 3).
+	tests.AuthUser(e.GET("/inspections/{id}/rapport"), 2).WithPath("id", 3).
 		Expect().
 		Status(http.StatusOK).ContentType("application/octet-stream")
 }

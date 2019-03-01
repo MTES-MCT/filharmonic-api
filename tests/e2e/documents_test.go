@@ -11,7 +11,7 @@ func TestGenererLettreAnnonce(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	lettreBody := tests.AuthInspecteur(e.GET("/inspections/{id}/lettreannonce")).WithPath("id", 1).
+	lettreBody := tests.AuthInspecteur(e.GET("/inspections/{id}/generer/lettreannonce")).WithPath("id", 1).
 		Expect().
 		Status(http.StatusOK).Body()
 
@@ -29,7 +29,7 @@ func TestGenererLettreSuite(t *testing.T) {
 		Expect().
 		Status(http.StatusOK).Body()
 
-	lettreBody := tests.AuthInspecteur(e.GET("/inspections/{id}/lettresuite")).WithPath("id", 3).
+	lettreBody := tests.AuthInspecteur(e.GET("/inspections/{id}/generer/lettresuite")).WithPath("id", 3).
 		Expect().
 		Status(http.StatusOK).Body()
 
@@ -40,7 +40,7 @@ func TestGenererRapport(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	lettreBody := tests.AuthInspecteur(e.GET("/inspections/{id}/rapport")).WithPath("id", 1).
+	lettreBody := tests.AuthInspecteur(e.GET("/inspections/{id}/generer/rapport")).WithPath("id", 1).
 		Expect().
 		Status(http.StatusOK).Body()
 

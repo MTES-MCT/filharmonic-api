@@ -102,7 +102,7 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	firstPieceJointe.ValueEqual("taille", 7945)
 }
 
-func TestGetInspectionValideeAvecRapportFinal(t *testing.T) {
+func TestGetInspectionValideeAvecRapport(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
