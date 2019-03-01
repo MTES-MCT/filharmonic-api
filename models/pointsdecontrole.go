@@ -51,6 +51,6 @@ type Constat struct {
 	Remarques          string          `json:"remarques"`
 	DateResolution     types.NullTime  `json:"date_resolution" sql:"type:timestamptz"`
 	EcheanceResolution util.DateString `json:"echeance_resolution,omitempty" sql:"type:date"`
-	DelaiNombre        int64           `json:"delai_nombre"`
+	DelaiNombre        int32           `json:"delai_nombre"`
 	DelaiUnite         string          `json:"delai_unite"`
 }

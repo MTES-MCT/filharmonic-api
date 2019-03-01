@@ -2,6 +2,7 @@ package integration
 
 import (
 	"testing"
+	"time"
 
 	"github.com/go-pg/pg/types"
 	"github.com/stretchr/testify/require"
@@ -12,6 +13,87 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/tests"
 	"github.com/MTES-MCT/filharmonic-api/util"
 )
+
+func TestValiderInspectionCalculEcheances(t *testing.T) {
+	assert, application, close := tests.InitService(t)
+	defer close()
+
+	inspectionId := initSeedsTestValiderInspectionCalculEcheances(assert, application.DB)
+
+	ctxApprobateur := &domain.UserContext{
+		User: &models.User{
+			Id:      6,
+			Profile: models.ProfilApprobateur,
+		},
+	}
+	err := application.Service.ValidateInspection(ctxApprobateur, inspectionId)
+	assert.NoError(err)
+
+	inspection, err := application.Service.GetInspection(ctxApprobateur, inspectionId)
+	assert.NoError(err)
+	assert.Equal(util.FormatDate(time.Now()), util.FormatDate(inspection.DateValidation.Time))
+	assert.Equal(util.FormatDate(time.Now().AddDate(0, 0, 15)), util.FormatDate(inspection.PointsDeControle[0].Constat.EcheanceResolution.Time))
+	assert.True(inspection.PointsDeControle[1].Constat.EcheanceResolution.IsZero())
+	assert.Equal(util.FormatDate(time.Now().AddDate(0, 4, 0)), util.FormatDate(inspection.PointsDeControle[2].Constat.EcheanceResolution.Time))
+}
+
+func initSeedsTestValiderInspectionCalculEcheances(assert *require.Assertions, db *database.Database) int64 {
+	inspection := models.Inspection{
+		Date:            util.Date("2019-01-10"),
+		Type:            models.TypeApprofondi,
+		Etat:            models.EtatAttenteValidation,
+		EtablissementId: 4,
+	}
+	assert.NoError(db.Insert(&inspection))
+
+	constats := []models.Constat{
+		models.Constat{
+			Type:        models.TypeConstatNonConforme,
+			DelaiNombre: 15,
+			DelaiUnite:  "jours",
+		},
+		models.Constat{
+			Type: models.TypeConstatConforme,
+		},
+		models.Constat{
+			Type:        models.TypeConstatNonConforme,
+			DelaiNombre: 4,
+			DelaiUnite:  "mois",
+		},
+	}
+	assert.NoError(db.Insert(&constats))
+
+	pointsDeControle := []models.PointDeControle{
+		models.PointDeControle{
+			InspectionId: inspection.Id,
+			Publie:       true,
+			Sujet:        "test1",
+			ConstatId:    constats[0].Id,
+		},
+		models.PointDeControle{
+			InspectionId: inspection.Id,
+			Publie:       true,
+			Sujet:        "test2",
+			ConstatId:    constats[1].Id,
+		},
+		models.PointDeControle{
+			InspectionId: inspection.Id,
+			Publie:       true,
+			Sujet:        "test3",
+			ConstatId:    constats[2].Id,
+		},
+	}
+	assert.NoError(db.Insert(&pointsDeControle))
+
+	inspectionToInspecteur := []models.InspectionToInspecteur{
+		models.InspectionToInspecteur{
+			InspectionId: inspection.Id,
+			UserId:       3,
+		},
+	}
+	assert.NoError(db.Insert(&inspectionToInspecteur))
+	return inspection.Id
+}
 
 func TestCloreInspectionConstatsResolus(t *testing.T) {
 	assert, application, close := tests.InitService(t)

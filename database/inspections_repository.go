@@ -7,6 +7,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
+	"github.com/go-pg/pg/types"
 )
 
 func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.ListInspectionsFilter) ([]models.Inspection, error) {
@@ -227,6 +228,34 @@ func (repo *Repository) UpdateEtatInspection(ctx *domain.UserContext, id int64, 
 	columns := []string{"etat"}
 	_, err := repo.db.client.Model(&inspection).Column(columns...).WherePK().Update()
 	return err
+}
+
+func (repo *Repository) ValidateInspection(id int64, etatCible models.EtatInspection) error {
+	return repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
+		inspection := models.Inspection{
+			Id:   id,
+			Etat: etatCible,
+			DateValidation: types.NullTime{
+				Time: time.Now(),
+			},
+		}
+		columns := []string{"etat", "date_validation"}
+		_, err := tx.Model(&inspection).Column(columns...).WherePK().Update()
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.Exec(`UPDATE constats as c
+										 SET echeance_resolution = date(
+												 i.date_validation + (case when c.delai_unite='jours' then make_interval(days => c.delai_nombre) else make_interval(months => c.delai_nombre) end)
+												)
+										 FROM point_de_controles as p
+										 JOIN inspections as i
+										   ON i.id = p.inspection_id
+										 WHERE p.constat_id = c.id
+										   AND i.id = ?`, id)
+		return err
+	})
 }
 
 func (repo *Repository) AddFavoriToInspection(ctx *domain.UserContext, idInspection int64) error {

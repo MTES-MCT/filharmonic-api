@@ -5,6 +5,7 @@ import (
 
 	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/util"
+	"github.com/go-pg/pg/types"
 )
 
 type TypeInspection string
@@ -54,6 +55,7 @@ type Inspection struct {
 	EtablissementId    int64                  `json:"etablissement_id" sql:",notnull"`
 	Themes             []string               `json:"themes" sql:",array"`
 	SuiteId            int64                  `json:"-" sql:"on_delete:SET NULL"`
+	DateValidation     types.NullTime         `json:"date_validation" sql:"type:timestamptz"`
 
 	Commentaires     []Commentaire     `json:"commentaires,omitempty"`
 	Etablissement    *Etablissement    `json:"etablissement,omitempty"`

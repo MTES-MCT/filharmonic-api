@@ -1,6 +1,6 @@
 ALTER TABLE "constats"
   ADD COLUMN "echeance_resolution" date,
-  ADD COLUMN "delai_nombre" bigint,
+  ADD COLUMN "delai_nombre" integer,
   ADD COLUMN "delai_unite" text;
 
 UPDATE "constats" SET "delai_unite" = 'mois';

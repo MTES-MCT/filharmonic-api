@@ -27,6 +27,7 @@ type Repository interface {
 	CheckInspectionHasNonConformites(idInspection int64) (bool, error)
 	GetInspectionTypesConstatsSuiteByID(idInspection int64) (*models.Inspection, error)
 	CanCloreInspection(ctx *UserContext, idInspection int64) error
+	ValidateInspection(id int64, etatCible models.EtatInspection) error
 	UpdateEtatInspection(ctx *UserContext, id int64, etat models.EtatInspection) error
 	AddFavoriToInspection(ctx *UserContext, idInspection int64) error
 	RemoveFavoriToInspection(ctx *UserContext, idInspection int64) error

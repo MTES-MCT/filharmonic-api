@@ -134,6 +134,14 @@ func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64) error
 		return ErrBesoinProfilApprobateur
 	}
 
+	ok, err := s.repo.CheckEtatInspection(idInspection, []models.EtatInspection{models.EtatAttenteValidation})
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ErrInvalidInput
+	}
+
 	hasNonConformites, err := s.repo.CheckInspectionHasNonConformites(idInspection)
 	if err != nil {
 		return err
@@ -142,7 +150,8 @@ func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64) error
 	if hasNonConformites {
 		etatCible = models.EtatTraitementNonConformites
 	}
-	err = s.changeEtatInspection(ctx, idInspection, models.EtatAttenteValidation, etatCible)
+
+	err = s.repo.ValidateInspection(idInspection, etatCible)
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/types"
 )
 
 /*
@@ -264,9 +265,12 @@ func SeedsTestDB(db *pg.DB) error {
 			Themes: []string{
 				"Rejets dans l'air",
 			},
-			Annonce:         true,
-			Origine:         models.OriginePlanControle,
-			Etat:            models.EtatTraitementNonConformites,
+			Annonce: true,
+			Origine: models.OriginePlanControle,
+			Etat:    models.EtatTraitementNonConformites,
+			DateValidation: types.NullTime{
+				Time: util.DateTime("2019-02-28T12:00:00"),
+			},
 			Contexte:        "Rejets CO2 de l'usine",
 			EtablissementId: 4,
 			SuiteId:         3,
@@ -349,8 +353,11 @@ func SeedsTestDB(db *pg.DB) error {
 		},
 		&models.Constat{
 			// Id: 4,
-			Type:      models.TypeConstatNonConforme,
-			Remarques: "Ne respecte pas la réglementation",
+			Type:               models.TypeConstatNonConforme,
+			Remarques:          "Ne respecte pas la réglementation",
+			DelaiNombre:        7,
+			DelaiUnite:         "jours",
+			EcheanceResolution: util.Date("2019-03-06"),
 		},
 	}
 	err = db.Insert(constats...)
