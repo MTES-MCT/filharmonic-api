@@ -50,7 +50,7 @@ func New(config Config) (*FileStorage, error) {
 	}, nil
 }
 
-func (storage *FileStorage) Put(pieceJointe models.PieceJointeFile) (string, error) {
+func (storage *FileStorage) Put(pieceJointe models.File) (string, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
 		return "", err

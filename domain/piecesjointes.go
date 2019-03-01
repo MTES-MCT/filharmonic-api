@@ -9,7 +9,7 @@ var (
 	ErrPieceJointeNotFound = errors.NewErrForbidden("Pièce-jointe non trouvée")
 )
 
-func (s *Service) CreatePieceJointe(ctx *UserContext, pieceJointeFile models.PieceJointeFile) (int64, error) {
+func (s *Service) CreatePieceJointe(ctx *UserContext, pieceJointeFile models.File) (int64, error) {
 	storageId, err := s.storage.Put(pieceJointeFile)
 	if err != nil {
 		return 0, err
@@ -28,7 +28,7 @@ func (s *Service) CreatePieceJointe(ctx *UserContext, pieceJointeFile models.Pie
 	return pieceJointeId, nil
 }
 
-func (s *Service) GetPieceJointe(ctx *UserContext, idPieceJointe int64) (*models.PieceJointeFile, error) {
+func (s *Service) GetPieceJointe(ctx *UserContext, idPieceJointe int64) (*models.File, error) {
 	pieceJointe, err := s.repo.GetPieceJointe(ctx, idPieceJointe)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *Service) GetPieceJointe(ctx *UserContext, idPieceJointe int64) (*models
 	if err != nil {
 		return nil, err
 	}
-	return &models.PieceJointeFile{
+	return &models.File{
 		Nom:     pieceJointe.Nom,
 		Type:    pieceJointe.Type,
 		Taille:  pieceJointe.Taille,

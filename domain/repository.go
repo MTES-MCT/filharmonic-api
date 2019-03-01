@@ -33,6 +33,8 @@ type Repository interface {
 	RemoveFavoriToInspection(ctx *UserContext, idInspection int64) error
 	CheckCanCreateSuite(ctx *UserContext, idInspection int64) error
 	CheckCanDeleteSuite(ctx *UserContext, idInspection int64) (bool, error)
+	CreateRapport(idInspection int64, rapport models.Rapport) error
+	GetRapport(ctx *UserContext, idInspection int64) (*models.Rapport, error)
 
 	CreateSuite(ctx *UserContext, idInspection int64, suite models.Suite) (int64, error)
 	UpdateSuite(ctx *UserContext, idInspection int64, suite models.Suite) error
@@ -77,7 +79,7 @@ type Repository interface {
 
 type Storage interface {
 	Get(id string) (io.Reader, error)
-	Put(file models.PieceJointeFile) (string, error)
+	Put(file models.File) (string, error)
 }
 
 type EmailService interface {

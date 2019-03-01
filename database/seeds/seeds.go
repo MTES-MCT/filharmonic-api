@@ -202,6 +202,19 @@ func SeedsTestDB(db *pg.DB) error {
 		return err
 	}
 
+	rapports := []interface{}{
+		&models.Rapport{
+			// Id:   1,
+			Nom:       "rapport.pdf",
+			AuteurId:  6,
+			StorageId: "rapport-1234",
+		},
+	}
+	err = db.Insert(rapports...)
+	if err != nil {
+		return err
+	}
+
 	inspections := []interface{}{
 		&models.Inspection{ // (non cohérent) en cours, avec suite, 1 point de contrôle publié avec constat, 1 point de contrôle non publié
 			// Id:   1,
@@ -274,6 +287,7 @@ func SeedsTestDB(db *pg.DB) error {
 			Contexte:        "Rejets CO2 de l'usine",
 			EtablissementId: 4,
 			SuiteId:         3,
+			RapportId:       1,
 		},
 	}
 	err = db.Insert(inspections...)

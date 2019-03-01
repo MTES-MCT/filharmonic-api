@@ -74,7 +74,21 @@ func (server *HttpServer) validateInspection(c *gin.Context) error {
 	if err != nil {
 		return badInputError(err)
 	}
-	return server.service.ValidateInspection(server.retrieveUserContext(c), idInspection)
+	formFile, err := c.FormFile("file")
+	if err != nil {
+		return badInputError(err)
+	}
+	file, err := formFile.Open()
+	if err != nil {
+		return badInputError(err)
+	}
+	rapportFile := models.File{
+		Content: file,
+		Taille:  formFile.Size,
+		Nom:     formFile.Filename,
+		Type:    formFile.Header.Get("Content-Type"),
+	}
+	return server.service.ValidateInspection(server.retrieveUserContext(c), idInspection, rapportFile)
 }
 
 func (server *HttpServer) cloreInspection(c *gin.Context) error {

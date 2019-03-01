@@ -66,7 +66,7 @@ func NewLettre(inspection *models.Inspection) Lettre {
 	return lettre
 }
 
-func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*models.PieceJointeFile, error) {
+func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*models.File, error) {
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
@@ -92,7 +92,7 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 	if err != nil {
 		return nil, err
 	}
-	return &models.PieceJointeFile{
+	return &models.File{
 		Nom:     "lettre-annonce.odt",
 		Type:    "application/vnd.oasis.opendocument.text",
 		Taille:  int64(len(contenuLettre)),
@@ -100,7 +100,7 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 	}, nil
 }
 
-func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*models.PieceJointeFile, error) {
+func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*models.File, error) {
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
@@ -127,7 +127,7 @@ func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*mod
 	if err != nil {
 		return nil, err
 	}
-	return &models.PieceJointeFile{
+	return &models.File{
 		Nom:     "lettre-suite.odt",
 		Type:    "application/vnd.oasis.opendocument.text",
 		Taille:  int64(len(contenuLettre)),
@@ -184,7 +184,7 @@ func NewRapport(inspection *models.Inspection) Rapport {
 	return rapport
 }
 
-func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.PieceJointeFile, error) {
+func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.File, error) {
 	if !ctx.IsInspecteur() {
 		return nil, ErrBesoinProfilInspecteur
 	}
@@ -210,7 +210,7 @@ func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.
 	if err != nil {
 		return nil, err
 	}
-	return &models.PieceJointeFile{
+	return &models.File{
 		Nom:     "rapport.odt",
 		Type:    "application/vnd.oasis.opendocument.text",
 		Taille:  int64(len(contenuRapport)),

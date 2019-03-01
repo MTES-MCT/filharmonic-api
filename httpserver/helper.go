@@ -57,7 +57,7 @@ func returnResult(serviceFunc func(*gin.Context) (interface{}, error)) gin.Handl
 }
 
 // call a service function returning a file and transfer it
-func returnFile(serviceFunc func(*gin.Context) (*models.PieceJointeFile, error)) gin.HandlerFunc {
+func returnFile(serviceFunc func(*gin.Context) (*models.File, error)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		file, err := serviceFunc(c)
 		if err != nil {
@@ -112,6 +112,6 @@ func badInputErrorN(err error) (interface{}, error) {
 }
 
 // shorthand to return a nil file and a bad input error
-func badInputErrorF(err error) (*models.PieceJointeFile, error) {
+func badInputErrorF(err error) (*models.File, error) {
 	return nil, errors.NewErrBadInput(err.Error())
 }

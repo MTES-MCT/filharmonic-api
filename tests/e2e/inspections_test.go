@@ -102,6 +102,20 @@ func TestGetInspectionAsInspecteur(t *testing.T) {
 	firstPieceJointe.ValueEqual("taille", 7945)
 }
 
+func TestGetInspectionValideeAvecRapportFinal(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", "5").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection.ValueEqual("etat", models.EtatTraitementNonConformites)
+	rapport := inspection.Value("rapport").Object()
+	rapport.ValueEqual("nom", "rapport.pdf")
+}
+
 func TestGetInspectionAsExploitantNotAllowed(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
@@ -281,6 +295,7 @@ func TestValidateInspectionSansNonConformites(t *testing.T) {
 		JSON().Object()
 
 	tests.AuthApprobateur(e.POST("/inspections/{id}/valider")).WithPath("id", 3).
+		WithMultipart().WithFile("file", "../testdata/pdf-sample.pdf").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -298,6 +313,7 @@ func TestValidateInspectionAvecNonConformites(t *testing.T) {
 	defer close()
 
 	tests.AuthApprobateur(e.POST("/inspections/{id}/valider")).WithPath("id", 3).
+		WithMultipart().WithFile("file", "../testdata/pdf-sample.pdf").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()

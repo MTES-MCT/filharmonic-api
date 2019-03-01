@@ -16,7 +16,7 @@ func (server *HttpServer) createPieceJointe(c *gin.Context) (int64, error) {
 	if err != nil {
 		return badInputErrorI(err)
 	}
-	pieceJointe := models.PieceJointeFile{
+	pieceJointe := models.File{
 		Content: file,
 		Taille:  formFile.Size,
 		Nom:     formFile.Filename,
@@ -25,7 +25,7 @@ func (server *HttpServer) createPieceJointe(c *gin.Context) (int64, error) {
 	return server.service.CreatePieceJointe(server.retrieveUserContext(c), pieceJointe)
 }
 
-func (server *HttpServer) getPieceJointe(c *gin.Context) (*models.PieceJointeFile, error) {
+func (server *HttpServer) getPieceJointe(c *gin.Context) (*models.File, error) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		return badInputErrorF(err)

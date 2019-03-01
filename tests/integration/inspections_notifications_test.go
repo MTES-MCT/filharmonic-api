@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
@@ -172,7 +173,13 @@ func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
 
 	err = application.Service.AskValidateInspection(ctxInspecteur1, inspectionId)
 	assert.NoError(err)
-	err = application.Service.ValidateInspection(ctxApprobateur, inspectionId)
+	rapportFile := models.File{
+		Content: strings.NewReader("MonContenu"),
+		Type:    "application/pdf",
+		Taille:  int64(len("MonContenu")),
+		Nom:     "test.pdf",
+	}
+	err = application.Service.ValidateInspection(ctxApprobateur, inspectionId, rapportFile)
 	assert.NoError(err)
 
 	notifications, err = application.Repo.ListNotifications(ctxInspecteur2, nil)

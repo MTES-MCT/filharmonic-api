@@ -80,6 +80,7 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.GET("/inspections/:id/lettreannonce", returnFile(s.genererLettreAnnonce))
 		authorized.GET("/inspections/:id/lettresuite", returnFile(s.genererLettreSuite))
 		authorized.GET("/inspections/:id/rapport", returnFile(s.genererRapport))
+		authorized.GET("/inspections/:id/rapportfinal", returnFile(s.getRapport))
 		authorized.PUT("/pointsdecontrole/:id", returnOk(s.updatePointDeControle))
 		authorized.POST("/pointsdecontrole/:id/constat", returnId(s.addConstat))
 		authorized.POST("/pointsdecontrole/:id/constat/resoudre", returnOk(s.resolveConstat))

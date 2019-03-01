@@ -56,6 +56,7 @@ type Inspection struct {
 	Themes             []string               `json:"themes" sql:",array"`
 	SuiteId            int64                  `json:"-" sql:"on_delete:SET NULL"`
 	DateValidation     types.NullTime         `json:"date_validation" sql:"type:timestamptz"`
+	RapportId          int64                  `json:"-" sql:"on_delete:SET NULL"`
 
 	Commentaires     []Commentaire     `json:"commentaires,omitempty"`
 	Etablissement    *Etablissement    `json:"etablissement,omitempty"`
@@ -63,6 +64,7 @@ type Inspection struct {
 	PointsDeControle []PointDeControle `json:"points_de_controle,omitempty"`
 	Suite            *Suite            `json:"suite,omitempty"`
 	Evenements       []Evenement       `json:"evenements,omitempty"`
+	Rapport          *Rapport          `json:"rapport,omitempty"`
 
 	NbMessagesNonLus int `json:"nb_messages_non_lus" sql:"-"`
 }

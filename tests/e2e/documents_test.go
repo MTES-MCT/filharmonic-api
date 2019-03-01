@@ -25,6 +25,7 @@ func TestGenererLettreSuite(t *testing.T) {
 	defer close()
 
 	tests.AuthApprobateur(e.POST("/inspections/{id}/valider")).WithPath("id", 3).
+		WithMultipart().WithFile("file", "../testdata/pdf-sample.pdf").
 		Expect().
 		Status(http.StatusOK).Body()
 

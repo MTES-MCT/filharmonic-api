@@ -23,7 +23,7 @@ func TestStorage(t *testing.T) {
 	assert.NoError(err)
 
 	content := "MonContenu"
-	id, err := store.Put(models.PieceJointeFile{
+	id, err := store.Put(models.File{
 		Content: strings.NewReader(content),
 		Type:    "application/pdf",
 		Taille:  int64(len(content)),

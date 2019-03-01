@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -14,11 +15,11 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/util"
 )
 
-func TestValiderInspectionCalculEcheances(t *testing.T) {
+func TestValiderInspection(t *testing.T) {
 	assert, application, close := tests.InitService(t)
 	defer close()
 
-	inspectionId := initSeedsTestValiderInspectionCalculEcheances(assert, application.DB)
+	inspectionId := initSeedsTestValiderInspection(assert, application.DB)
 
 	ctxApprobateur := &domain.UserContext{
 		User: &models.User{
@@ -26,23 +27,38 @@ func TestValiderInspectionCalculEcheances(t *testing.T) {
 			Profile: models.ProfilApprobateur,
 		},
 	}
-	err := application.Service.ValidateInspection(ctxApprobateur, inspectionId)
+	rapportFile := models.File{
+		Content: strings.NewReader("MonContenu"),
+		Type:    "application/pdf",
+		Taille:  int64(len("MonContenu")),
+		Nom:     "test.pdf",
+	}
+
+	err := application.Service.ValidateInspection(ctxApprobateur, inspectionId, rapportFile)
 	assert.NoError(err)
 
 	inspection, err := application.Service.GetInspection(ctxApprobateur, inspectionId)
 	assert.NoError(err)
+	assert.Equal(models.EtatTraitementNonConformites, inspection.Etat)
+	assert.NotZero(inspection.RapportId)
 	assert.Equal(util.FormatDate(time.Now()), util.FormatDate(inspection.DateValidation.Time))
 	assert.Equal(util.FormatDate(time.Now().AddDate(0, 0, 15)), util.FormatDate(inspection.PointsDeControle[0].Constat.EcheanceResolution.Time))
 	assert.True(inspection.PointsDeControle[1].Constat.EcheanceResolution.IsZero())
 	assert.Equal(util.FormatDate(time.Now().AddDate(0, 4, 0)), util.FormatDate(inspection.PointsDeControle[2].Constat.EcheanceResolution.Time))
 }
 
-func initSeedsTestValiderInspectionCalculEcheances(assert *require.Assertions, db *database.Database) int64 {
+func initSeedsTestValiderInspection(assert *require.Assertions, db *database.Database) int64 {
+	suite := models.Suite{
+		Type: models.TypeSuitePropositionMiseEnDemeure,
+	}
+	assert.NoError(db.Insert(&suite))
+
 	inspection := models.Inspection{
 		Date:            util.Date("2019-01-10"),
 		Type:            models.TypeApprofondi,
 		Etat:            models.EtatAttenteValidation,
 		EtablissementId: 4,
+		SuiteId:         suite.Id,
 	}
 	assert.NoError(db.Insert(&inspection))
 
@@ -112,11 +128,25 @@ func TestCloreInspectionConstatsResolus(t *testing.T) {
 }
 
 func initSeedsTestCloreInspectionConstatsResolus(assert *require.Assertions, db *database.Database) int64 {
+	rapport := models.Rapport{
+		Nom:       "test",
+		StorageId: "test-1111",
+		AuteurId:  6,
+	}
+	assert.NoError(db.Insert(&rapport))
+
+	suite := models.Suite{
+		Type: models.TypeSuitePropositionMiseEnDemeure,
+	}
+	assert.NoError(db.Insert(&suite))
+
 	inspection := models.Inspection{
 		Date:            util.Date("2019-01-10"),
 		Type:            models.TypeApprofondi,
 		Etat:            models.EtatTraitementNonConformites,
 		EtablissementId: 4,
+		SuiteId:         suite.Id,
+		RapportId:       rapport.Id,
 	}
 	assert.NoError(db.Insert(&inspection))
 
@@ -194,11 +224,25 @@ func TestCloreInspectionErrConstatNonResoluDelaisNonDepasses(t *testing.T) {
 }
 
 func initSeedsTestCloreInspectionErrConstatNonResoluDelaisNonDepasses(assert *require.Assertions, db *database.Database) int64 {
+	rapport := models.Rapport{
+		Nom:       "test",
+		StorageId: "test-1111",
+		AuteurId:  6,
+	}
+	assert.NoError(db.Insert(&rapport))
+
+	suite := models.Suite{
+		Type: models.TypeSuitePropositionMiseEnDemeure,
+	}
+	assert.NoError(db.Insert(&suite))
+
 	inspection := models.Inspection{
 		Date:            util.Date("2019-01-10"),
 		Type:            models.TypeApprofondi,
 		Etat:            models.EtatTraitementNonConformites,
 		EtablissementId: 4,
+		SuiteId:         suite.Id,
+		RapportId:       rapport.Id,
 	}
 	assert.NoError(db.Insert(&inspection))
 
@@ -273,11 +317,24 @@ func TestCloreInspectionErrConstatNonResoluDelaisDepasses(t *testing.T) {
 }
 
 func initSeedsTestCloreInspectionErrConstatNonResoluDelaisDepasses(assert *require.Assertions, db *database.Database) int64 {
+	rapport := models.Rapport{
+		Nom:       "test",
+		StorageId: "test-1111",
+		AuteurId:  6,
+	}
+	assert.NoError(db.Insert(&rapport))
+
+	suite := models.Suite{
+		Type: models.TypeSuitePropositionMiseEnDemeure,
+	}
+	assert.NoError(db.Insert(&suite))
 	inspection := models.Inspection{
 		Date:            util.Date("2019-01-10"),
 		Type:            models.TypeApprofondi,
 		Etat:            models.EtatTraitementNonConformites,
 		EtablissementId: 4,
+		SuiteId:         suite.Id,
+		RapportId:       rapport.Id,
 	}
 	assert.NoError(db.Insert(&inspection))
 

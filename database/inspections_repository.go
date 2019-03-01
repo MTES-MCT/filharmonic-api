@@ -129,6 +129,7 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, fil
 		Relation("PointsDeControle.Messages.PiecesJointes").
 		Relation("Inspecteurs").
 		Relation("Suite").
+		Relation("Rapport").
 		Where(`inspection.id = ?`, id)
 	if ctx.IsExploitant() {
 		query.Join("JOIN etablissement_to_exploitants AS u").

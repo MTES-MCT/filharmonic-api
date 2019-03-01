@@ -129,7 +129,7 @@ func (s *Service) AskValidateInspection(ctx *UserContext, idInspection int64) er
 	return err
 }
 
-func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64) error {
+func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64, rapportFile models.File) error {
 	if !ctx.IsApprobateur() {
 		return ErrBesoinProfilApprobateur
 	}
@@ -149,6 +149,21 @@ func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64) error
 	etatCible := models.EtatClos
 	if hasNonConformites {
 		etatCible = models.EtatTraitementNonConformites
+	}
+	storageId, err := s.storage.Put(rapportFile)
+	if err != nil {
+		return err
+	}
+	rapport := models.Rapport{
+		Nom:       rapportFile.Nom,
+		Type:      rapportFile.Type,
+		Taille:    rapportFile.Taille,
+		StorageId: storageId,
+		AuteurId:  ctx.User.Id,
+	}
+	err = s.repo.CreateRapport(idInspection, rapport)
+	if err != nil {
+		return err
 	}
 
 	err = s.repo.ValidateInspection(idInspection, etatCible)
