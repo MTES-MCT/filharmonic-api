@@ -15,7 +15,8 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.L
 	query := repo.db.client.Model(&models.Inspection{}).
 		Relation("Etablissement")
 	if ctx.IsExploitant() {
-		query.Join("JOIN etablissement_to_exploitants AS u").
+		query.Where(`inspection.etat <> ?`, models.EtatPreparation).
+			Join("JOIN etablissement_to_exploitants AS u").
 			JoinOn("u.etablissement_id = inspection.etablissement_id").
 			JoinOn("u.user_id = ?", ctx.User.Id)
 	} else {
@@ -131,8 +132,10 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, fil
 		Relation("Suite").
 		Relation("Rapport").
 		Where(`inspection.id = ?`, id)
+
 	if ctx.IsExploitant() {
-		query.Join("JOIN etablissement_to_exploitants AS u").
+		query.Where(`inspection.etat <> ?`, models.EtatPreparation).
+			Join("JOIN etablissement_to_exploitants AS u").
 			JoinOn("u.etablissement_id = etablissement.id").
 			JoinOn("u.user_id = ?", ctx.User.Id)
 	} else {

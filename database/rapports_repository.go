@@ -35,10 +35,6 @@ func (repo *Repository) GetRapport(ctx *domain.UserContext, idInspection int64) 
 			Join("JOIN etablissement_to_exploitants AS ex").
 			JoinOn("ex.etablissement_id = etablissement.id").
 			JoinOn("ex.user_id = ?", ctx.User.Id)
-	} else {
-		query.Join("JOIN inspection_to_inspecteurs AS u").
-			JoinOn("u.inspection_id = inspection.id").
-			JoinOn("u.user_id = ?", ctx.User.Id)
 	}
 	err := query.Select()
 	if err == pg.ErrNoRows {
