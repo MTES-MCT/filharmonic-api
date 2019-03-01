@@ -25,67 +25,88 @@ func (_m *Repository) AddFavoriToInspection(ctx *domain.UserContext, idInspectio
 	return r0
 }
 
-// CheckCanCreateConstat provides a mock function with given fields: ctx, idPointDeControle
-func (_m *Repository) CheckCanCreateConstat(ctx *domain.UserContext, idPointDeControle int64) (bool, error) {
+// CanCloreInspection provides a mock function with given fields: ctx, idInspection
+func (_m *Repository) CanCloreInspection(ctx *domain.UserContext, idInspection int64) error {
+	ret := _m.Called(ctx, idInspection)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) error); ok {
+		r0 = rf(ctx, idInspection)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// CanCreateConstat provides a mock function with given fields: ctx, idPointDeControle
+func (_m *Repository) CanCreateConstat(ctx *domain.UserContext, idPointDeControle int64) error {
 	ret := _m.Called(ctx, idPointDeControle)
 
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) bool); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) error); ok {
 		r0 = rf(ctx, idPointDeControle)
 	} else {
-		r0 = ret.Get(0).(bool)
+		r0 = ret.Error(0)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(*domain.UserContext, int64) error); ok {
-		r1 = rf(ctx, idPointDeControle)
+	return r0
+}
+
+// CanCreatePointDeControle provides a mock function with given fields: ctx, idInspection
+func (_m *Repository) CanCreatePointDeControle(ctx *domain.UserContext, idInspection int64) error {
+	ret := _m.Called(ctx, idInspection)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) error); ok {
+		r0 = rf(ctx, idInspection)
 	} else {
-		r1 = ret.Error(1)
+		r0 = ret.Error(0)
 	}
 
-	return r0, r1
+	return r0
+}
+
+// CanDeleteConstat provides a mock function with given fields: ctx, idPointDeControle
+func (_m *Repository) CanDeleteConstat(ctx *domain.UserContext, idPointDeControle int64) error {
+	ret := _m.Called(ctx, idPointDeControle)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) error); ok {
+		r0 = rf(ctx, idPointDeControle)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// CanUpdatePointDeControle provides a mock function with given fields: ctx, idPointDeControle
+func (_m *Repository) CanUpdatePointDeControle(ctx *domain.UserContext, idPointDeControle int64) error {
+	ret := _m.Called(ctx, idPointDeControle)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) error); ok {
+		r0 = rf(ctx, idPointDeControle)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // CheckCanCreateSuite provides a mock function with given fields: ctx, idInspection
-func (_m *Repository) CheckCanCreateSuite(ctx *domain.UserContext, idInspection int64) (bool, error) {
+func (_m *Repository) CheckCanCreateSuite(ctx *domain.UserContext, idInspection int64) error {
 	ret := _m.Called(ctx, idInspection)
 
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) bool); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) error); ok {
 		r0 = rf(ctx, idInspection)
 	} else {
-		r0 = ret.Get(0).(bool)
+		r0 = ret.Error(0)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(*domain.UserContext, int64) error); ok {
-		r1 = rf(ctx, idInspection)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// CheckCanDeleteConstat provides a mock function with given fields: ctx, idPointDeControle
-func (_m *Repository) CheckCanDeleteConstat(ctx *domain.UserContext, idPointDeControle int64) (bool, error) {
-	ret := _m.Called(ctx, idPointDeControle)
-
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) bool); ok {
-		r0 = rf(ctx, idPointDeControle)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(*domain.UserContext, int64) error); ok {
-		r1 = rf(ctx, idPointDeControle)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // CheckCanDeleteSuite provides a mock function with given fields: ctx, idInspection
@@ -131,19 +152,33 @@ func (_m *Repository) CheckEtatInspection(idInspection int64, etats []models.Eta
 }
 
 // CheckInspecteurAllowedInspection provides a mock function with given fields: ctx, idInspection
-func (_m *Repository) CheckInspecteurAllowedInspection(ctx *domain.UserContext, idInspection int64) (bool, error) {
+func (_m *Repository) CheckInspecteurAllowedInspection(ctx *domain.UserContext, idInspection int64) error {
 	ret := _m.Called(ctx, idInspection)
 
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) bool); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) error); ok {
 		r0 = rf(ctx, idInspection)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// CheckInspectionHasNonConformites provides a mock function with given fields: idInspection
+func (_m *Repository) CheckInspectionHasNonConformites(idInspection int64) (bool, error) {
+	ret := _m.Called(idInspection)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(int64) bool); ok {
+		r0 = rf(idInspection)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*domain.UserContext, int64) error); ok {
-		r1 = rf(ctx, idInspection)
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(idInspection)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -375,6 +410,20 @@ func (_m *Repository) CreatePointDeControle(ctx *domain.UserContext, idInspectio
 	return r0, r1
 }
 
+// CreateRapport provides a mock function with given fields: idInspection, rapport
+func (_m *Repository) CreateRapport(idInspection int64, rapport models.Rapport) error {
+	ret := _m.Called(idInspection, rapport)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int64, models.Rapport) error); ok {
+		r0 = rf(idInspection, rapport)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // CreateSuite provides a mock function with given fields: ctx, idInspection, suite
 func (_m *Repository) CreateSuite(ctx *domain.UserContext, idInspection int64, suite models.Suite) (int64, error) {
 	ret := _m.Called(ctx, idInspection, suite)
@@ -542,6 +591,27 @@ func (_m *Repository) GetEtablissementByID(ctx *domain.UserContext, id int64) (*
 	return r0, r1
 }
 
+// GetEtatInspectionByPointDeControleID provides a mock function with given fields: idPointDeControle
+func (_m *Repository) GetEtatInspectionByPointDeControleID(idPointDeControle int64) (models.EtatInspection, error) {
+	ret := _m.Called(idPointDeControle)
+
+	var r0 models.EtatInspection
+	if rf, ok := ret.Get(0).(func(int64) models.EtatInspection); ok {
+		r0 = rf(idPointDeControle)
+	} else {
+		r0 = ret.Get(0).(models.EtatInspection)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(idPointDeControle)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetInspectionByID provides a mock function with given fields: ctx, id, filter
 func (_m *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, filter domain.InspectionFilter) (*models.Inspection, error) {
 	ret := _m.Called(ctx, id, filter)
@@ -565,6 +635,29 @@ func (_m *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, filte
 	return r0, r1
 }
 
+// GetInspectionTypesConstatsSuiteByID provides a mock function with given fields: idInspection
+func (_m *Repository) GetInspectionTypesConstatsSuiteByID(idInspection int64) (*models.Inspection, error) {
+	ret := _m.Called(idInspection)
+
+	var r0 *models.Inspection
+	if rf, ok := ret.Get(0).(func(int64) *models.Inspection); ok {
+		r0 = rf(idInspection)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Inspection)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(idInspection)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetPieceJointe provides a mock function with given fields: ctx, id
 func (_m *Repository) GetPieceJointe(ctx *domain.UserContext, id int64) (*models.PieceJointe, error) {
 	ret := _m.Called(ctx, id)
@@ -581,6 +674,50 @@ func (_m *Repository) GetPieceJointe(ctx *domain.UserContext, id int64) (*models
 	var r1 error
 	if rf, ok := ret.Get(1).(func(*domain.UserContext, int64) error); ok {
 		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetRapport provides a mock function with given fields: ctx, idInspection
+func (_m *Repository) GetRapport(ctx *domain.UserContext, idInspection int64) (*models.Rapport, error) {
+	ret := _m.Called(ctx, idInspection)
+
+	var r0 *models.Rapport
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) *models.Rapport); ok {
+		r0 = rf(ctx, idInspection)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Rapport)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*domain.UserContext, int64) error); ok {
+		r1 = rf(ctx, idInspection)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetTypeConstatByPointDeControleID provides a mock function with given fields: idPointDeControle
+func (_m *Repository) GetTypeConstatByPointDeControleID(idPointDeControle int64) (models.TypeConstat, error) {
+	ret := _m.Called(idPointDeControle)
+
+	var r0 models.TypeConstat
+	if rf, ok := ret.Get(0).(func(int64) models.TypeConstat); ok {
+		r0 = rf(idPointDeControle)
+	} else {
+		r0 = ret.Get(0).(models.TypeConstat)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(idPointDeControle)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -660,29 +797,6 @@ func (_m *Repository) LireNotifications(ctx *domain.UserContext, ids []int64) er
 	}
 
 	return r0
-}
-
-// ListEvenements provides a mock function with given fields: ctx, filter
-func (_m *Repository) ListEvenements(ctx *domain.UserContext, filter domain.ListEvenementsFilter) ([]models.Evenement, error) {
-	ret := _m.Called(ctx, filter)
-
-	var r0 []models.Evenement
-	if rf, ok := ret.Get(0).(func(*domain.UserContext, domain.ListEvenementsFilter) []models.Evenement); ok {
-		r0 = rf(ctx, filter)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]models.Evenement)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(*domain.UserContext, domain.ListEvenementsFilter) error); ok {
-		r1 = rf(ctx, filter)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
 }
 
 // ListInspections provides a mock function with given fields: ctx, filter
@@ -828,6 +942,20 @@ func (_m *Repository) RemoveFavoriToInspection(ctx *domain.UserContext, idInspec
 	return r0
 }
 
+// ResolveConstat provides a mock function with given fields: ctx, idPointDeControle
+func (_m *Repository) ResolveConstat(ctx *domain.UserContext, idPointDeControle int64) error {
+	ret := _m.Called(ctx, idPointDeControle)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64) error); ok {
+		r0 = rf(ctx, idPointDeControle)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // UpdateEtatInspection provides a mock function with given fields: ctx, id, etat
 func (_m *Repository) UpdateEtatInspection(ctx *domain.UserContext, id int64, etat models.EtatInspection) error {
 	ret := _m.Called(ctx, id, etat)
@@ -877,6 +1005,20 @@ func (_m *Repository) UpdateSuite(ctx *domain.UserContext, idInspection int64, s
 	var r0 error
 	if rf, ok := ret.Get(0).(func(*domain.UserContext, int64, models.Suite) error); ok {
 		r0 = rf(ctx, idInspection, suite)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ValidateInspection provides a mock function with given fields: id, etatCible
+func (_m *Repository) ValidateInspection(id int64, etatCible models.EtatInspection) error {
+	ret := _m.Called(id, etatCible)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int64, models.EtatInspection) error); ok {
+		r0 = rf(id, etatCible)
 	} else {
 		r0 = ret.Error(0)
 	}

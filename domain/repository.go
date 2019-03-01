@@ -72,7 +72,6 @@ type Repository interface {
 
 	ListNotifications(ctx *UserContext, filter *ListNotificationsFilter) ([]models.Notification, error)
 	LireNotifications(ctx *UserContext, ids []int64) error
-	ListEvenements(ctx *UserContext, filter ListEvenementsFilter) ([]models.Evenement, error)
 	CreateEvenement(ctx *UserContext, typeEvenement models.TypeEvenement, idInspection int64, data map[string]interface{}) error
 	ListNouveauxMessages() ([]NouveauxMessagesUser, error)
 }

@@ -96,7 +96,6 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.GET("/piecesjointes/:id", returnFile(s.getPieceJointe))
 		authorized.GET("/notifications", returnResult(s.listNotifications))
 		authorized.POST("/notifications/lire", returnOk(s.lireNotifications))
-		authorized.GET("/evenements", returnResult(s.listEvenements))
 	}
 
 	s.server = &http.Server{
