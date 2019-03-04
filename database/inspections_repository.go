@@ -40,7 +40,8 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.L
 			AND auteur.profile in (?)
 		WHERE p.inspection_id = inspection.id
 		AND p.publie IS TRUE
-		) AS nb_messages_non_lus`, pg.In(getDestinataires(ctx)))
+		) AS nb_messages_non_lus`, pg.In(getDestinataires(ctx))).
+		Order("inspection.id ASC")
 
 	err := query.Select(&inspections)
 	return inspections, err
@@ -117,7 +118,7 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, fil
 			if ctx.IsExploitant() || filter.OmitPointsDeControleNonPublies {
 				q.Where("publie = TRUE")
 			}
-			return q, nil
+			return q.Order("id ASC"), nil
 		}).
 		Relation("PointsDeControle.Constat").
 		Relation("PointsDeControle.Messages", func(q *orm.Query) (*orm.Query, error) {

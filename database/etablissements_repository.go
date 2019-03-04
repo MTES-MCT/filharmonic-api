@@ -66,6 +66,7 @@ func (repo *Repository) GetEtablissementByID(ctx *domain.UserContext, id int64) 
 	var etablissement models.Etablissement
 	query := repo.db.client.Model(&etablissement).
 		Relation("Inspections", func(q *orm.Query) (*orm.Query, error) {
+			q.Order("id ASC")
 			if ctx.IsExploitant() {
 				q.Where("etat <> ?", models.EtatPreparation)
 			}
