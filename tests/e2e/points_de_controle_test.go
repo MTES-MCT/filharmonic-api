@@ -62,7 +62,6 @@ func TestUpdatePointDeControle(t *testing.T) {
 	defer close()
 
 	pointControle := models.PointDeControle{
-		Id:    2,
 		Sujet: "Emissions de NOx",
 		ReferencesReglementaires: []string{
 			"Article 1 de l'arrêté préfectoral du 2/10/2010",
@@ -79,9 +78,9 @@ func TestUpdatePointDeControle(t *testing.T) {
 		JSON().Object()
 	pointsControle := inspection.Value("points_de_controle").Array()
 	pointsControle.Length().Equal(2)
-	pointsControle.Last().Object().ValueEqual("sujet", "Emissions de NOx")
-	pointsControle.Last().Object().ValueEqual("references_reglementaires", []string{"Article 1 de l'arrêté préfectoral du 2/10/2010"})
-	pointsControle.Last().Object().ValueEqual("publie", true)
+	pointsControle.First().Object().ValueEqual("sujet", "Emissions de NOx")
+	pointsControle.First().Object().ValueEqual("references_reglementaires", []string{"Article 1 de l'arrêté préfectoral du 2/10/2010"})
+	pointsControle.First().Object().ValueEqual("publie", true)
 }
 
 func TestUpdatePointDeControleNotAllowed(t *testing.T) {
