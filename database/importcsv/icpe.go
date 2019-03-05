@@ -15,7 +15,7 @@ const (
 	batchSize = 2000
 )
 
-func LoadEtablissementsCSV(filepath string, db *database.Database) error {
+func LoadEtablissementsCSV(filepath string, db *database.Database) (returnErr error) {
 	indexesEtablissement := map[string]int{
 		"codeBase":   0,
 		"codeEtab":   1,
@@ -43,6 +43,18 @@ func LoadEtablissementsCSV(filepath string, db *database.Database) error {
 		return err
 	}
 	etablissements := make([]models.Etablissement, 0)
+
+	_, err = db.Exec("UPDATE pg_index SET indisready = false WHERE indrelid = (SELECT oid FROM pg_class WHERE relname = 'etablissements') AND indisunique = false")
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_, returnErr = db.Exec(`UPDATE pg_index SET indisready = true WHERE indrelid = (SELECT oid FROM pg_class WHERE relname = 'etablissements' AND indisunique = false);
+											REINDEX TABLE etablissements`)
+
+		log.Warn().Msgf("%d établissements importés", nbEtablissementsImportes)
+	}()
+
 	done := false
 	for !done {
 		iterations := 0
@@ -89,8 +101,6 @@ func LoadEtablissementsCSV(filepath string, db *database.Database) error {
 			etablissements = etablissements[:0]
 		}
 	}
-	log.Warn().Msgf("%d établissements importés", nbEtablissementsImportes)
-
 	return nil
 }
 

@@ -57,6 +57,21 @@ go test -p 1 -v ./...
 - `FILHARMONIC_DATABASE_SQL_LOG=1` permet d'afficher les requêtes SQL.
 
 
+### Benchmarks
+
+On utilise [k6](https://k6.io/), qui permet d'écrire des scénarios en javascript.
+
+Pour lancer un test pendant 10 secondes avec 4 utilisateurs en parallèle.
+```sh
+docker run -it --rm -v $PWD/tests/benchmark/:/benchmark --network host loadimpact/k6 run -u 4 -d 10s /benchmark/creation_inspection.js
+```
+
+Pour afficher les requêtes HTTP et leur contenu :
+```sh
+docker run -it --rm -v $PWD/tests/benchmark/:/benchmark --network host loadimpact/k6 run --http-debug=full /benchmark/creation_inspection.js
+```
+
+
 ### Modifications du modèle
 
 Pour vérifier que le schéma des migrations correpond bien à celui des structures, lancer le script suivant :
