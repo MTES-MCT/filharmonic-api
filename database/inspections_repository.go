@@ -44,7 +44,16 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.L
 		Order("inspection.id ASC")
 
 	err := query.Select(&inspections)
-	return inspections, err
+	if err != nil {
+		return nil, err
+	}
+	if ctx.IsExploitant() {
+		for i, _ := range inspections {
+			inspections[i].ValidationRejetee = false
+			inspections[i].MotifRejetValidation = ""
+		}
+	}
+	return inspections, nil
 }
 
 func (repo *Repository) ListInspectionsFavorites(ctx *domain.UserContext) ([]models.Inspection, error) {
@@ -152,6 +161,10 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, fil
 	if err == pg.ErrNoRows {
 		return nil, nil
 	}
+	if ctx.IsExploitant() {
+		inspection.ValidationRejetee = false
+		inspection.MotifRejetValidation = ""
+	}
 	return &inspection, err
 }
 
@@ -243,8 +256,10 @@ func (repo *Repository) ValidateInspection(id int64, etatCible models.EtatInspec
 			DateValidation: types.NullTime{
 				Time: time.Now(),
 			},
+			ValidationRejetee:    false,
+			MotifRejetValidation: "",
 		}
-		columns := []string{"etat", "date_validation"}
+		columns := []string{"etat", "date_validation", "validation_rejetee", "motif_rejet_validation"}
 		_, err := tx.Model(&inspection).Column(columns...).WherePK().Update()
 		if err != nil {
 			return err
@@ -261,6 +276,18 @@ func (repo *Repository) ValidateInspection(id int64, etatCible models.EtatInspec
 										   AND i.id = ?`, id)
 		return err
 	})
+}
+
+func (repo *Repository) RejectInspection(id int64, motifRejet string) error {
+	inspection := models.Inspection{
+		Id:                   id,
+		Etat:                 models.EtatEnCours,
+		ValidationRejetee:    true,
+		MotifRejetValidation: motifRejet,
+	}
+	columns := []string{"etat", "validation_rejetee", "motif_rejet_validation"}
+	_, err := repo.db.client.Model(&inspection).Column(columns...).WherePK().Update()
+	return err
 }
 
 func (repo *Repository) AddFavoriToInspection(ctx *domain.UserContext, idInspection int64) error {

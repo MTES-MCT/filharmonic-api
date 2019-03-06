@@ -28,6 +28,7 @@ type Repository interface {
 	GetInspectionTypesConstatsSuiteByID(idInspection int64) (*models.Inspection, error)
 	CanCloreInspection(ctx *UserContext, idInspection int64) error
 	ValidateInspection(id int64, etatCible models.EtatInspection) error
+	RejectInspection(id int64, motifRejet string) error
 	UpdateEtatInspection(ctx *UserContext, id int64, etat models.EtatInspection) error
 	AddFavoriToInspection(ctx *UserContext, idInspection int64) error
 	RemoveFavoriToInspection(ctx *UserContext, idInspection int64) error

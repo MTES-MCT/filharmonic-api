@@ -66,7 +66,11 @@ func (server *HttpServer) rejectInspection(c *gin.Context) error {
 	if err != nil {
 		return badInputError(err)
 	}
-	return server.service.RejectInspection(server.retrieveUserContext(c), idInspection)
+	var inspection models.Inspection
+	if err := c.ShouldBindJSON(&inspection); err != nil {
+		return badInputError(err)
+	}
+	return server.service.RejectInspection(server.retrieveUserContext(c), idInspection, inspection.MotifRejetValidation)
 }
 
 func (server *HttpServer) validateInspection(c *gin.Context) error {

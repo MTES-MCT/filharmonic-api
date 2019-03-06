@@ -43,20 +43,22 @@ const (
 )
 
 type Inspection struct {
-	Id                 int64                  `json:"id"`
-	Date               util.DateString        `json:"date" sql:"type:date"`
-	Type               TypeInspection         `json:"type"`
-	Annonce            bool                   `json:"annonce" sql:",notnull,default:false"`
-	Origine            OrigineInspection      `json:"origine"`
-	Circonstance       CirconstanceInspection `json:"circonstance"`
-	DetailCirconstance string                 `json:"detail_circonstance"`
-	Contexte           string                 `json:"contexte"`
-	Etat               EtatInspection         `json:"etat"`
-	EtablissementId    int64                  `json:"etablissement_id" sql:",notnull"`
-	Themes             []string               `json:"themes" sql:",array"`
-	SuiteId            int64                  `json:"-" sql:"on_delete:SET NULL"`
-	DateValidation     types.NullTime         `json:"date_validation" sql:"type:timestamptz"`
-	RapportId          int64                  `json:"-" sql:"on_delete:SET NULL"`
+	Id                   int64                  `json:"id"`
+	Date                 util.DateString        `json:"date" sql:"type:date"`
+	Type                 TypeInspection         `json:"type"`
+	Annonce              bool                   `json:"annonce" sql:",notnull,default:false"`
+	Origine              OrigineInspection      `json:"origine"`
+	Circonstance         CirconstanceInspection `json:"circonstance"`
+	DetailCirconstance   string                 `json:"detail_circonstance"`
+	Contexte             string                 `json:"contexte"`
+	Etat                 EtatInspection         `json:"etat"`
+	EtablissementId      int64                  `json:"etablissement_id" sql:",notnull"`
+	Themes               []string               `json:"themes" sql:",array"`
+	SuiteId              int64                  `json:"-" sql:"on_delete:SET NULL"`
+	DateValidation       types.NullTime         `json:"date_validation" sql:"type:timestamptz"`
+	RapportId            int64                  `json:"-" sql:"on_delete:SET NULL"`
+	ValidationRejetee    bool                   `json:"validation_rejetee,omitempty" sql:",notnull,default:false"`
+	MotifRejetValidation string                 `json:"motif_rejet_validation,omitempty"`
 
 	Commentaires     []Commentaire     `json:"commentaires,omitempty"`
 	Etablissement    *Etablissement    `json:"etablissement,omitempty"`

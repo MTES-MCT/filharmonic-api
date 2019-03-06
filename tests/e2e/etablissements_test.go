@@ -103,6 +103,8 @@ func TestGetEtablissementByIdOwnedByExploitant(t *testing.T) {
 	inspection := inspections.First().Object()
 	inspection.ValueEqual("etat", models.EtatEnCours)
 	inspection.ValueEqual("date", "2018-09-01")
+	inspection.NotContainsKey("validation_rejetee")
+	inspection.NotContainsKey("motif_rejet_validation")
 	exploitants := etablissement.Value("exploitants").Array()
 	exploitants.Length().Equal(1)
 }

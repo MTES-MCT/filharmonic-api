@@ -174,15 +174,25 @@ func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64, rappo
 	return err
 }
 
-func (s *Service) RejectInspection(ctx *UserContext, idInspection int64) error {
+func (s *Service) RejectInspection(ctx *UserContext, idInspection int64, motifRejet string) error {
 	if !ctx.IsApprobateur() {
 		return ErrBesoinProfilApprobateur
 	}
-	err := s.changeEtatInspection(ctx, idInspection, models.EtatAttenteValidation, models.EtatEnCours)
+	ok, err := s.repo.CheckEtatInspection(idInspection, []models.EtatInspection{models.EtatAttenteValidation})
 	if err != nil {
 		return err
 	}
-	err = s.repo.CreateEvenement(ctx, models.EvenementRejetValidationInspection, idInspection, nil)
+	if !ok {
+		return ErrInvalidInput
+	}
+
+	err = s.repo.RejectInspection(idInspection, motifRejet)
+	if err != nil {
+		return err
+	}
+	err = s.repo.CreateEvenement(ctx, models.EvenementRejetValidationInspection, idInspection, map[string]interface{}{
+		"motif": motifRejet,
+	})
 	return err
 }
 

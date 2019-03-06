@@ -159,7 +159,7 @@ func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
 	assert.Equal(inspectionId, notification.Evenement.InspectionId)
 	assert.Equal(int64(3), notification.Evenement.AuteurId)
 
-	err = application.Service.RejectInspection(ctxApprobateur, inspectionId)
+	err = application.Service.RejectInspection(ctxApprobateur, inspectionId, "motif de rejet")
 	assert.NoError(err)
 
 	notifications, err = application.Repo.ListNotifications(ctxInspecteur2, nil)

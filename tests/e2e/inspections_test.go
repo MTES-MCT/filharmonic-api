@@ -277,7 +277,11 @@ func TestValidateInspectionSansNonConformites(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	tests.AuthApprobateur(e.POST("/inspections/{id}/rejeter")).WithPath("id", 3).
+	inspectionInput := models.Inspection{
+		MotifRejetValidation: "pas bon",
+	}
+
+	tests.AuthApprobateur(e.POST("/inspections/{id}/rejeter")).WithPath("id", 3).WithJSON(inspectionInput).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -376,7 +380,10 @@ func TestRejectInspection(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
-	tests.AuthApprobateur(e.POST("/inspections/{id}/rejeter")).WithPath("id", 3).
+	inspectionInput := models.Inspection{
+		MotifRejetValidation: "Contrôle pas assez poussé",
+	}
+	tests.AuthApprobateur(e.POST("/inspections/{id}/rejeter")).WithPath("id", 3).WithJSON(inspectionInput).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -387,6 +394,37 @@ func TestRejectInspection(t *testing.T) {
 		JSON().Object()
 
 	inspection.ValueEqual("etat", models.EtatEnCours)
+	inspection.ValueEqual("validation_rejetee", true)
+	inspection.ValueEqual("motif_rejet_validation", inspectionInput.MotifRejetValidation)
+
+	inspection = tests.AuthUser(e.GET("/inspections/{id}"), 2).WithPath("id", 3).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection.ValueEqual("etat", models.EtatEnCours)
+	inspection.NotContainsKey("validation_rejetee")
+	inspection.NotContainsKey("motif_rejet_validation")
+
+	inspections := tests.AuthUser(e.GET("/inspections"), 2).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+
+	inspection = inspections.First().Object()
+	inspection.ValueEqual("etat", models.EtatEnCours)
+	inspection.NotContainsKey("validation_rejetee")
+	inspection.NotContainsKey("motif_rejet_validation")
+
+	etablissement := tests.AuthUser(e.GET("/etablissements/{id}"), 2).WithPath("id", 4).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	inspection = etablissement.Value("inspections").Array().First().Object()
+	inspection.ValueEqual("etat", models.EtatEnCours)
+	inspection.NotContainsKey("validation_rejetee")
+	inspection.NotContainsKey("motif_rejet_validation")
 }
 
 func TestCloreInspection(t *testing.T) {

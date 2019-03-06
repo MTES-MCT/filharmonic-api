@@ -68,6 +68,7 @@ func (repo *Repository) GetEtablissementByID(ctx *domain.UserContext, id int64) 
 		Relation("Inspections", func(q *orm.Query) (*orm.Query, error) {
 			q.Order("id ASC")
 			if ctx.IsExploitant() {
+				q.ExcludeColumn("validation_rejetee", "motif_rejet_validation")
 				q.Where("etat <> ?", models.EtatPreparation)
 			}
 			return q, nil
