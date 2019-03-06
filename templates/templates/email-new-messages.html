@@ -1,4 +1,6 @@
+<!DOCTYPE html>
 <html>
+  <meta charset="UTF-8">
   <head>
     <style>
     a[href] {
@@ -14,6 +16,9 @@
       padding-left: 16px;
     }
     .maincontent {
+      display: block;
+      margin: 0 auto;
+      max-width: 600px;
       padding: 32px;
       background-color: #ffffff;
       border: 1px solid #ededed;
@@ -22,17 +27,16 @@
     </style>
   </head>
 <body>
-<table style="background-color: #fafafa; border-collapse: collapse; margin: 0 auto">
+<table style="background-color: #fafafa; border-collapse: collapse; width: 100%">
   <tr>
     <td style="text-align: center; padding: 32px"><h2>Fil'Harmonic</h2></td>
   </tr>
-
   <tr>
       <td class="maincontent">
 
         <p>Bonjour {{ .Destinataire.Nom }},</p>
 
-        <p>Vous avez {{ len .Messages }} message(s) non lu(s) sur <a href="https://filharmonic.beta.gouv.fr">Fil'Harmonic</a>.</p>
+        <p>Vous avez {{ len .Messages }} message(s) non lu(s) sur <a href="{{ $.BaseURL }}">Fil'Harmonic</a>.</p>
 
 
         {{ range .Messages }}
@@ -41,14 +45,14 @@
           <table style="border-collapse: collapse;">
             <tr>
                 <td style="padding-right: 16px">Établissement : <strong>{{ .RaisonEtablissement }}</strong></td>
-                <td style="padding-left: 16px; text-align: right; border-left: 1px solid #cecece">Inspection du <strong>{{ .DateInspection }}</strong></td>
+                <td style="padding-left: 16px; text-align: right; border-left: 1px solid #cecece">Inspection du <strong><a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}">{{ .DateInspection }}</a></strong></td>
             </tr>
             <tr>
-              <td colspan="2" style="padding-top: 6px;"><strong>Sujet :</strong> {{ .SujetPointDeControle }}</td>
+              <td colspan="2" style="padding-top: 6px;"><strong>Sujet :</strong> <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}/#pdc{{ .PointDeControleId }}">{{ .SujetPointDeControle }}</a></td>
             </tr>
             <tr>
               <td colspan="2" style="padding-left: 12px; padding-top: 12px">
-                <strong>{{ .NomAuteur }}</strong>, <em>le {{ .DateMessage }}</em><br>
+                <strong>{{ .NomAuteur }}</strong>, <em>le <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}#pdc{{ .PointDeControleId }}-m{{ .MessageId }}">{{ .DateMessage }}</a></em><br>
                 {{ .Message }}
               </td>
             </tr>
@@ -59,14 +63,13 @@
   </tr>
 
   <tr>
-      <td style="text-align: center; color: #5c5c5c; padding-top: 16px; padding-bottom: 32px;">
-        <p>Vous recevez cet email car vous avez un compte sur <a href="https://filharmonic.beta.gouv.fr">filharmonic.beta.gouv.fr</a>.</p>
+      <td style="text-align: center; color: #5c5c5c; padding-top: 16px; padding-bottom: 64px;">
+        <p>Vous recevez cet email car vous avez un compte sur <a href="{{ $.BaseURL }}">Fil'Harmonic</a>.</p>
         <p >Pour plus d'informations sur le service Fil'Harmonic et ses ambitions,<br>
         vous pouvez consulter la <a href="https://beta.gouv.fr/startups/filharmonic.html">page de produit de Fil'Harmonic</a>.</p>
       </td>
   </tr>
 </table>
-<!-- <div style="background-color: white; color: black; padding-left: 10px; padding-right: 10px;"> -->
 
 </body>
 </html>

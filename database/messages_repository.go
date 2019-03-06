@@ -209,6 +209,9 @@ func (repo *Repository) toNouveauxMessageUsers(rows []RowNouveauMessageUser) []d
 			Message:              row.Message,
 			DateMessage:          util.FormatDateTime(row.DateMessage),
 			NomAuteur:            row.NomAuteur,
+			InspectionId:         row.InspectionId,
+			PointDeControleId:    row.PointDeControleId,
+			MessageId:            row.MessageId,
 		})
 	}
 	nouveauxMessagesUsers = append(nouveauxMessagesUsers, currentUser)
@@ -219,10 +222,13 @@ func (repo *Repository) toNouveauxMessageUsers(rows []RowNouveauMessageUser) []d
 type RowNouveauMessageUser struct {
 	EmailDestinataire    string
 	NomDestinataire      string
+	InspectionId         int64
 	DateInspection       string
 	RaisonEtablissement  string
+	PointDeControleId    int64
 	SujetPointDeControle string
 	Message              string
+	MessageId            int64
 	DateMessage          time.Time
 	NomAuteur            string
 }
@@ -232,9 +238,12 @@ func (repo *Repository) buildQueryNouveauxMessage(joinFunc func(*orm.Query) (*or
 		ColumnExpr(`"user".email as email_destinataire`).
 		ColumnExpr(`"user".prenom || ' ' || "user".nom as nom_destinataire`).
 		ColumnExpr("inspection.date as date_inspection").
+		ColumnExpr(`inspection.id as inspection_id`).
 		ColumnExpr(`etablissement.raison as raison_etablissement`).
+		ColumnExpr(`p.id as point_de_controle_id`).
 		ColumnExpr(`p.sujet as sujet_point_de_controle`).
 		ColumnExpr(`m.message as message`).
+		ColumnExpr(`m.id as message_id`).
 		ColumnExpr(`m.date as date_message`).
 		ColumnExpr(`auteur.prenom || ' ' || auteur.nom as nom_auteur`).
 		Apply(joinFunc).

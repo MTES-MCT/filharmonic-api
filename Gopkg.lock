@@ -519,12 +519,14 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/fatih/structs",
     "github.com/gin-contrib/logger",
     "github.com/gin-gonic/gin",
     "github.com/gin-gonic/gin/render",
     "github.com/go-pg/migrations",
     "github.com/go-pg/pg",
     "github.com/go-pg/pg/orm",
+    "github.com/go-pg/pg/types",
     "github.com/go-redis/redis",
     "github.com/gofrs/uuid",
     "github.com/kelseyhightower/envconfig",

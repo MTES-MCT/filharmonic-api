@@ -13,7 +13,8 @@ import (
 func initTest(t *testing.T) (*require.Assertions, *TemplateService) {
 	assert := require.New(t)
 	service, err := New(Config{
-		Dir: "templates/",
+		Dir:     "templates/",
+		BaseURL: "http://localhost:8080",
 	})
 	assert.NoError(err)
 	return assert, service
@@ -33,13 +34,21 @@ func TestRenderEmailTemplate(t *testing.T) {
 				SujetPointDeControle: "Rejets Eau",
 				Message:              "Il faut des photos",
 				NomAuteur:            "Alain Champion",
+				DateMessage:          "02/01/2018 à 15h04",
+				InspectionId:         3,
+				PointDeControleId:    5,
+				MessageId:            7,
 			},
 			domain.NouveauMessage{
 				DateInspection:       "26/02/2018",
 				RaisonEtablissement:  "Etablissement 2",
 				SujetPointDeControle: "Rejets Air",
 				Message:              "Il faut des documents",
+				DateMessage:          "16/01/2018 à 18h01",
 				NomAuteur:            "Alain Champion",
+				InspectionId:         1,
+				PointDeControleId:    2,
+				MessageId:            2,
 			},
 		},
 	}

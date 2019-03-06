@@ -6,10 +6,12 @@ import (
 	text "text/template"
 
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/fatih/structs"
 )
 
 type Config struct {
-	Dir string `default:"templates/templates/"`
+	Dir     string `default:"templates/templates/"`
+	BaseURL string `default:"https://filharmonic.beta.gouv.fr"`
 }
 
 type TemplateService struct {
@@ -161,9 +163,15 @@ func (s *TemplateService) RenderRapport(data interface{}) (string, error) {
 	return s.renderTextTemplate(s.rapportTemplate, data)
 }
 
+func (s *TemplateService) addCommonVariables(data interface{}) map[string]interface{} {
+	output := structs.Map(data)
+	output["BaseURL"] = s.config.BaseURL
+	return output
+}
+
 func (s *TemplateService) renderHTMLTemplate(tmpl *html.Template, data interface{}) (string, error) {
 	var tpl bytes.Buffer
-	err := tmpl.Execute(&tpl, data)
+	err := tmpl.Execute(&tpl, s.addCommonVariables(data))
 	if err != nil {
 		return "", err
 	}
@@ -172,7 +180,7 @@ func (s *TemplateService) renderHTMLTemplate(tmpl *html.Template, data interface
 
 func (s *TemplateService) renderTextTemplate(tmpl *text.Template, data interface{}) (string, error) {
 	var tpl bytes.Buffer
-	err := tmpl.Execute(&tpl, data)
+	err := tmpl.Execute(&tpl, s.addCommonVariables(data))
 	if err != nil {
 		return "", err
 	}

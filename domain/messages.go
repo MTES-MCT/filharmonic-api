@@ -57,6 +57,9 @@ type NouveauMessage struct {
 	SujetPointDeControle string `json:"sujet_point_de_controle"`
 	Message              string `json:"message"`
 	DateMessage          string `json:"date_message"`
+	InspectionId         int64  `json:"inspection_id"`
+	PointDeControleId    int64  `json:"point_de_controle_id"`
+	MessageId            int64  `json:"message_id"`
 }
 
 func (s *Service) ListNouveauxMessages() ([]NouveauxMessagesUser, error) {
