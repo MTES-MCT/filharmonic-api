@@ -120,17 +120,17 @@ func New(config Config) (*TemplateService, error) {
 		config: config,
 	}
 	var err error
-	service.emailNouveauxMessagesTemplate, err = html.ParseFiles(config.Dir + "email-new-messages.html")
+	service.emailNouveauxMessagesTemplate, err = html.ParseFiles(config.Dir+"email-layout.html", config.Dir+"email-new-messages.html")
 	if err != nil {
 		return nil, err
 	}
 
-	service.emailRecapValidationTemplate, err = html.ParseFiles(config.Dir + "email-recap-validation.html")
+	service.emailRecapValidationTemplate, err = html.ParseFiles(config.Dir+"email-layout.html", config.Dir+"email-recap-validation.html")
 	if err != nil {
 		return nil, err
 	}
 
-	service.emailExpirationDelaisTemplate, err = html.ParseFiles(config.Dir + "email-expiration-delais.html")
+	service.emailExpirationDelaisTemplate, err = html.ParseFiles(config.Dir+"email-layout.html", config.Dir+"email-expiration-delais.html")
 	if err != nil {
 		return nil, err
 	}
