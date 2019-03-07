@@ -19,6 +19,7 @@ type Repository interface {
 
 	ListInspections(ctx *UserContext, filter ListInspectionsFilter) ([]models.Inspection, error)
 	ListInspectionsFavorites(ctx *UserContext) ([]models.Inspection, error)
+	ListInspectionsExpirationDelais() ([]InspectionExpirationDelais, error)
 	CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error)
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64, filter InspectionFilter) (*models.Inspection, error)
@@ -90,6 +91,7 @@ type EmailService interface {
 type TemplateService interface {
 	RenderHTMLEmailNouveauxMessages(data interface{}) (string, error)
 	RenderHTMLEmailRecapValidation(data interface{}) (string, error)
+	RenderHTMLEmailExpirationDelais(data interface{}) (string, error)
 	RenderLettreAnnonce(data interface{}) (string, error)
 	RenderLettreSuite(data interface{}) (string, error)
 	RenderRapport(data interface{}) (string, error)

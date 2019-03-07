@@ -130,14 +130,6 @@ func (s *Service) AskValidateInspection(ctx *UserContext, idInspection int64) er
 	return err
 }
 
-type RecapValidationInspection struct {
-	Destinataire        models.User
-	InspectionId        int64  `json:"inspection_id"`
-	DateInspection      string `json:"date_inspection"`
-	RaisonEtablissement string `json:"raison_etablissement"`
-	NonConformites      bool   `json:"non_conformites"`
-}
-
 func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64, rapportFile models.File) error {
 	if !ctx.IsApprobateur() {
 		return ErrBesoinProfilApprobateur

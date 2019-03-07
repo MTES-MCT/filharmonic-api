@@ -21,6 +21,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/MTES-MCT/filharmonic-api/templates"
+	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
@@ -120,6 +121,7 @@ func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	config.Http.Logger = false
 	config.Templates.Dir = "../../templates/templates/"
 	config.LogLevel = ""
+	util.SetTime(util.Date("2019-04-01").Time)
 	application := app.New(config)
 	err := application.BootstrapDB()
 	assert.NoError(err)

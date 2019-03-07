@@ -6,6 +6,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/tests"
+	"github.com/MTES-MCT/filharmonic-api/util"
 )
 
 func TestListInpections(t *testing.T) {
@@ -55,4 +56,12 @@ func TestGetRecapsValidation(t *testing.T) {
 	recaps, err := application.Repo.GetRecapsValidation(5)
 	assert.NoError(err)
 	assert.Len(recaps, 1)
+}
+func TestListInspectionsExpirationDelais(t *testing.T) {
+	assert, application := tests.InitDB(t)
+
+	util.SetTime(util.Date("2019-04-01").Time)
+	inspections, err := application.Repo.ListInspectionsExpirationDelais()
+	assert.NoError(err)
+	assert.Len(inspections, 1)
 }

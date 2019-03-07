@@ -25,7 +25,16 @@ func New(config Config, service *domain.Service) (*CronManager, error) {
 	err := cronmanager.cron.AddFunc(config.Activity, func() {
 		err := cronmanager.service.SendEmailsNouveauxMessages()
 		if err != nil {
-			log.Error().Err(err).Msg("error while sending emails")
+			log.Error().Err(err).Msg("error while sending emails: nouveaux messages")
+		}
+	})
+	if err != nil {
+		return nil, err
+	}
+	err = cronmanager.cron.AddFunc(config.Activity, func() {
+		err = cronmanager.service.SendEmailsExpirationDelais()
+		if err != nil {
+			log.Error().Err(err).Msg("error while sending emails: expiration des délais")
 		}
 	})
 	if err != nil {

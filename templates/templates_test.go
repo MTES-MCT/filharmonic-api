@@ -79,6 +79,26 @@ func TestRenderEmailRecapValidation(t *testing.T) {
 	assert.Contains(htmlPart, "échéances de résolution")
 	assert.NoError(ioutil.WriteFile("../.tmp/email-recap-validation.html", []byte(htmlPart), 0644))
 }
+
+func TestRenderHTMLEmailExpirationDelais(t *testing.T) {
+	assert, service := initTest(t)
+
+	data := domain.InspectionExpirationDelais{
+		Destinataire: models.User{
+			Email: "test@localhost",
+			Nom:   "Michel Exploitant1",
+		},
+		InspectionId:        3,
+		DateInspection:      "01/01/2019",
+		RaisonEtablissement: "Etablissement 1",
+	}
+
+	htmlPart, err := service.RenderHTMLEmailExpirationDelais(data)
+	assert.NoError(err)
+	assert.Contains(htmlPart, "délais expirés")
+	assert.NoError(ioutil.WriteFile("../.tmp/email-expiration-delais.html", []byte(htmlPart), 0644))
+}
+
 func TestRenderLettre(t *testing.T) {
 	assert, service := initTest(t)
 

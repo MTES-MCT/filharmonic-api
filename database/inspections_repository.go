@@ -5,6 +5,7 @@ import (
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/go-pg/pg/types"
@@ -311,7 +312,7 @@ func (repo *Repository) GetRecapsValidation(idInspection int64) ([]domain.RecapV
 		inspection.date as date_inspection,
 		inspection.etat = ? as non_conformites,
 		etablissement.raison as raison_etablissement,
-		users.nom as destinataire__nom,
+		users.prenom || ' ' || users.nom as destinataire__nom,
 		users.email as destinataire__email
 	from inspections as inspection
 	join etablissements as etablissement
@@ -326,4 +327,31 @@ func (repo *Repository) GetRecapsValidation(idInspection int64) ([]domain.RecapV
 		return nil, err
 	}
 	return recaps, nil
+}
+
+func (repo *Repository) ListInspectionsExpirationDelais() ([]domain.InspectionExpirationDelais, error) {
+	inspectionExpirationDelais := []domain.InspectionExpirationDelais{}
+	_, err := repo.db.client.Query(&inspectionExpirationDelais, `select
+		distinct(inspection.id) as inspection_id,
+		inspection.date as date_inspection,
+		etablissement.raison as raison_etablissement,
+		users.prenom || ' ' || users.nom as destinataire__nom,
+		users.email as destinataire__email
+	from inspections as inspection
+	join etablissements as etablissement
+		on etablissement.id = inspection.etablissement_id
+	join inspection_to_inspecteurs as inspecteur
+		on inspection.id = inspecteur.inspection_id
+	join point_de_controles AS p
+		ON p.inspection_id = inspection.id
+	join constats AS constat
+		on p.constat_id = constat.id
+		and constat.date_resolution is null
+		and constat.echeance_resolution <= ?
+	join users
+		on users.id = inspecteur.user_id`, util.Now())
+	if err != nil {
+		return nil, err
+	}
+	return inspectionExpirationDelais, nil
 }

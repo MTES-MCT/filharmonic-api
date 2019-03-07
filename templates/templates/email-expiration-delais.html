@@ -36,29 +36,8 @@
 
         <p>Bonjour {{ .Destinataire.Nom }},</p>
 
-        <p>Vous avez {{ len .Messages }} message(s) non lu(s) sur <a href="{{ $.BaseURL }}">Fil'Harmonic</a>.</p>
-
-
-        {{ range .Messages }}
-        <hr style="margin-top: 12px">
-        <div class="message">
-          <table style="border-collapse: collapse;">
-            <tr>
-                <td style="padding-right: 16px">Établissement : <strong>{{ .RaisonEtablissement }}</strong></td>
-                <td style="padding-left: 16px; text-align: right; border-left: 1px solid #cecece">Inspection du <strong><a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}">{{ .DateInspection }}</a></strong></td>
-            </tr>
-            <tr>
-              <td colspan="2" style="padding-top: 6px;"><strong>Sujet :</strong> <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}/#pdc{{ .PointDeControleId }}">{{ .SujetPointDeControle }}</a></td>
-            </tr>
-            <tr>
-              <td colspan="2" style="padding-left: 12px; padding-top: 12px">
-                <strong>{{ .NomAuteur }}</strong>, <em>le <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}#pdc{{ .PointDeControleId }}-m{{ .MessageId }}">{{ .DateMessage }}</a></em><br>
-                {{ .Message }}
-              </td>
-            </tr>
-          </table>
-        </div>
-        {{ end }}
+        <p>L'inspection du {{ .DateInspection }} sur l'établissement {{ .RaisonEtablissement }} en cours de traitement des non-conformités a des délais expirés.
+          Vous pouvez consulter le détail sur <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}">Fil'Harmonic</a>.</p>
       </td>
   </tr>
 

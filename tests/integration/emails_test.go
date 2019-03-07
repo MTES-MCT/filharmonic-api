@@ -12,3 +12,10 @@ func TestSendEmailsRecapValidation(t *testing.T) {
 
 	assert.NoError(application.Service.SendEmailsRecapValidation(int64(5)))
 }
+
+func TestSendEmailsExpirationDelais(t *testing.T) {
+	assert, application, close := tests.InitService(t)
+	defer close()
+
+	assert.NoError(application.Service.SendEmailsExpirationDelais())
+}
