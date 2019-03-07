@@ -5,6 +5,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
 	"github.com/MTES-MCT/filharmonic-api/cron"
 	"github.com/MTES-MCT/filharmonic-api/database"
+	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/emails"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/storage"
@@ -29,6 +30,7 @@ type Config struct {
 	Http       httpserver.Config
 	Sso        authentication.SsoConfig
 	Redis      sessions.RedisConfig
+	Service    domain.Config
 	Storage    storage.Config
 	Templates  templates.Config
 	LogLevel   string  `default:"info"`

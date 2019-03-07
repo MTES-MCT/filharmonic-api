@@ -65,3 +65,11 @@ func TestListInspectionsExpirationDelais(t *testing.T) {
 	assert.NoError(err)
 	assert.Len(inspections, 1)
 }
+func TestListInspectionsEcheancesProches(t *testing.T) {
+	assert, application := tests.InitDB(t)
+
+	util.SetTime(util.Date("2019-03-05").Time)
+	inspections, err := application.Repo.ListInspectionsEcheancesProches(0.2)
+	assert.NoError(err)
+	assert.Len(inspections, 1)
+}

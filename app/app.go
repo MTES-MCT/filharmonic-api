@@ -96,7 +96,7 @@ func (a *Application) BootstrapServer() error {
 	if err != nil {
 		return err
 	}
-	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService, a.EmailService)
+	a.Service = domain.New(a.Config.Service, a.Repo, a.Storage, a.TemplateService, a.EmailService)
 	a.Cron, err = cron.New(a.Config.Cron, a.Service)
 	if err != nil {
 		return err

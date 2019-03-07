@@ -49,7 +49,7 @@ func InitService(t *testing.T) (*require.Assertions, *app.Application, func()) {
 		assert.NoError(ioutil.WriteFile("../../.tmp/email-"+strconv.FormatInt(time.Now().UnixNano(), 10)+".html", []byte(email.HTMLPart), 0644))
 	})
 	a.EmailService = emailService
-	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService, a.EmailService)
+	a.Service = domain.New(a.Config.Service, a.Repo, a.Storage, a.TemplateService, a.EmailService)
 
 	return assert, a, func() {
 		err := a.Shutdown()
@@ -77,7 +77,7 @@ func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *authmocks.Sso) {
 		assert.NoError(ioutil.WriteFile("../../.tmp/email-"+strconv.FormatInt(time.Now().UnixNano(), 10)+".html", []byte(email.HTMLPart), 0644))
 	})
 	a.EmailService = emailService
-	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService, a.EmailService)
+	a.Service = domain.New(a.Config.Service, a.Repo, a.Storage, a.TemplateService, a.EmailService)
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
 	assert.NoError(a.Server.Start())
 	assert.NoError(initSessions(a.Sessions))

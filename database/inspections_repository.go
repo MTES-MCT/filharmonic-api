@@ -355,3 +355,49 @@ func (repo *Repository) ListInspectionsExpirationDelais() ([]domain.InspectionEx
 	}
 	return inspectionExpirationDelais, nil
 }
+
+func (repo *Repository) ListInspectionsEcheancesProches(seuilRappelEcheances float32) ([]domain.InspectionEcheancesProches, error) {
+	inspectionEcheancesProches := []domain.InspectionEcheancesProches{}
+	_, err := repo.db.client.Query(&inspectionEcheancesProches, `select
+		inspection.id as inspection_id,
+		constat.id as constat_id,
+		inspection.date as date_inspection,
+		etablissement.raison as raison_etablissement,
+		users.prenom || ' ' || users.nom as destinataire__nom,
+		users.email as destinataire__email
+	from inspections as inspection
+	join etablissements as etablissement
+		on etablissement.id = inspection.etablissement_id
+	join inspection_to_inspecteurs as inspecteur
+		on inspection.id = inspecteur.inspection_id
+	join point_de_controles AS p
+		ON p.inspection_id = inspection.id
+	join constats AS constat
+		on p.constat_id = constat.id
+		and constat.date_resolution is null
+		and constat.rappel_echeances_envoye is false
+		and ? between date(
+			constat.echeance_resolution - (case when constat.delai_unite='jours' then make_interval(days => cast(ceil(? * constat.delai_nombre) as int)) else make_interval(months => cast(ceil(? * constat.delai_nombre) as int)) end)
+		   ) and constat.echeance_resolution
+	join users
+		on users.id = inspecteur.user_id
+	order by inspection.id asc`, util.Now(), seuilRappelEcheances, seuilRappelEcheances)
+	if err != nil {
+		return nil, err
+	}
+	return inspectionEcheancesProches, nil
+}
+
+func (repo *Repository) UpdateRappelsEcheancesEnvoyes(constatIds []int64) error {
+	if len(constatIds) == 0 {
+		return nil
+	}
+	constat := models.Constat{
+		RappelEcheancesEnvoye: true,
+	}
+	_, err := repo.db.client.Model(&constat).
+		Column("rappel_echeances_envoye").
+		Where("id in (?)", pg.In(constatIds)).
+		Update()
+	return err
+}

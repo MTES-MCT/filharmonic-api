@@ -1,0 +1,10 @@
+{{ define "content" }}
+
+  <p>Bonjour {{ .Destinataire.Nom }},</p>
+
+  <p>L'inspection du {{ .DateInspection }} sur votre établissement {{ .RaisonEtablissement }} contient des non-conformités encore non résolues.
+    Leurs échéances de résolution sont proches.</p>
+  <p>Si vous rencontrez des difficultés, ne pas hésiter à en informer les inspecteurs.</p>
+  <p>Vous pouvez consulter le détail des échéances sur <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}">Fil'Harmonic</a>.</p>
+
+{{ end }}

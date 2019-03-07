@@ -20,6 +20,7 @@ type TemplateService struct {
 	emailNouveauxMessagesTemplate *html.Template
 	emailRecapValidationTemplate  *html.Template
 	emailExpirationDelaisTemplate *html.Template
+	emailRappelEcheancesTemplate  *html.Template
 	lettreAnnonceTemplate         *text.Template
 	lettreSuiteTemplate           *text.Template
 	rapportTemplate               *text.Template
@@ -135,6 +136,11 @@ func New(config Config) (*TemplateService, error) {
 		return nil, err
 	}
 
+	service.emailRappelEcheancesTemplate, err = html.ParseFiles(config.Dir+"email-layout.html", config.Dir+"email-rappel-echeances.html")
+	if err != nil {
+		return nil, err
+	}
+
 	service.lettreAnnonceTemplate, err = text.New("modele_de_lettre_annonce_inspection.fodt").
 		Funcs(templateHelpers).
 		ParseFiles(config.Dir + "modele_de_lettre_annonce_inspection.fodt")
@@ -169,6 +175,10 @@ func (s *TemplateService) RenderHTMLEmailRecapValidation(data interface{}) (stri
 
 func (s *TemplateService) RenderHTMLEmailExpirationDelais(data interface{}) (string, error) {
 	return s.renderHTMLTemplate(s.emailExpirationDelaisTemplate, data)
+}
+
+func (s *TemplateService) RenderHTMLEmailRappelEcheances(data interface{}) (string, error) {
+	return s.renderHTMLTemplate(s.emailRappelEcheancesTemplate, data)
 }
 
 func (s *TemplateService) RenderLettreAnnonce(data interface{}) (string, error) {

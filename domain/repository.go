@@ -20,6 +20,7 @@ type Repository interface {
 	ListInspections(ctx *UserContext, filter ListInspectionsFilter) ([]models.Inspection, error)
 	ListInspectionsFavorites(ctx *UserContext) ([]models.Inspection, error)
 	ListInspectionsExpirationDelais() ([]InspectionExpirationDelais, error)
+	ListInspectionsEcheancesProches(seuilRappelEcheancservicees float32) ([]InspectionEcheancesProches, error)
 	CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error)
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64, filter InspectionFilter) (*models.Inspection, error)
@@ -62,6 +63,7 @@ type Repository interface {
 	DeleteConstat(ctx *UserContext, idPointDeControle int64) error
 	ResolveConstat(ctx *UserContext, idPointDeControle int64) error
 	GetTypeConstatByPointDeControleID(idPointDeControle int64) (models.TypeConstat, error)
+	UpdateRappelsEcheancesEnvoyes(constatsIds []int64) error
 
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByID(id int64) (*models.User, error)
@@ -92,6 +94,7 @@ type TemplateService interface {
 	RenderHTMLEmailNouveauxMessages(data interface{}) (string, error)
 	RenderHTMLEmailRecapValidation(data interface{}) (string, error)
 	RenderHTMLEmailExpirationDelais(data interface{}) (string, error)
+	RenderHTMLEmailRappelEcheances(data interface{}) (string, error)
 	RenderLettreAnnonce(data interface{}) (string, error)
 	RenderLettreSuite(data interface{}) (string, error)
 	RenderRapport(data interface{}) (string, error)

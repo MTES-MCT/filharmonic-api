@@ -113,3 +113,43 @@ func (s *Service) SendEmailsExpirationDelais() error {
 	}
 	return nil
 }
+
+type InspectionEcheancesProches struct {
+	Destinataire        models.User
+	InspectionId        int64  `json:"inspection_id"`
+	ConstatId           int64  `json:"constat_id"`
+	DateInspection      string `json:"date_inspection"`
+	RaisonEtablissement string `json:"raison_etablissement"`
+}
+
+func (s *Service) SendEmailsRappelEcheances() error {
+	inspectionsEcheancesProches, err := s.repo.ListInspectionsEcheancesProches(s.config.SeuilRappelEcheances)
+	if err != nil {
+		return err
+	}
+	constatsIds := []int64{}
+	previousInspectionId := int64(0)
+	for _, inspectionEcheancesProches := range inspectionsEcheancesProches {
+		var htmlPart string
+		htmlPart, err = s.templateService.RenderHTMLEmailRappelEcheances(inspectionEcheancesProches)
+		if err != nil {
+			return err
+		}
+		if inspectionEcheancesProches.InspectionId != previousInspectionId {
+			err = s.emailService.Send(emails.Email{
+				Subject:        "Fil'Harmonic : Rappel des échéances",
+				RecipientEmail: inspectionEcheancesProches.Destinataire.Email,
+				RecipientName:  inspectionEcheancesProches.Destinataire.Nom,
+				TextPart:       "",
+				HTMLPart:       htmlPart,
+			})
+			if err != nil {
+				log.Error().Err(err).Msg("error while sending email")
+			}
+			previousInspectionId = inspectionEcheancesProches.InspectionId
+		}
+		constatsIds = append(constatsIds, inspectionEcheancesProches.ConstatId)
+	}
+	err = s.repo.UpdateRappelsEcheancesEnvoyes(constatsIds)
+	return err
+}
