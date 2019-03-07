@@ -8,7 +8,7 @@ executors:
   gotest:
     docker:
       - image: circleci/golang:1.11
-      - image: circleci/postgres:11.1-alpine
+      - image: circleci/postgres:11.1-alpine-ram
         environment:
           POSTGRES_USER: filharmonic
           POSTGRES_PASS: filharmonic
