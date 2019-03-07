@@ -12,7 +12,7 @@ const (
 
 func RegimeFromString(regime string) RegimeEtablissement {
 	switch regime {
-	case "NULL":
+	case "":
 		return RegimeAucun
 	case "Autorisation":
 		return RegimeAutorisation
