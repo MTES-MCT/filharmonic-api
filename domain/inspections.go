@@ -3,6 +3,7 @@ package domain
 import (
 	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -129,6 +130,14 @@ func (s *Service) AskValidateInspection(ctx *UserContext, idInspection int64) er
 	return err
 }
 
+type RecapValidationInspection struct {
+	Destinataire        models.User
+	InspectionId        int64  `json:"inspection_id"`
+	DateInspection      string `json:"date_inspection"`
+	RaisonEtablissement string `json:"raison_etablissement"`
+	NonConformites      bool   `json:"non_conformites"`
+}
+
 func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64, rapportFile models.File) error {
 	if !ctx.IsApprobateur() {
 		return ErrBesoinProfilApprobateur
@@ -171,7 +180,18 @@ func (s *Service) ValidateInspection(ctx *UserContext, idInspection int64, rappo
 		return err
 	}
 	err = s.repo.CreateEvenement(ctx, models.EvenementValidationInspection, idInspection, nil)
-	return err
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		err := s.SendEmailsRecapValidation(idInspection)
+		if err != nil {
+			log.Error().Err(err).Msg("could not send emails recap validation")
+		}
+	}()
+
+	return nil
 }
 
 func (s *Service) RejectInspection(ctx *UserContext, idInspection int64, motifRejet string) error {

@@ -1,16 +1,23 @@
 package tests
 
 import (
+	"io/ioutil"
 	"os"
+	"strconv"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/mock"
 
 	httpexpect "gopkg.in/gavv/httpexpect.v1"
 
 	"github.com/MTES-MCT/filharmonic-api/app"
 	"github.com/MTES-MCT/filharmonic-api/authentication"
-	"github.com/MTES-MCT/filharmonic-api/authentication/mocks"
+	authmocks "github.com/MTES-MCT/filharmonic-api/authentication/mocks"
 	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
 	"github.com/MTES-MCT/filharmonic-api/domain"
+	domainmocks "github.com/MTES-MCT/filharmonic-api/domain/mocks"
+	"github.com/MTES-MCT/filharmonic-api/emails"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/MTES-MCT/filharmonic-api/templates"
@@ -30,12 +37,18 @@ func InitService(t *testing.T) (*require.Assertions, *app.Application, func()) {
 	a.Storage, err = storage.New(a.Config.Storage)
 	assert.NoError(err)
 	a.Sessions = sessions.NewMemory()
-	sso := new(mocks.Sso)
+	sso := new(authmocks.Sso)
 	a.Sso = sso
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
 	a.TemplateService, err = templates.New(a.Config.Templates)
 	assert.NoError(err)
-	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService)
+	emailService := new(domainmocks.EmailService)
+	emailService.On("Send", mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+		email := args.Get(0).(emails.Email)
+		assert.NoError(ioutil.WriteFile("../../.tmp/email-"+strconv.FormatInt(time.Now().UnixNano(), 10)+".html", []byte(email.HTMLPart), 0644))
+	})
+	a.EmailService = emailService
+	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService, a.EmailService)
 
 	return assert, a, func() {
 		err := a.Shutdown()
@@ -45,19 +58,25 @@ func InitService(t *testing.T) (*require.Assertions, *app.Application, func()) {
 	}
 }
 
-func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *mocks.Sso) {
+func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *authmocks.Sso) {
 	assert, a := InitDB(t)
 
 	var err error
 	a.Storage, err = storage.New(a.Config.Storage)
 	assert.NoError(err)
 	a.Sessions = sessions.NewMemory()
-	sso := new(mocks.Sso)
+	sso := new(authmocks.Sso)
 	a.Sso = sso
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
 	a.TemplateService, err = templates.New(a.Config.Templates)
 	assert.NoError(err)
-	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService)
+	emailService := new(domainmocks.EmailService)
+	emailService.On("Send", mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+		email := args.Get(0).(emails.Email)
+		assert.NoError(ioutil.WriteFile("../../.tmp/email-"+strconv.FormatInt(time.Now().UnixNano(), 10)+".html", []byte(email.HTMLPart), 0644))
+	})
+	a.EmailService = emailService
+	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService, a.EmailService)
 	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
 	assert.NoError(a.Server.Start())
 	assert.NoError(initSessions(a.Sessions))

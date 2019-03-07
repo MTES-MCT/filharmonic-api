@@ -24,7 +24,7 @@ type Application struct {
 	Config                Config
 	DB                    *database.Database
 	Repo                  *database.Repository
-	EmailService          *emails.EmailService
+	EmailService          domain.EmailService
 	Cron                  *cron.CronManager
 	Sso                   authentication.Sso
 	Sessions              sessions.Sessions
@@ -96,8 +96,8 @@ func (a *Application) BootstrapServer() error {
 	if err != nil {
 		return err
 	}
-	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService)
-	a.Cron, err = cron.New(a.Config.Cron, a.Service, a.EmailService, a.TemplateService)
+	a.Service = domain.New(a.Repo, a.Storage, a.TemplateService, a.EmailService)
+	a.Cron, err = cron.New(a.Config.Cron, a.Service)
 	if err != nil {
 		return err
 	}

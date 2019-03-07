@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="UTF-8">
+  <head>
+    <style>
+    a[href] {
+      color: #1050c0;
+      text-decoration: none;
+    }
+    .label {
+      color: #8c8c8c;
+    }
+    .message {
+      margin-top: 12px;
+      border-left: 4px solid black;
+      padding-left: 16px;
+    }
+    .maincontent {
+      display: block;
+      margin: 0 auto;
+      max-width: 600px;
+      padding: 32px;
+      background-color: #ffffff;
+      border: 1px solid #ededed;
+      border-radius: 3px;
+    }
+    </style>
+  </head>
+<body>
+<table style="background-color: #fafafa; border-collapse: collapse; width: 100%">
+  <tr>
+    <td style="text-align: center; padding: 32px"><h2>Fil'Harmonic</h2></td>
+  </tr>
+  <tr>
+      <td class="maincontent">
+
+        <p>Bonjour {{ .Destinataire.Nom }},</p>
+
+        <p>L'inspection du {{ .DateInspection }} sur votre établissement {{ .RaisonEtablissement }} a été validée.
+          Vous pouvez consulter le rapport final sur <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}">Fil'Harmonic</a>.</p>
+
+        {{ if .NonConformites }}
+        <p>De plus, l'inspection a fait l'objet de non-conformités. Vous pouvez consulter le détail des constats et leurs échéances de résolution.</p>
+        {{ end }}
+
+      </td>
+  </tr>
+
+  <tr>
+      <td style="text-align: center; color: #5c5c5c; padding-top: 16px; padding-bottom: 64px;">
+        <p>Vous recevez cet email car vous avez un compte sur <a href="{{ $.BaseURL }}">Fil'Harmonic</a>.</p>
+        <p >Pour plus d'informations sur le service Fil'Harmonic et ses ambitions,<br>
+        vous pouvez consulter la <a href="https://beta.gouv.fr/startups/filharmonic.html">page de produit de Fil'Harmonic</a>.</p>
+      </td>
+  </tr>
+</table>
+
+</body>
+</html>

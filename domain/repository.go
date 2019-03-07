@@ -7,7 +7,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
-//go:generate mockery -name Repository
+//go:generate mockery -all
 
 type Repository interface {
 	FindEtablissements(ctx *UserContext, filter ListEtablissementsFilter) (*models.FindEtablissementResults, error)
@@ -26,6 +26,7 @@ type Repository interface {
 	GetEtatInspectionByPointDeControleID(idPointDeControle int64) (models.EtatInspection, error)
 	CheckInspectionHasNonConformites(idInspection int64) (bool, error)
 	GetInspectionTypesConstatsSuiteByID(idInspection int64) (*models.Inspection, error)
+	GetRecapsValidation(idInspection int64) ([]RecapValidationInspection, error)
 	CanCloreInspection(ctx *UserContext, idInspection int64) error
 	ValidateInspection(id int64, etatCible models.EtatInspection) error
 	RejectInspection(id int64, motifRejet string) error
@@ -88,6 +89,7 @@ type EmailService interface {
 
 type TemplateService interface {
 	RenderHTMLEmailNouveauxMessages(data interface{}) (string, error)
+	RenderHTMLEmailRecapValidation(data interface{}) (string, error)
 	RenderLettreAnnonce(data interface{}) (string, error)
 	RenderLettreSuite(data interface{}) (string, error)
 	RenderRapport(data interface{}) (string, error)

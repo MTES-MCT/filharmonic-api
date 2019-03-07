@@ -303,3 +303,27 @@ func (repo *Repository) RemoveFavoriToInspection(ctx *domain.UserContext, idInsp
 		UserId:       ctx.User.Id,
 	})
 }
+
+func (repo *Repository) GetRecapsValidation(idInspection int64) ([]domain.RecapValidationInspection, error) {
+	recaps := []domain.RecapValidationInspection{}
+	_, err := repo.db.client.Query(&recaps, `select
+		inspection.id as inspection_id,
+		inspection.date as date_inspection,
+		inspection.etat = ? as non_conformites,
+		etablissement.raison as raison_etablissement,
+		users.nom as destinataire__nom,
+		users.email as destinataire__email
+	from inspections as inspection
+	join etablissements as etablissement
+		on etablissement.id = inspection.etablissement_id
+	join etablissement_to_exploitants as exploitant
+		on etablissement.id = exploitant.etablissement_id
+	join users
+		on users.id = exploitant.user_id
+	where
+		inspection.id = ?`, models.EtatTraitementNonConformites, idInspection)
+	if err != nil {
+		return nil, err
+	}
+	return recaps, nil
+}

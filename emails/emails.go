@@ -51,7 +51,7 @@ func (em *EmailService) Send(email Email) error {
 	if em.config.APIPublicKey == "" {
 		return nil
 	}
-	log.Debug().
+	log.Info().
 		Str("recipient", email.RecipientEmail).
 		Msg("send email")
 	messagesInfo := []mailjet.InfoMessagesV31{

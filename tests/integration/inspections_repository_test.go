@@ -48,3 +48,11 @@ func TestGetInspectionTypesConstatsSuiteByID(t *testing.T) {
 	pointDeControle := inspection.PointsDeControle[0]
 	assert.Equal(models.TypeConstatObservation, pointDeControle.Constat.Type)
 }
+
+func TestGetRecapsValidation(t *testing.T) {
+	assert, application := tests.InitDB(t)
+
+	recaps, err := application.Repo.GetRecapsValidation(5)
+	assert.NoError(err)
+	assert.Len(recaps, 1)
+}

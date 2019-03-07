@@ -19,7 +19,7 @@ func initTest(t *testing.T) (*require.Assertions, *TemplateService) {
 	assert.NoError(err)
 	return assert, service
 }
-func TestRenderEmailTemplate(t *testing.T) {
+func TestRenderEmailNouveauxMessages(t *testing.T) {
 	assert, service := initTest(t)
 
 	data := domain.NouveauxMessagesUser{
@@ -60,6 +60,25 @@ func TestRenderEmailTemplate(t *testing.T) {
 	assert.NoError(ioutil.WriteFile("../.tmp/email-new-messages.html", []byte(htmlPart), 0644))
 }
 
+func TestRenderEmailRecapValidation(t *testing.T) {
+	assert, service := initTest(t)
+
+	data := domain.RecapValidationInspection{
+		Destinataire: models.User{
+			Email: "test@localhost",
+			Nom:   "Michel Exploitant1",
+		},
+		InspectionId:        3,
+		NonConformites:      true,
+		DateInspection:      "01/01/2019",
+		RaisonEtablissement: "Etablissement 1",
+	}
+
+	htmlPart, err := service.RenderHTMLEmailRecapValidation(data)
+	assert.NoError(err)
+	assert.Contains(htmlPart, "échéances de résolution")
+	assert.NoError(ioutil.WriteFile("../.tmp/email-recap-validation.html", []byte(htmlPart), 0644))
+}
 func TestRenderLettre(t *testing.T) {
 	assert, service := initTest(t)
 
