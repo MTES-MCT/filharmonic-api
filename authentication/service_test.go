@@ -35,7 +35,7 @@ func initAuthenticationService(t *testing.T) (*require.Assertions, *Authenticati
 func TestValidateTokenSuccessful(t *testing.T) {
 	assert, authenticationService, mock := initAuthenticationService(t)
 
-	mock.Sessions.Set("token-123", int64(123))
+	assert.NoError(mock.Sessions.Set("token-123", int64(123)))
 	mock.Repo.On("GetUserByID", int64(123)).Return(&models.User{
 		Id: 123,
 	}, nil)
@@ -59,13 +59,13 @@ func TestLoginSuccessful(t *testing.T) {
 	assert, authenticationService, mock := initAuthenticationService(t)
 	email := "inspecteur1@filharmonic.com"
 
-	mock.Sessions.Set("token-123", int64(123))
+	assert.NoError(mock.Sessions.Set("token-123", int64(123)))
 	mock.Sso.On("ValidateTicket", "ticket-123").Return(email, nil)
 	mock.Repo.On("GetUserByEmail", email).Return(&models.User{
 		Id:    123,
 		Email: email,
 	}, nil)
-	mock.Sessions.Set("token-123", int64(123))
+	assert.NoError(mock.Sessions.Set("token-123", int64(123)))
 
 	loginResult, err := authenticationService.Login("ticket-123")
 	assert.NoError(err)
@@ -77,7 +77,7 @@ func TestLoginFailedWithMissingUser(t *testing.T) {
 	assert, authenticationService, mock := initAuthenticationService(t)
 	email := "inspecteur1@filharmonic.com"
 
-	mock.Sessions.Set("token-123", int64(123))
+	assert.NoError(mock.Sessions.Set("token-123", int64(123)))
 	mock.Sso.On("ValidateTicket", "ticket-123").Return(email, nil)
 	mock.Repo.On("GetUserByEmail", email).Return(nil, nil)
 

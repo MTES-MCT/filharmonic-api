@@ -25,11 +25,6 @@ type Email struct {
 	HTMLPart       string
 }
 
-type emailTemplate struct {
-	Name      string
-	MailJetID int
-}
-
 func New(config Config) *EmailService {
 	mailjetClient := mailjet.NewMailjetClient(config.APIPublicKey, config.APIPrivateKey)
 

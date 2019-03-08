@@ -49,7 +49,7 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.L
 		return nil, err
 	}
 	if ctx.IsExploitant() {
-		for i, _ := range inspections {
+		for i := range inspections {
 			inspections[i].ValidationRejetee = false
 			inspections[i].MotifRejetValidation = ""
 		}

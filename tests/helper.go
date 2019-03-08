@@ -100,7 +100,7 @@ func InitWithSso(t *testing.T) (*httpexpect.Expect, func(), *authmocks.Sso) {
 	}, sso
 }
 
-var UserSessions = make(map[int64]string, 0)
+var UserSessions = make(map[int64]string)
 
 func initSessions(sessionsStorage sessions.Sessions) error {
 	for i := 1; i < 8; i++ {

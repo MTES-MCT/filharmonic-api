@@ -4,7 +4,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/models"
 )
 
-var NotificationsEvenements = make(map[models.TypeEvenement](func(*UserContext) []string), 0)
+var NotificationsEvenements = make(map[models.TypeEvenement](func(*UserContext) []string))
 
 func init() {
 	NotificationsEvenements[models.EvenementCreationMessage] = func(ctx *UserContext) []string {

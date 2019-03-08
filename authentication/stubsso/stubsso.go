@@ -19,7 +19,7 @@ func New(repo *database.Repository) *StubSso {
 }
 
 func (sso *StubSso) ValidateTicket(ticket string) (string, error) {
-	userIdStr := strings.TrimLeft(ticket, "ticket-")
+	userIdStr := strings.TrimPrefix(ticket, "ticket-")
 	userId, err := strconv.ParseInt(userIdStr, 10, 64)
 	if err != nil {
 		return "", err

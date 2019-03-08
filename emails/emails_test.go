@@ -14,9 +14,10 @@ func TestSend(t *testing.T) {
 	// start a fake MailJet API
 	go func() {
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte(`{"success": true}`))
+			_, err := w.Write([]byte(`{"success": true}`))
+			assert.NoError(err)
 		})
-		http.ListenAndServe(":5100", nil)
+		assert.NoError(http.ListenAndServe(":5100", nil))
 	}()
 	time.Sleep(20 * time.Millisecond)
 

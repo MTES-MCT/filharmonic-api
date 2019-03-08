@@ -162,7 +162,7 @@ func LoadExploitantsCSV(filepath string, db *database.Database) error {
 				log.Error().Err(err).Msg("failed to save exploitants")
 			}
 
-			for index, _ := range etablissementToExploitants {
+			for index := range etablissementToExploitants {
 				etablissementToExploitants[index].UserId = exploitants[index].Id
 			}
 

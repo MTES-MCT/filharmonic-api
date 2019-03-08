@@ -19,9 +19,9 @@ executors:
           MINIO_ACCESS_KEY: filharmonic
           MINIO_SECRET_KEY: filharmonic
     working_directory: /go/src/github.com/MTES-MCT/filharmonic-api
-  gometalinter:
+  golangcilint:
     docker:
-      - image: mozgiii/gometalinter-docker:v2
+      - image: golangci/golangci-lint:v1.15.0
     working_directory: /go/src/github.com/MTES-MCT/filharmonic-api
 
 jobs:
@@ -36,12 +36,12 @@ jobs:
             - filharmonic-api/
 
   lint:
-    executor: gometalinter
+    executor: golangcilint
     steps:
       - attach_workspace:
           at: '/go/src/github.com/MTES-MCT'
       - run:
-          command: gometalinter ./...
+          command: golangci-lint run
 
   test:
     executor: gotest
