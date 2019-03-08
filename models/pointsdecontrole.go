@@ -46,12 +46,13 @@ const (
 )
 
 type Constat struct {
-	Id                    int64           `json:"id"`
-	Type                  TypeConstat     `json:"type"`
-	Remarques             string          `json:"remarques"`
-	DateResolution        types.NullTime  `json:"date_resolution" sql:"type:timestamptz"`
-	EcheanceResolution    util.DateString `json:"echeance_resolution,omitempty" sql:"type:date"`
-	DelaiNombre           int32           `json:"delai_nombre"`
-	DelaiUnite            string          `json:"delai_unite"`
-	RappelEcheancesEnvoye bool            `json:"_" sql:",notnull,default:false"`
+	Id                                 int64           `json:"id"`
+	Type                               TypeConstat     `json:"type"`
+	Remarques                          string          `json:"remarques"`
+	DateResolution                     types.NullTime  `json:"date_resolution" sql:"type:timestamptz"`
+	EcheanceResolution                 util.DateString `json:"echeance_resolution,omitempty" sql:"type:date"`
+	DelaiNombre                        int32           `json:"delai_nombre"`
+	DelaiUnite                         string          `json:"delai_unite"`
+	NotificationRappelEcheanceEnvoyee  bool            `json:"_" sql:",notnull,default:false"`
+	NotificationEcheanceExpireeEnvoyee bool            `json:"_" sql:",notnull,default:false"`
 }

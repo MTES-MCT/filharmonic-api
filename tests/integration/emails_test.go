@@ -20,8 +20,14 @@ func TestSendEmailsExpirationDelais(t *testing.T) {
 	assert, application, close := tests.InitService(t)
 	defer close()
 
+	util.SetTime(util.Date("2019-03-07").Time)
 	assert.NoError(application.Service.SendEmailsExpirationDelais())
+	constats := []models.Constat{}
+	_, err := application.DB.Query(&constats, "select * from constats where notification_echeance_expiree_envoyee is true")
+	assert.NoError(err)
+	assert.Len(constats, 1)
 }
+
 func TestSendEmailsRappelEcheances(t *testing.T) {
 	assert, application, close := tests.InitService(t)
 	defer close()
@@ -29,7 +35,7 @@ func TestSendEmailsRappelEcheances(t *testing.T) {
 	util.SetTime(util.Date("2019-03-05").Time)
 	assert.NoError(application.Service.SendEmailsRappelEcheances())
 	constats := []models.Constat{}
-	_, err := application.DB.Query(&constats, "select * from constats where rappel_echeances_envoye is true")
+	_, err := application.DB.Query(&constats, "select * from constats where notification_rappel_echeance_envoyee is true")
 	assert.NoError(err)
 	assert.Len(constats, 1)
 }

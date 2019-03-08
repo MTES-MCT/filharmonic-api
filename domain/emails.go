@@ -85,6 +85,7 @@ func (s *Service) SendEmailsRecapValidation(idInspection int64) error {
 type InspectionExpirationDelais struct {
 	Destinataire        models.User
 	InspectionId        int64  `json:"inspection_id"`
+	ConstatId           int64  `json:"constat_id"`
 	DateInspection      string `json:"date_inspection"`
 	RaisonEtablissement string `json:"raison_etablissement"`
 }
@@ -94,24 +95,32 @@ func (s *Service) SendEmailsExpirationDelais() error {
 	if err != nil {
 		return err
 	}
+	constatsIds := []int64{}
+	previousInspectionId := int64(0)
+	previousRecipientEmail := ""
 	for _, inspectionDelaisExpires := range inspectionsDelaisExpires {
 		htmlPart, err := s.templateService.RenderHTMLEmailExpirationDelais(inspectionDelaisExpires)
 		if err != nil {
 			return err
 		}
-
-		err = s.emailService.Send(emails.Email{
-			Subject:        "Fil'Harmonic : Expiration des délais",
-			RecipientEmail: inspectionDelaisExpires.Destinataire.Email,
-			RecipientName:  inspectionDelaisExpires.Destinataire.Nom,
-			TextPart:       "",
-			HTMLPart:       htmlPart,
-		})
-		if err != nil {
-			log.Error().Err(err).Msg("error while sending email")
+		if inspectionDelaisExpires.InspectionId != previousInspectionId || inspectionDelaisExpires.Destinataire.Email != previousRecipientEmail {
+			err = s.emailService.Send(emails.Email{
+				Subject:        "Fil'Harmonic : Expiration des délais",
+				RecipientEmail: inspectionDelaisExpires.Destinataire.Email,
+				RecipientName:  inspectionDelaisExpires.Destinataire.Nom,
+				TextPart:       "",
+				HTMLPart:       htmlPart,
+			})
+			if err != nil {
+				log.Error().Err(err).Msg("error while sending email")
+			}
+			previousInspectionId = inspectionDelaisExpires.InspectionId
+			previousRecipientEmail = inspectionDelaisExpires.Destinataire.Email
 		}
+		constatsIds = append(constatsIds, inspectionDelaisExpires.ConstatId)
 	}
-	return nil
+	err = s.repo.UpdateNotificationEcheanceExpireeEnvoyee(constatsIds)
+	return err
 }
 
 type InspectionEcheancesProches struct {
@@ -150,6 +159,6 @@ func (s *Service) SendEmailsRappelEcheances() error {
 		}
 		constatsIds = append(constatsIds, inspectionEcheancesProches.ConstatId)
 	}
-	err = s.repo.UpdateRappelsEcheancesEnvoyes(constatsIds)
+	err = s.repo.UpdateNotificationRappelEcheanceEnvoyee(constatsIds)
 	return err
 }

@@ -63,7 +63,8 @@ type Repository interface {
 	DeleteConstat(ctx *UserContext, idPointDeControle int64) error
 	ResolveConstat(ctx *UserContext, idPointDeControle int64) error
 	GetTypeConstatByPointDeControleID(idPointDeControle int64) (models.TypeConstat, error)
-	UpdateRappelsEcheancesEnvoyes(constatsIds []int64) error
+	UpdateNotificationRappelEcheanceEnvoyee(constatsIds []int64) error
+	UpdateNotificationEcheanceExpireeEnvoyee(constatsIds []int64) error
 
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByID(id int64) (*models.User, error)
