@@ -2,7 +2,7 @@
 
   <p>Bonjour {{ .Destinataire.Nom }},</p>
 
-  <p>L'inspection du {{ .DateInspection }} sur votre établissement {{ .RaisonEtablissement }} a été validée.
+  <p>Votre inspection du {{ .DateInspection }} sur l'établissement {{ .RaisonEtablissement }} sis {{ .AdresseEtablissement }} a été validée.
     Vous pouvez consulter le rapport final sur <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}">Fil'Harmonic</a>.</p>
 
   {{ if .NonConformites }}

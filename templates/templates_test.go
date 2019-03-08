@@ -68,14 +68,16 @@ func TestRenderEmailRecapValidation(t *testing.T) {
 			Email: "test@localhost",
 			Nom:   "Michel Exploitant1",
 		},
-		InspectionId:        3,
-		NonConformites:      true,
-		DateInspection:      "01/01/2019",
-		RaisonEtablissement: "Etablissement 1",
+		InspectionId:         3,
+		NonConformites:       true,
+		DateInspection:       "01/01/2019",
+		RaisonEtablissement:  "Etablissement 1",
+		AdresseEtablissement: "1 rue des Fleurs 75000 Paris",
 	}
 
 	htmlPart, err := service.RenderHTMLEmailRecapValidation(data)
 	assert.NoError(err)
+	assert.Contains(htmlPart, data.AdresseEtablissement)
 	assert.Contains(htmlPart, "échéances de résolution")
 	assert.NoError(ioutil.WriteFile("../.tmp/email-recap-validation.html", []byte(htmlPart), 0644))
 }
@@ -88,14 +90,16 @@ func TestRenderHTMLEmailExpirationDelais(t *testing.T) {
 			Email: "test@localhost",
 			Nom:   "Michel Exploitant1",
 		},
-		InspectionId:        3,
-		DateInspection:      "01/01/2019",
-		RaisonEtablissement: "Etablissement 1",
+		InspectionId:         3,
+		DateInspection:       "01/01/2019",
+		RaisonEtablissement:  "Etablissement 1",
+		AdresseEtablissement: "1 rue des Fleurs 75000 Paris",
 	}
 
 	htmlPart, err := service.RenderHTMLEmailExpirationDelais(data)
 	assert.NoError(err)
-	assert.Contains(htmlPart, "délais expirés")
+	assert.Contains(htmlPart, "lever vos non-conformités")
+	assert.Contains(htmlPart, data.AdresseEtablissement)
 	assert.NoError(ioutil.WriteFile("../.tmp/email-expiration-delais.html", []byte(htmlPart), 0644))
 }
 
@@ -107,14 +111,16 @@ func TestRenderHTMLEmailRappelEcheances(t *testing.T) {
 			Email: "test@localhost",
 			Nom:   "Michel Exploitant1",
 		},
-		InspectionId:        3,
-		DateInspection:      "01/01/2019",
-		RaisonEtablissement: "Etablissement 1",
+		InspectionId:         3,
+		DateInspection:       "01/01/2019",
+		RaisonEtablissement:  "Etablissement 1",
+		AdresseEtablissement: "1 rue des Fleurs 75000 Paris",
 	}
 
 	htmlPart, err := service.RenderHTMLEmailRappelEcheances(data)
 	assert.NoError(err)
 	assert.Contains(htmlPart, "échéances de résolution sont proches")
+	assert.Contains(htmlPart, data.AdresseEtablissement)
 	assert.NoError(ioutil.WriteFile("../.tmp/email-rappel-echeances.html", []byte(htmlPart), 0644))
 }
 

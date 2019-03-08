@@ -2,7 +2,8 @@
 
   <p>Bonjour {{ .Destinataire.Nom }},</p>
 
-  <p>L'inspection du {{ .DateInspection }} sur l'établissement {{ .RaisonEtablissement }} en cours de traitement des non-conformités a des délais expirés.
-    Vous pouvez consulter le détail sur <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}">Fil'Harmonic</a>.</p>
+  <p>Des délais de mise en conformités relatifs à l'inspection du {{ .DateInspection }} sur votre établissement {{ .RaisonEtablissement }} sis {{ .AdresseEtablissement }} sont expirés.</p>
+  <p>Vous devez rapidement lever vos non-conformités et informer votre inspecteur de l'état d'avancement de vos actions correctives.</p>
+  <p>Vous pouvez consulter le détail sur <a href="{{ $.BaseURL }}/inspections/{{ .InspectionId }}">Fil'Harmonic</a>.</p>
 
 {{ end }}

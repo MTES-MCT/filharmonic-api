@@ -49,11 +49,12 @@ func (s *Service) SendEmailsNouveauxMessages() error {
 }
 
 type RecapValidationInspection struct {
-	Destinataire        models.User
-	InspectionId        int64  `json:"inspection_id"`
-	DateInspection      string `json:"date_inspection"`
-	RaisonEtablissement string `json:"raison_etablissement"`
-	NonConformites      bool   `json:"non_conformites"`
+	Destinataire         models.User
+	InspectionId         int64  `json:"inspection_id"`
+	DateInspection       string `json:"date_inspection"`
+	RaisonEtablissement  string `json:"raison_etablissement"`
+	AdresseEtablissement string `json:"adresse_etablissement"`
+	NonConformites       bool   `json:"non_conformites"`
 }
 
 func (s *Service) SendEmailsRecapValidation(idInspection int64) error {
@@ -83,11 +84,12 @@ func (s *Service) SendEmailsRecapValidation(idInspection int64) error {
 }
 
 type InspectionExpirationDelais struct {
-	Destinataire        models.User
-	InspectionId        int64  `json:"inspection_id"`
-	ConstatId           int64  `json:"constat_id"`
-	DateInspection      string `json:"date_inspection"`
-	RaisonEtablissement string `json:"raison_etablissement"`
+	Destinataire         models.User
+	InspectionId         int64  `json:"inspection_id"`
+	ConstatId            int64  `json:"constat_id"`
+	DateInspection       string `json:"date_inspection"`
+	RaisonEtablissement  string `json:"raison_etablissement"`
+	AdresseEtablissement string `json:"adresse_etablissement"`
 }
 
 func (s *Service) SendEmailsExpirationDelais() error {
@@ -124,11 +126,12 @@ func (s *Service) SendEmailsExpirationDelais() error {
 }
 
 type InspectionEcheancesProches struct {
-	Destinataire        models.User
-	InspectionId        int64  `json:"inspection_id"`
-	ConstatId           int64  `json:"constat_id"`
-	DateInspection      string `json:"date_inspection"`
-	RaisonEtablissement string `json:"raison_etablissement"`
+	Destinataire         models.User
+	InspectionId         int64  `json:"inspection_id"`
+	ConstatId            int64  `json:"constat_id"`
+	DateInspection       string `json:"date_inspection"`
+	RaisonEtablissement  string `json:"raison_etablissement"`
+	AdresseEtablissement string `json:"adresse_etablissement"`
 }
 
 func (s *Service) SendEmailsRappelEcheances() error {

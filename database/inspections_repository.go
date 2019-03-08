@@ -312,7 +312,8 @@ func (repo *Repository) GetRecapsValidation(idInspection int64) ([]domain.RecapV
 		inspection.date as date_inspection,
 		inspection.etat = ? as non_conformites,
 		etablissement.raison as raison_etablissement,
-		users.prenom || ' ' || users.nom as destinataire__nom,
+		concat(etablissement.adresse1, ' ', etablissement.adresse2, ' ', etablissement.code_postal, ' ', etablissement.commune) as adresse_etablissement,
+		concat(users.prenom, ' ', users.nom) as destinataire__nom,
 		users.email as destinataire__email
 	from inspections as inspection
 	join etablissements as etablissement
@@ -336,7 +337,8 @@ func (repo *Repository) ListInspectionsExpirationDelais() ([]domain.InspectionEx
 		constat.id as constat_id,
 		inspection.date as date_inspection,
 		etablissement.raison as raison_etablissement,
-		users.prenom || ' ' || users.nom as destinataire__nom,
+		concat(etablissement.adresse1, ' ', etablissement.adresse2, ' ', etablissement.code_postal, ' ', etablissement.commune) as adresse_etablissement,
+		concat(users.prenom, ' ', users.nom) as destinataire__nom,
 		users.email as destinataire__email
 	from inspections as inspection
 	join etablissements as etablissement
@@ -368,7 +370,8 @@ func (repo *Repository) ListInspectionsEcheancesProches(seuilRappelEcheances flo
 		constat.id as constat_id,
 		inspection.date as date_inspection,
 		etablissement.raison as raison_etablissement,
-		users.prenom || ' ' || users.nom as destinataire__nom,
+		concat(etablissement.adresse1, ' ', etablissement.adresse2, ' ', etablissement.code_postal, ' ', etablissement.commune) as adresse_etablissement,
+		concat(users.prenom, ' ', users.nom) as destinataire__nom,
 		users.email as destinataire__email
 	from inspections as inspection
 	join etablissements as etablissement
