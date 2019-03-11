@@ -42,6 +42,17 @@ func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.L
 		WHERE p.inspection_id = inspection.id
 		AND p.publie IS TRUE
 		) AS nb_messages_non_lus`, pg.In(getDestinataires(ctx))).
+		ColumnExpr(`(
+		SELECT count(c.id)
+		FROM point_de_controles AS p
+		JOIN constats AS c
+			ON c.id = p.constat_id
+			AND c.type <> ?
+			AND c.date_resolution IS NULL
+		WHERE p.inspection_id = inspection.id
+			AND p.publie IS TRUE
+			AND inspection.etat = ?
+		) AS nb_non_conformites_a_resoudre`, models.TypeConstatConforme, models.EtatTraitementNonConformites).
 		Order("inspection.id ASC")
 
 	err := query.Select(&inspections)
