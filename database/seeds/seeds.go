@@ -215,6 +215,45 @@ func SeedsTestDB(db *pg.DB) error {
 		return err
 	}
 
+	canevas := []interface{}{
+		&models.Canevas{
+			// Id:   1,
+			Nom:      "test",
+			AuteurId: 3,
+			Data: models.CanevasData{
+				PointsDeControle: []models.CanevasPointDeControle{
+					models.CanevasPointDeControle{
+						Sujet: "COV",
+						ReferencesReglementaires: []string{
+							"Article 5 du 01/02/1995",
+						},
+					},
+					models.CanevasPointDeControle{
+						Sujet: "Rejets dans l'air",
+						ReferencesReglementaires: []string{
+							"Article 1 du 01/02/2003",
+							"Article 2 du 01/02/2002",
+						},
+						Message: "Donnez-moi le document sur l'air.",
+					},
+					models.CanevasPointDeControle{
+						Sujet: "Rejets dans l'eau",
+						ReferencesReglementaires: []string{
+							"Article 13 du 01/02/2006",
+						},
+						Message: "Donnez-moi le document sur l'eau.",
+					},
+				},
+			},
+			DataVersion: 1,
+			CreatedAt:   util.DateTime("2019-03-11T08:30:45"),
+		},
+	}
+	err = db.Insert(canevas...)
+	if err != nil {
+		return err
+	}
+
 	inspections := []interface{}{
 		&models.Inspection{ // (non cohérent) en cours, avec suite, 1 point de contrôle publié avec constat, 1 point de contrôle non publié
 			// Id:   1,

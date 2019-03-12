@@ -38,9 +38,20 @@ func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspectio
 	if !ok {
 		return 0, ErrInvalidInput
 	}
+
 	inspectionId, err := s.repo.CreateInspection(ctx, inspection)
 	if err != nil {
 		return 0, err
+	}
+	if inspection.CanevasId > 0 {
+		canevas, err := s.repo.GetCanevasByID(inspection.CanevasId)
+		if err != nil {
+			return 0, err
+		}
+		err = s.repo.ImportCanevas(ctx, inspectionId, *canevas)
+		if err != nil {
+			return 0, err
+		}
 	}
 	return inspectionId, s.addMissingThemes(inspection.Themes)
 }

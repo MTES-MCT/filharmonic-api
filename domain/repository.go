@@ -17,6 +17,11 @@ type Repository interface {
 	CreateTheme(theme models.Theme) (int64, error)
 	DeleteTheme(idTheme int64) error
 
+	ListCanevas() ([]models.Canevas, error)
+	GetCanevasByID(id int64) (*models.Canevas, error)
+	CreateCanevas(ctx *UserContext, idInspection int64, canevas models.Canevas) (int64, error)
+	DeleteCanevas(idCanevas int64) error
+
 	ListInspections(ctx *UserContext, filter ListInspectionsFilter) ([]models.Inspection, error)
 	ListInspectionsFavorites(ctx *UserContext) ([]models.Inspection, error)
 	ListInspectionsExpirationDelais() ([]InspectionExpirationDelais, error)
@@ -24,6 +29,7 @@ type Repository interface {
 	CreateInspection(ctx *UserContext, inspection models.Inspection) (int64, error)
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64, filter InspectionFilter) (*models.Inspection, error)
+	ImportCanevas(ctx *UserContext, inspectionId int64, canevas models.Canevas) error
 	CheckEtatInspection(idInspection int64, etats []models.EtatInspection) (bool, error)
 	GetEtatInspectionByPointDeControleID(idPointDeControle int64) (models.EtatInspection, error)
 	CheckInspectionHasNonConformites(idInspection int64) (bool, error)

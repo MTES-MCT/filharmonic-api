@@ -68,8 +68,9 @@ type Inspection struct {
 	Evenements       []Evenement       `json:"evenements,omitempty"`
 	Rapport          *Rapport          `json:"rapport,omitempty"`
 
-	NbMessagesNonLus          int `json:"nb_messages_non_lus" sql:"-"`
-	NbNonConformitesAResoudre int `json:"nb_non_conformites_a_resoudre" sql:"-"`
+	NbMessagesNonLus          int   `json:"nb_messages_non_lus" sql:"-"`
+	NbNonConformitesAResoudre int   `json:"nb_non_conformites_a_resoudre" sql:"-"`
+	CanevasId                 int64 `json:"canevas_id" sql:"-"`
 }
 
 type InspectionToInspecteur struct {

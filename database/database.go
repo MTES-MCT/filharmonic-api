@@ -47,6 +47,7 @@ var tables = []interface{}{
 	&models.UserToFavori{},
 	&models.Evenement{},
 	&models.Notification{},
+	&models.Canevas{},
 }
 
 const createIndexesQuery = `CREATE EXTENSION pg_trgm;
@@ -63,6 +64,11 @@ CREATE INDEX idx_inspections_etat ON inspections(etat);
 CREATE INDEX idx_point_de_controles_publie ON point_de_controles(publie);
 CREATE INDEX idx_messages_interne ON messages(interne);
 CREATE INDEX idx_messages_lu ON messages(lu);
+
+CREATE EXTENSION unaccent;
+`
+const dropIndexesQuery = `DROP EXTENSION IF EXISTS pg_trgm cascade;
+DROP EXTENSION IF EXISTS unaccent;
 `
 
 func New(config Config) (*Database, error) {
@@ -93,7 +99,7 @@ func New(config Config) (*Database, error) {
 		if err != nil {
 			return nil, err
 		}
-		// Création des indexes cf migration 21_add_indexes_etablissements
+		// Création des indexes
 		_, err = db.client.Exec(createIndexesQuery)
 	} else if config.ApplyMigrations {
 		err = migrations.MigrateDB(client)
@@ -109,7 +115,7 @@ func New(config Config) (*Database, error) {
 }
 
 func (d *Database) createSchema() error {
-	_, err := d.client.Exec("drop extension if exists pg_trgm cascade")
+	_, err := d.client.Exec(dropIndexesQuery)
 	if err != nil {
 		return err
 	}

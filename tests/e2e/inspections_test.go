@@ -154,7 +154,7 @@ func TestGetInspectionAsExploitantAllowed(t *testing.T) {
 	inspection.NotContainsKey("commentaires")
 }
 
-func TestCreateInspection(t *testing.T) {
+func TestCreateInspectionWithoutCanevas(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()
 
@@ -204,6 +204,169 @@ func TestCreateInspection(t *testing.T) {
 		JSON().Array()
 	themes.Length().Equal(7)
 	themes.Last().Object().ValueEqual("nom", "Santé")
+}
+
+func TestCreateInspectionWithCanevas(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	inspectionInput := models.Inspection{
+		Date:            util.Date("2019-01-22"),
+		Type:            models.TypeCourant,
+		Annonce:         true,
+		Origine:         models.OriginePlanControle,
+		EtablissementId: 1,
+		Inspecteurs: []models.User{
+			models.User{
+				Id: 3,
+			},
+			models.User{
+				Id: 4,
+			},
+		},
+		Themes: []string{
+			"Incendie",
+			"Produits chimiques",
+			"Santé",
+		},
+		Contexte:  "Contrôles de début d'année",
+		CanevasId: 1,
+	}
+
+	inspectionId := tests.AuthInspecteur(e.POST("/inspections")).WithJSON(inspectionInput).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().Value("id").Raw()
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", inspectionId).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	inspection.ValueEqual("id", inspectionId)
+	inspection.ValueEqual("etat", models.EtatPreparation)
+	inspecteurs := inspection.Value("inspecteurs").Array()
+	inspecteurs.Length().Equal(2)
+	inspecteurs.First().Object().ValueEqual("id", 3)
+	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
+	inspecteurs.Last().Object().ValueEqual("id", 4)
+	inspecteurs.Last().Object().ValueEqual("email", "inspecteur2@filharmonic.com")
+
+	pointsDeControle := inspection.Value("points_de_controle").Array()
+	pointsDeControle.Length().Equal(3)
+
+	pointDeControle := pointsDeControle.First().Object()
+	pointDeControle.ValueEqual("sujet", "COV")
+	pointDeControle.Value("references_reglementaires").Array().Equal([]string{"Article 5 du 01/02/1995"})
+	pointDeControle.NotContainsKey("messages")
+
+	pointDeControle = pointsDeControle.Element(1).Object()
+	pointDeControle.ValueEqual("sujet", "Rejets dans l'air")
+	pointDeControle.Value("references_reglementaires").Array().Equal([]string{
+		"Article 1 du 01/02/2003",
+		"Article 2 du 01/02/2002",
+	})
+	messages := pointDeControle.Value("messages").Array()
+	messages.Length().Equal(1)
+	firstMessage := messages.First().Object()
+	firstMessage.ValueEqual("message", "Donnez-moi le document sur l'air.")
+	firstMessage.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
+
+	pointDeControle = pointsDeControle.Last().Object()
+	pointDeControle.ValueEqual("sujet", "Rejets dans l'eau")
+	pointDeControle.Value("references_reglementaires").Array().Contains("Article 13 du 01/02/2006")
+	messages = pointDeControle.Value("messages").Array()
+	messages.Length().Equal(1)
+	firstMessage = messages.First().Object()
+	firstMessage.ValueEqual("message", "Donnez-moi le document sur l'eau.")
+	firstMessage.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
+}
+
+func TestCreateCanevasFromInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	canevasInput := models.Canevas{
+		Nom: "zest",
+	}
+
+	canevasId := tests.AuthInspecteur(e.POST("/inspections/{id}/canevas")).
+		WithPath("id", 1).
+		WithJSON(canevasInput).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().Value("id").Raw()
+
+	canevasArray := tests.AuthInspecteur(e.GET("/canevas")).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+	canevasArray.Length().Equal(2)
+	lastCanevas := canevasArray.Last().Object()
+	lastCanevas.ValueEqual("id", canevasId)
+	lastCanevas.ValueEqual("nom", canevasInput.Nom)
+
+	pointsDeControle := lastCanevas.Value("data").Object().Value("points_de_controle").Array()
+	pointsDeControle.Length().Equal(2)
+
+	pointDeControle := pointsDeControle.First().Object()
+	pointDeControle.ValueEqual("sujet", "Autosurveillance des émissions canalisées de COV")
+	pointDeControle.Value("references_reglementaires").Array().Equal([]string{
+		"Article 8.2.1.1. de l'arrêté préfectoral du 28 juin 2017",
+	})
+	pointDeControle.ValueEqual("message", "Merci de me fournir le document.")
+
+	pointDeControle = pointsDeControle.Last().Object()
+	pointDeControle.ValueEqual("sujet", "Mesure des émissions atmosphériques canalisées par un organisme extérieur")
+	pointDeControle.Value("references_reglementaires").Array().Equal([]string{
+		"Article 3.2.3. de l'arrêté préfectoral du 28 juin 2017",
+		"Article 3.2.8. de l'arrêté préfectoral du 28 juin 2017",
+		"Article 8.2.1.2. de l'arrêté préfectoral du 28 juin 2017",
+	})
+	pointDeControle.ValueEqual("message", "Auriez-vous l'obligeance de me fournir le document approprié ?")
+}
+
+func TestUpdateCanevas(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	canevasInput := models.Canevas{
+		Nom: "test",
+	}
+
+	canevasId := tests.AuthInspecteur(e.POST("/inspections/{id}/canevas")).
+		WithPath("id", 1).
+		WithJSON(canevasInput).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().Value("id").Raw()
+
+	canevasArray := tests.AuthInspecteur(e.GET("/canevas")).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Array()
+	canevasArray.Length().Equal(1)
+	lastCanevas := canevasArray.Last().Object()
+	lastCanevas.ValueEqual("id", canevasId)
+	lastCanevas.ValueEqual("nom", canevasInput.Nom)
+
+	pointsDeControle := lastCanevas.Value("data").Object().Value("points_de_controle").Array()
+	pointsDeControle.Length().Equal(2)
+
+	pointDeControle := pointsDeControle.First().Object()
+	pointDeControle.ValueEqual("sujet", "Autosurveillance des émissions canalisées de COV")
+	pointDeControle.Value("references_reglementaires").Array().Equal([]string{
+		"Article 8.2.1.1. de l'arrêté préfectoral du 28 juin 2017",
+	})
+	pointDeControle.ValueEqual("message", "Merci de me fournir le document.")
+
+	pointDeControle = pointsDeControle.Last().Object()
+	pointDeControle.ValueEqual("sujet", "Mesure des émissions atmosphériques canalisées par un organisme extérieur")
+	pointDeControle.Value("references_reglementaires").Array().Equal([]string{
+		"Article 3.2.3. de l'arrêté préfectoral du 28 juin 2017",
+		"Article 3.2.8. de l'arrêté préfectoral du 28 juin 2017",
+		"Article 8.2.1.2. de l'arrêté préfectoral du 28 juin 2017",
+	})
+	pointDeControle.ValueEqual("message", "Auriez-vous l'obligeance de me fournir le document approprié ?")
 }
 
 func TestUpdateInspection(t *testing.T) {
