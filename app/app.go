@@ -12,6 +12,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/emails"
+	"github.com/MTES-MCT/filharmonic-api/events"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
 	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/MTES-MCT/filharmonic-api/templates"
@@ -24,6 +25,7 @@ type Application struct {
 	Config                Config
 	DB                    *database.Database
 	Repo                  *database.Repository
+	EventsManager         *events.EventsManager
 	EmailService          domain.EmailService
 	Cron                  *cron.CronManager
 	Sso                   authentication.Sso
@@ -61,8 +63,9 @@ func (a *Application) BootstrapDB() error {
 		return err
 	}
 	a.DB = db
+	a.EventsManager = events.New()
 
-	a.Repo = database.NewRepository(a.Config.Repository, db)
+	a.Repo = database.NewRepository(a.Config.Repository, db, a.EventsManager)
 	return nil
 }
 
@@ -101,7 +104,7 @@ func (a *Application) BootstrapServer() error {
 	if err != nil {
 		return err
 	}
-	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService)
+	a.Server = httpserver.New(a.Config.Http, a.Service, a.AuthenticationService, a.EventsManager)
 	return a.Server.Start()
 }
 

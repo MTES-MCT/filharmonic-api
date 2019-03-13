@@ -145,6 +145,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:7b5c6e2eeaa9ae5907c391a91c132abfd5c9e8a784a341b5625e750c67e6825d"
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
+  version = "v1.4.0"
+
+[[projects]]
   digest = "1:a3ce4de79566c21e93cb6934797fdaa587ad3fc6a964708ab77babe54ea67188"
   name = "github.com/imkira/go-interpol"
   packages = ["."]
@@ -270,6 +278,14 @@
   pruneopts = "UT"
   revision = "9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d"
   version = "v1.0.0"
+
+[[projects]]
+  digest = "1:0a7a9cf66246acda7703a89c6ccbd68aefdba2eea775e7368c92879c24f1c606"
+  name = "github.com/olahol/melody"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d521390733761fe1db13de575c253afd5c743085"
+  version = "v1"
 
 [[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
@@ -532,6 +548,7 @@
     "github.com/kelseyhightower/envconfig",
     "github.com/mailjet/mailjet-apiv3-go",
     "github.com/minio/minio-go",
+    "github.com/olahol/melody",
     "github.com/pkg/errors",
     "github.com/robfig/cron",
     "github.com/rs/zerolog",

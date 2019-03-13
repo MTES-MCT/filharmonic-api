@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/authentication"
-	"github.com/gin-contrib/logger"
-	"github.com/rs/zerolog/log"
-
 	"github.com/MTES-MCT/filharmonic-api/domain"
+	"github.com/MTES-MCT/filharmonic-api/events"
+	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
@@ -24,14 +24,16 @@ type HttpServer struct {
 	config                Config
 	service               *domain.Service
 	authenticationService *authentication.AuthenticationService
+	eventsManager         *events.EventsManager
 	server                *http.Server
 }
 
-func New(config Config, service *domain.Service, authenticationService *authentication.AuthenticationService) *HttpServer {
+func New(config Config, service *domain.Service, authenticationService *authentication.AuthenticationService, eventsManager *events.EventsManager) *HttpServer {
 	return &HttpServer{
 		config:                config,
 		service:               service,
 		authenticationService: authenticationService,
+		eventsManager:         eventsManager,
 	}
 }
 
@@ -48,6 +50,13 @@ func (s *HttpServer) Start() (returnErr error) {
 	})
 	router.POST("/login", returnResult(s.login))
 	router.POST("/authenticate", returnResult(s.authenticate))
+
+	router.GET("/ws", func(c *gin.Context) {
+		err := s.eventsManager.HandleRequest(c.Writer, c.Request)
+		if err != nil {
+			handleError(c, err)
+		}
+	})
 
 	authorized := router.Group("/")
 	authorized.Use(s.authRequired)

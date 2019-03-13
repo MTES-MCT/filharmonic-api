@@ -81,10 +81,20 @@ func (repo *Repository) createNotifications(tx *pg.Tx, ctx *domain.UserContext, 
 			addNotification(approbateur.Id)
 		}
 	}
-	if len(notifications) > 0 {
-		return tx.Insert(&notifications)
+	if len(notifications) == 0 {
+		return nil
 	}
-	return nil
+	err := tx.Insert(&notifications)
+	if err != nil {
+		return err
+	}
+
+	destinatairesId := []int64{}
+	for _, notification := range notifications {
+		destinatairesId = append(destinatairesId, notification.DestinataireId)
+	}
+	err = repo.eventsManager.DispatchUpdatedNotifications(destinatairesId)
+	return err
 }
 
 func (repo *Repository) LireNotifications(ctx *domain.UserContext, ids []int64) error {

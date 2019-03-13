@@ -22,6 +22,10 @@ func (repo *Repository) CreateEvenementTx(tx *pg.Tx, ctx *domain.UserContext, ty
 	}
 
 	err = repo.createNotifications(tx, ctx, evenement)
+	if err != nil {
+		return err
+	}
+	err = repo.eventsManager.DispatchUpdatedResource(ctx, "inspection", idInspection)
 	return err
 }
 
