@@ -24,11 +24,11 @@ type HttpServer struct {
 	config                Config
 	service               *domain.Service
 	authenticationService *authentication.AuthenticationService
-	eventsManager         *events.EventsManager
+	eventsManager         events.EventsManager
 	server                *http.Server
 }
 
-func New(config Config, service *domain.Service, authenticationService *authentication.AuthenticationService, eventsManager *events.EventsManager) *HttpServer {
+func New(config Config, service *domain.Service, authenticationService *authentication.AuthenticationService, eventsManager events.EventsManager) *HttpServer {
 	return &HttpServer{
 		config:                config,
 		service:               service,

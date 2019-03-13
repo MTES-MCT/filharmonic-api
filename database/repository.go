@@ -9,10 +9,10 @@ type RepositoryConfig struct {
 type Repository struct {
 	config        RepositoryConfig
 	db            *Database
-	eventsManager *events.EventsManager
+	eventsManager events.EventsManager
 }
 
-func NewRepository(config RepositoryConfig, db *Database, eventsManager *events.EventsManager) *Repository {
+func NewRepository(config RepositoryConfig, db *Database, eventsManager events.EventsManager) *Repository {
 	return &Repository{
 		config:        config,
 		db:            db,

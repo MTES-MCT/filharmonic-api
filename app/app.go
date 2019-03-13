@@ -14,6 +14,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/emails"
 	"github.com/MTES-MCT/filharmonic-api/events"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
+	"github.com/MTES-MCT/filharmonic-api/redis"
 	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/MTES-MCT/filharmonic-api/templates"
 	"github.com/pkg/errors"
@@ -24,8 +25,9 @@ import (
 type Application struct {
 	Config                Config
 	DB                    *database.Database
+	Redis                 *redis.Client
 	Repo                  *database.Repository
-	EventsManager         *events.EventsManager
+	EventsManager         events.EventsManager
 	EmailService          domain.EmailService
 	Cron                  *cron.CronManager
 	Sso                   authentication.Sso
@@ -63,7 +65,16 @@ func (a *Application) BootstrapDB() error {
 		return err
 	}
 	a.DB = db
-	a.EventsManager = events.New()
+
+	if a.Config.Mode == ModeTest {
+		a.EventsManager = events.NewStub()
+	} else {
+		a.Redis, err = redis.New(a.Config.Redis)
+		if err != nil {
+			return err
+		}
+		a.EventsManager = events.New(a.Config.Events, a.Redis)
+	}
 
 	a.Repo = database.NewRepository(a.Config.Repository, db, a.EventsManager)
 	return nil
@@ -77,21 +88,13 @@ func (a *Application) BootstrapServer() error {
 	a.Storage = storage
 	if a.Config.Mode == ModeDev {
 		a.Sso = stubsso.New(a.Repo)
-		redisSessions, err2 := sessions.NewRedis(a.Config.Redis)
-		if err2 != nil {
-			return err2
-		}
-		a.Sessions = redisSessions
+		a.Sessions = sessions.NewRedis(a.Config.Sessions, a.Redis)
 	} else if a.Config.Mode == ModeTest {
 		a.Sso = stubsso.New(a.Repo)
 		a.Sessions = sessions.NewMemory()
 	} else {
 		a.Sso = cerbere.New(a.Config.Sso)
-		redisSessions, err2 := sessions.NewRedis(a.Config.Redis)
-		if err2 != nil {
-			return err2
-		}
-		a.Sessions = redisSessions
+		a.Sessions = sessions.NewRedis(a.Config.Sessions, a.Redis)
 	}
 	a.EmailService = emails.New(a.Config.Emails)
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)

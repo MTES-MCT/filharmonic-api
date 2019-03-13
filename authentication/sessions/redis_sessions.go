@@ -3,47 +3,33 @@ package sessions
 import (
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/MTES-MCT/filharmonic-api/redis"
+	goredis "github.com/go-redis/redis"
 	"github.com/gofrs/uuid"
-	"github.com/rs/zerolog/log"
 )
 
 const Prefix = "filharmonic:sessions:"
 
-type RedisConfig struct {
-	Addr       string        `json:"addr" default:"localhost:6379"`
-	Password   string        `json:"password" default:"filharmonic"`
-	Database   int           `json:"database" default:"0"`
+type Config struct {
 	Expiration time.Duration `json:"expiration" default:"604800s"` // 7 days
 }
 
 type RedisSessions struct {
-	config RedisConfig
+	config Config
 	client *redis.Client
 }
 
-func NewRedis(config RedisConfig) (*RedisSessions, error) {
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:     config.Addr,
-		Password: config.Password,
-		DB:       config.Database,
-	})
-	log.Info().Msgf("connecting to redis endpoint on %s", config.Addr)
-	err := redisClient.Ping().Err()
-	if err != nil {
-		return nil, err
-	}
-	log.Info().Msgf("connected to redis")
+func NewRedis(config Config, redisClient *redis.Client) *RedisSessions {
 	return &RedisSessions{
 		config: config,
 		client: redisClient,
-	}, nil
+	}
 }
 
 func (redisSessions *RedisSessions) Get(sessionToken string) (int64, error) {
 	id, err := redisSessions.client.Get(Prefix + sessionToken).Int64()
 	if err != nil {
-		if err == redis.Nil {
+		if err == goredis.Nil {
 			return int64(0), nil
 		}
 		return int64(0), err

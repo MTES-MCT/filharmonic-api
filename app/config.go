@@ -7,7 +7,9 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/emails"
+	"github.com/MTES-MCT/filharmonic-api/events"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
+	"github.com/MTES-MCT/filharmonic-api/redis"
 	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/MTES-MCT/filharmonic-api/templates"
 	"github.com/kelseyhightower/envconfig"
@@ -29,7 +31,9 @@ type Config struct {
 	Cron       cron.Config
 	Http       httpserver.Config
 	Sso        authentication.SsoConfig
-	Redis      sessions.RedisConfig
+	Sessions   sessions.Config
+	Redis      redis.Config
+	Events     events.Config
 	Service    domain.Config
 	Storage    storage.Config
 	Templates  templates.Config
