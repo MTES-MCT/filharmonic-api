@@ -66,3 +66,31 @@ func TestResoudreConstat(t *testing.T) {
 	constatOutput := lastPointDeControle.Value("constat").Object()
 	constatOutput.ValueNotEqual("date_resolution", "")
 }
+
+func TestUpdateConstat(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	constatInput := models.Constat{
+		Remarques:   "test",
+		DelaiNombre: 2,
+		DelaiUnite:  "mois",
+		Type:        models.TypeConstatNonConforme,
+	}
+
+	tests.AuthInspecteur(e.PUT("/pointsdecontrole/{id}/constat")).WithPath("id", 5).WithJSON(constatInput).
+		Expect().
+		Status(http.StatusOK)
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 4).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+
+	lastPointDeControle := inspection.Value("points_de_controle").Array().First().Object()
+	constatOutput := lastPointDeControle.Value("constat").Object()
+	constatOutput.ValueEqual("remarques", constatInput.Remarques)
+	constatOutput.ValueEqual("delai_nombre", constatInput.DelaiNombre)
+	constatOutput.ValueEqual("delai_unite", constatInput.DelaiUnite)
+	constatOutput.ValueEqual("type", constatInput.Type)
+}

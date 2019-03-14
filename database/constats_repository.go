@@ -39,6 +39,33 @@ func (repo *Repository) CreateConstat(ctx *domain.UserContext, idPointDeControle
 	return constatId, err
 }
 
+func (repo *Repository) UpdateConstat(ctx *domain.UserContext, idPointDeControle int64, constat models.Constat) error {
+	return repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
+		pointDeControle := models.PointDeControle{
+			Id: idPointDeControle,
+		}
+		err := tx.Model(&pointDeControle).Column("constat_id", "inspection_id").WherePK().Select()
+		if err != nil {
+			return err
+		}
+		constat.Id = pointDeControle.ConstatId
+		columns := []string{"type", "remarques", "delai_nombre", "delai_unite"}
+		if constat.Type == models.TypeConstatConforme {
+			constat.DelaiNombre = 0
+			constat.DelaiUnite = ""
+		}
+		_, err = tx.Model(&constat).Column(columns...).WherePK().Update()
+		if err != nil {
+			return err
+		}
+		err = repo.CreateEvenementTx(tx, ctx, models.EvenementModificationConstat, pointDeControle.InspectionId, map[string]interface{}{
+			"constat_id":           constat.Id,
+			"point_de_controle_id": idPointDeControle,
+		})
+		return err
+	})
+}
+
 func (repo *Repository) DeleteConstat(ctx *domain.UserContext, idPointDeControle int64) error {
 	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
 		pointDeControle := models.PointDeControle{
@@ -85,7 +112,7 @@ func (repo *Repository) CanCreateConstat(ctx *domain.UserContext, idPointDeContr
 	return nil
 }
 
-func (repo *Repository) CanDeleteConstat(ctx *domain.UserContext, idPointDeControle int64) error {
+func (repo *Repository) CanDeleteOrUpdateConstat(ctx *domain.UserContext, idPointDeControle int64) error {
 	count, err := repo.db.client.Model(&models.PointDeControle{}).
 		Join("JOIN inspections AS i").
 		JoinOn("i.id = point_de_controle.inspection_id").
@@ -101,7 +128,7 @@ func (repo *Repository) CanDeleteConstat(ctx *domain.UserContext, idPointDeContr
 		return err
 	}
 	if count < 1 {
-		return domain.ErrSuppressionConstatImpossible
+		return domain.ErrSuppressionOuModificationConstatImpossible
 	}
 	return nil
 }

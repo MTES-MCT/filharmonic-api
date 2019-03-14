@@ -93,6 +93,7 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.POST("/inspections/:id/canevas", returnId(s.createCanevas))
 		authorized.PUT("/pointsdecontrole/:id", returnOk(s.updatePointDeControle))
 		authorized.POST("/pointsdecontrole/:id/constat", returnId(s.addConstat))
+		authorized.PUT("/pointsdecontrole/:id/constat", returnOk(s.updateConstat))
 		authorized.POST("/pointsdecontrole/:id/constat/resoudre", returnOk(s.resolveConstat))
 		authorized.DELETE("/pointsdecontrole/:id/constat", returnOk(s.deleteConstat))
 		authorized.POST("/pointsdecontrole/:id/publier", returnOk(s.publishPointDeControle))

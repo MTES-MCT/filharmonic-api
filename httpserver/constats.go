@@ -19,6 +19,18 @@ func (server *HttpServer) addConstat(c *gin.Context) (int64, error) {
 	return server.service.CreateConstat(server.retrieveUserContext(c), idPointDeControle, constat)
 }
 
+func (server *HttpServer) updateConstat(c *gin.Context) error {
+	idPointDeControle, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return badInputError(err)
+	}
+	var constat models.Constat
+	if err = c.ShouldBindJSON(&constat); err != nil {
+		return badInputError(err)
+	}
+	return server.service.UpdateConstat(server.retrieveUserContext(c), idPointDeControle, constat)
+}
+
 func (server *HttpServer) deleteConstat(c *gin.Context) error {
 	idPointDeControle, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

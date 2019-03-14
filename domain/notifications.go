@@ -61,6 +61,9 @@ func init() {
 	NotificationsEvenements[models.EvenementCreationConstat] = func(ctx *UserContext) []string {
 		return []string{"inspecteurs"}
 	}
+	NotificationsEvenements[models.EvenementModificationConstat] = func(ctx *UserContext) []string {
+		return []string{"inspecteurs"}
+	}
 	NotificationsEvenements[models.EvenementSuppressionConstat] = func(ctx *UserContext) []string {
 		return []string{"inspecteurs"}
 	}

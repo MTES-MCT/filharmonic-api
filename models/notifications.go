@@ -21,6 +21,7 @@ const (
 	EvenementSuppressionPointDeControle  TypeEvenement = "suppression_point_de_controle"
 	EvenementPublicationPointDeControle  TypeEvenement = "publication_point_de_controle"
 	EvenementCreationConstat             TypeEvenement = "creation_constat"
+	EvenementModificationConstat         TypeEvenement = "modification_constat"
 	EvenementSuppressionConstat          TypeEvenement = "suppression_constat"
 	EvenementResolutionConstat           TypeEvenement = "resolution_constat"
 	EvenementCreationSuite               TypeEvenement = "creation_suite"
