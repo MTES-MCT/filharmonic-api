@@ -77,7 +77,7 @@ func TestRenderEmailRecapValidation(t *testing.T) {
 
 	htmlPart, err := service.RenderHTMLEmailRecapValidation(data)
 	assert.NoError(err)
-	assert.Contains(htmlPart, data.AdresseEtablissement)
+	assert.Contains(htmlPart, data.RaisonEtablissement)
 	assert.Contains(htmlPart, "échéances de résolution")
 	assert.NoError(ioutil.WriteFile("../.tmp/email-recap-validation.html", []byte(htmlPart), 0644))
 }
