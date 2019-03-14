@@ -2,8 +2,9 @@ version: "3.5"
 
 services:
   db:
-    image: postgres:11.1-alpine
+    image: postgres:11.2-alpine
     restart: unless-stopped
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
     ports:
       - 5432:5432
     environment:
@@ -11,7 +12,7 @@ services:
       POSTGRES_PASS: filharmonic
       POSTGRES_DB: filharmonic
     volumes:
-      - ./tests/docker/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+      - ./tests/docker/postgresql.conf:/etc/postgresql/postgresql.conf
 
   minio:
     image: minio/minio:RELEASE.2019-01-23T23-18-58Z
