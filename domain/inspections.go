@@ -53,7 +53,7 @@ func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspectio
 			return 0, err
 		}
 	}
-	return inspectionId, s.addMissingThemes(inspection.Themes)
+	return inspectionId, nil
 }
 
 type InspectionFilter struct {
@@ -94,10 +94,7 @@ func (s *Service) UpdateInspection(ctx *UserContext, inspection models.Inspectio
 		return ErrInvalidInput
 	}
 	err = s.repo.UpdateInspection(ctx, inspection)
-	if err != nil {
-		return err
-	}
-	return s.addMissingThemes(inspection.Themes)
+	return err
 }
 
 func (s *Service) PublishInspection(ctx *UserContext, idInspection int64) error {

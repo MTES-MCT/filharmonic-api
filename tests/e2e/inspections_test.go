@@ -175,7 +175,6 @@ func TestCreateInspectionWithoutCanevas(t *testing.T) {
 		Themes: []string{
 			"Incendie",
 			"Produits chimiques",
-			"Santé",
 		},
 		Contexte: "Contrôles de début d'année",
 	}
@@ -197,13 +196,6 @@ func TestCreateInspectionWithoutCanevas(t *testing.T) {
 	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	inspecteurs.Last().Object().ValueEqual("id", 4)
 	inspecteurs.Last().Object().ValueEqual("email", "inspecteur2@filharmonic.com")
-
-	themes := tests.AuthInspecteur(e.GET("/themes")).
-		Expect().
-		Status(http.StatusOK).
-		JSON().Array()
-	themes.Length().Equal(7)
-	themes.Last().Object().ValueEqual("nom", "Santé")
 }
 
 func TestCreateInspectionWithCanevas(t *testing.T) {
@@ -390,7 +382,7 @@ func TestUpdateInspection(t *testing.T) {
 		Themes: []string{
 			"Produits chimiques",
 			"Incendie",
-			"Santé",
+			"COV",
 		},
 		Contexte: "Contrôles de début d'année",
 	}
@@ -408,20 +400,13 @@ func TestUpdateInspection(t *testing.T) {
 	inspection.ValueEqual("date", "2019-01-30")
 	themes := inspection.Value("themes").Array()
 	themes.Length().Equal(3)
-	themes.Equal([]string{"Produits chimiques", "Incendie", "Santé"})
+	themes.Equal([]string{"Produits chimiques", "Incendie", "COV"})
 	inspecteurs := inspection.Value("inspecteurs").Array()
 	inspecteurs.Length().Equal(2)
 	inspecteurs.First().Object().ValueEqual("id", 3)
 	inspecteurs.First().Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 	inspecteurs.Last().Object().ValueEqual("id", 5)
 	inspecteurs.Last().Object().ValueEqual("email", "inspecteur3@filharmonic.com")
-
-	allThemes := tests.AuthInspecteur(e.GET("/themes")).
-		Expect().
-		Status(http.StatusOK).
-		JSON().Array()
-	allThemes.Length().Equal(7)
-	allThemes.Last().Object().ValueEqual("nom", "Santé")
 }
 
 func TestGetInspectionAsExploitantPointDeControleNonPublie(t *testing.T) {
