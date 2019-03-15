@@ -63,8 +63,15 @@ func (em *RedisEventsManager) handleMessage(s *melody.Session, msg []byte) {
 	}
 }
 
+func (em *RedisEventsManager) DispatchUpdatedResources(ctx *domain.UserContext, resource string) error {
+	return em.DispatchUpdatedResource(ctx, resource, 0)
+}
+
 func (em *RedisEventsManager) DispatchUpdatedResource(ctx *domain.UserContext, resource string, id int64) error {
-	resourceKey := resource + ":" + strconv.FormatInt(id, 10)
+	resourceKey := resource
+	if id > 0 {
+		resourceKey += ":" + strconv.FormatInt(id, 10)
+	}
 	event := Event{
 		Type: EventResourceUpdated,
 		Payload: Payload{
@@ -72,21 +79,7 @@ func (em *RedisEventsManager) DispatchUpdatedResource(ctx *domain.UserContext, r
 			ResourceId: id,
 		},
 	}
-	eventStr, err := json.Marshal(event)
-	if err != nil {
-		return err
-	}
-	err = em.ws.BroadcastFilter(eventStr, func(s *melody.Session) bool {
-		userIdStr, err := em.redisClient.Get(em.sessionPrefix(s) + "user_id").Result()
-		if err != nil {
-			log.Error().Err(err).Msg("could not get user_id key")
-			return false
-		}
-		userId, err := strconv.ParseInt(userIdStr, 10, 64)
-		if err != nil {
-			log.Error().Err(err).Msg("could not parse user_id")
-			return false
-		}
+	return em.dispatchEvent(event, func(s *melody.Session, userId int64) bool {
 		value, err := em.redisClient.Exists(em.sessionPrefix(s) + resourceKey).Result()
 		if err != nil {
 			log.Error().Err(err).Msg("could not get resource key")
@@ -94,22 +87,35 @@ func (em *RedisEventsManager) DispatchUpdatedResource(ctx *domain.UserContext, r
 		}
 		return value == 1 && userId != ctx.User.Id
 	})
-	return err
 }
 
-func (em *RedisEventsManager) DispatchUpdatedNotifications(ids []int64) error {
+func (em *RedisEventsManager) DispatchUpdatedResourcesToUsers(resources string, userIds []int64) error {
+	if len(userIds) == 0 {
+		return nil
+	}
 	event := Event{
 		Type: EventResourceUpdated,
 		Payload: Payload{
-			Resource: "notifications",
+			Resource: resources,
 		},
 	}
+
+	return em.dispatchEvent(event, func(s *melody.Session, userId int64) bool {
+		for _, id := range userIds {
+			if id == userId {
+				return true
+			}
+		}
+		return false
+	})
+}
+
+func (em *RedisEventsManager) dispatchEvent(event Event, filterFunc func(s *melody.Session, userId int64) bool) error {
 	eventStr, err := json.Marshal(event)
 	if err != nil {
 		return err
 	}
-	err = em.ws.BroadcastFilter(eventStr, func(s *melody.Session) bool {
-
+	return em.ws.BroadcastFilter(eventStr, func(s *melody.Session) bool {
 		userIdStr, err := em.redisClient.Get(em.sessionPrefix(s) + "user_id").Result()
 		if err != nil {
 			log.Error().Err(err).Msg("could not get user_id key")
@@ -120,14 +126,8 @@ func (em *RedisEventsManager) DispatchUpdatedNotifications(ids []int64) error {
 			log.Error().Err(err).Msg("could not parse user_id")
 			return false
 		}
-		for _, id := range ids {
-			if id == userId {
-				return true
-			}
-		}
-		return false
+		return filterFunc(s, userId)
 	})
-	return err
 }
 
 func (em *RedisEventsManager) HandleRequest(w http.ResponseWriter, r *http.Request) error {

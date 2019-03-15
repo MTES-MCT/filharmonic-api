@@ -14,13 +14,13 @@ type Repository interface {
 	GetEtablissementByID(ctx *UserContext, id int64) (*models.Etablissement, error)
 
 	ListThemes() ([]models.Theme, error)
-	CreateTheme(theme models.Theme) (int64, error)
-	DeleteTheme(idTheme int64) error
+	CreateTheme(ctx *UserContext, theme models.Theme) (int64, error)
+	DeleteTheme(ctx *UserContext, idTheme int64) error
 
 	ListCanevas() ([]models.Canevas, error)
 	GetCanevasByID(id int64) (*models.Canevas, error)
 	CreateCanevas(ctx *UserContext, idInspection int64, canevas models.Canevas) (int64, error)
-	DeleteCanevas(idCanevas int64) error
+	DeleteCanevas(ctx *UserContext, idCanevas int64) error
 
 	ListInspections(ctx *UserContext, filter ListInspectionsFilter) ([]models.Inspection, error)
 	ListInspectionsFavorites(ctx *UserContext) ([]models.Inspection, error)

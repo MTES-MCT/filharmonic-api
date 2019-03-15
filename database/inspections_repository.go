@@ -79,6 +79,25 @@ func (repo *Repository) ListInspectionsFavorites(ctx *domain.UserContext) ([]mod
 	return inspections, err
 }
 
+func (repo *Repository) ListUsersAssignedToInspection(idInspection int64) ([]int64, error) {
+	userIds := []int64{}
+	_, err := repo.db.client.Query(&userIds, `
+	select
+		distinct(users.id)
+	from inspections as inspection
+	join etablissements as etablissement
+		on etablissement.id = inspection.etablissement_id
+	left join etablissement_to_exploitants as exploitant
+		on exploitant.etablissement_id = etablissement.id
+	left join inspection_to_inspecteurs as inspecteur
+		on inspection.id = inspecteur.inspection_id
+	join users
+		on users.id = inspecteur.user_id
+		or users.id = exploitant.user_id
+	where inspection.id = ?`, idInspection)
+	return userIds, err
+}
+
 func (repo *Repository) CreateInspection(ctx *domain.UserContext, inspection models.Inspection) (int64, error) {
 	inspectionId := int64(0)
 	err := repo.db.client.RunInTransaction(func(tx *pg.Tx) error {

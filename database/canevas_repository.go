@@ -78,12 +78,21 @@ func (repo *Repository) CreateCanevas(ctx *domain.UserContext, idInspection int6
 	_, err = repo.db.Model(&canevas).
 		OnConflict("(nom) DO UPDATE").
 		Insert()
+	if err != nil {
+		return 0, err
+	}
+	err = repo.eventsManager.DispatchUpdatedResources(ctx, "canevas")
 	return canevas.Id, err
 }
 
-func (repo *Repository) DeleteCanevas(id int64) error {
+func (repo *Repository) DeleteCanevas(ctx *domain.UserContext, id int64) error {
 	canevas := models.Canevas{
 		Id: id,
 	}
-	return repo.db.client.Delete(&canevas)
+	err := repo.db.client.Delete(&canevas)
+	if err != nil {
+		return err
+	}
+	err = repo.eventsManager.DispatchUpdatedResources(ctx, "canevas")
+	return err
 }

@@ -17,11 +17,15 @@ func NewStub() *StubEventsManager {
 	}
 }
 
+func (em *StubEventsManager) DispatchUpdatedResources(ctx *domain.UserContext, resource string) error {
+	return nil
+}
+
 func (em *StubEventsManager) DispatchUpdatedResource(ctx *domain.UserContext, resource string, id int64) error {
 	return nil
 }
 
-func (em *StubEventsManager) DispatchUpdatedNotifications(ids []int64) error {
+func (em *StubEventsManager) DispatchUpdatedResourcesToUsers(resource string, userIds []int64) error {
 	return nil
 }
 

@@ -7,8 +7,9 @@ import (
 )
 
 type EventsManager interface {
+	DispatchUpdatedResources(ctx *domain.UserContext, resource string) error
 	DispatchUpdatedResource(ctx *domain.UserContext, resource string, id int64) error
-	DispatchUpdatedNotifications(ids []int64) error
+	DispatchUpdatedResourcesToUsers(resources string, userIds []int64) error
 	HandleRequest(w http.ResponseWriter, r *http.Request) error
 }
 

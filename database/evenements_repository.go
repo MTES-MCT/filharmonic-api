@@ -26,6 +26,14 @@ func (repo *Repository) CreateEvenementTx(tx *pg.Tx, ctx *domain.UserContext, ty
 		return err
 	}
 	err = repo.eventsManager.DispatchUpdatedResource(ctx, "inspection", idInspection)
+	if err != nil {
+		return err
+	}
+	userIds, err := repo.ListUsersAssignedToInspection(idInspection)
+	if err != nil {
+		return err
+	}
+	err = repo.eventsManager.DispatchUpdatedResourcesToUsers("inspections", userIds)
 	return err
 }
 

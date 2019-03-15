@@ -93,7 +93,7 @@ func (repo *Repository) createNotifications(tx *pg.Tx, ctx *domain.UserContext, 
 	for _, notification := range notifications {
 		destinatairesId = append(destinatairesId, notification.DestinataireId)
 	}
-	err = repo.eventsManager.DispatchUpdatedNotifications(destinatairesId)
+	err = repo.eventsManager.DispatchUpdatedResourcesToUsers("notifications", destinatairesId)
 	return err
 }
 

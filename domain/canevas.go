@@ -20,5 +20,5 @@ func (s *Service) DeleteCanevas(ctx *UserContext, idCanevas int64) error {
 	if ctx.IsExploitant() {
 		return ErrBesoinProfilInspecteur
 	}
-	return s.repo.DeleteCanevas(idCanevas)
+	return s.repo.DeleteCanevas(ctx, idCanevas)
 }

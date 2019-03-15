@@ -10,13 +10,12 @@ func (s *Service) CreateTheme(ctx *UserContext, theme models.Theme) (int64, erro
 	if ctx.IsExploitant() {
 		return 0, ErrBesoinProfilInspecteur
 	}
-	return s.repo.CreateTheme(theme)
+	return s.repo.CreateTheme(ctx, theme)
 }
 
 func (s *Service) DeleteTheme(ctx *UserContext, idTheme int64) error {
 	if ctx.IsExploitant() {
 		return ErrBesoinProfilInspecteur
 	}
-	return s.repo.DeleteTheme(idTheme)
+	return s.repo.DeleteTheme(ctx, idTheme)
 }
-

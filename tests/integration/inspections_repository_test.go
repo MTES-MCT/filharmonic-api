@@ -73,3 +73,11 @@ func TestListInspectionsEcheancesProches(t *testing.T) {
 	assert.NoError(err)
 	assert.Len(inspections, 1)
 }
+
+func TestListUsersAssignedToInspection(t *testing.T) {
+	assert, application := tests.InitDB(t)
+
+	userIds, err := application.Repo.ListUsersAssignedToInspection(1)
+	assert.NoError(err)
+	assert.Equal([]int64{1, 3, 4}, userIds)
+}
