@@ -18,9 +18,8 @@ func TestListThemes(t *testing.T) {
 		JSON().Array()
 
 	themes.Length().Equal(6)
-	firstTheme := themes.First().Object()
-	firstTheme.ValueEqual("id", 1)
-	firstTheme.ValueEqual("nom", "Rejets dans l'eau")
+	themes.First().Object().ValueEqual("nom", "COV")
+	themes.Last().Object().ValueEqual("nom", "Sûreté")
 }
 
 func TestCreateTheme(t *testing.T) {
@@ -40,9 +39,9 @@ func TestCreateTheme(t *testing.T) {
 		Status(http.StatusOK).
 		JSON().Array()
 	themes.Length().Equal(7)
-	lastTheme := themes.Last().Object()
-	lastTheme.ValueEqual("id", 7)
-	lastTheme.ValueEqual("nom", themeInput.Nom)
+	themes.First().Object().ValueEqual("nom", "COV")
+	themes.Element(5).Object().ValueEqual("nom", "Sanitaire")
+	themes.Last().Object().ValueEqual("nom", "Sûreté")
 }
 
 func TestDeleteTheme(t *testing.T) {

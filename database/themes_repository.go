@@ -6,7 +6,7 @@ import (
 
 func (repo *Repository) ListThemes() ([]models.Theme, error) {
 	themes := []models.Theme{}
-	err := repo.db.client.Model(&themes).Select()
+	err := repo.db.client.Model(&themes).Order("nom asc").Select()
 	return themes, err
 }
 
