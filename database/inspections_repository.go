@@ -126,7 +126,7 @@ func (repo *Repository) CreateInspection(ctx *domain.UserContext, inspection mod
 
 func (repo *Repository) UpdateInspection(ctx *domain.UserContext, inspection models.Inspection) error {
 	return repo.db.client.RunInTransaction(func(tx *pg.Tx) error {
-		columns := []string{"date", "type", "origine", "annonce", "circonstance", "detail_circonstance", "contexte", "themes"}
+		columns := []string{"date", "type", "origine", "annonce", "circonstance", "detail_circonstance", "personnes_rencontrees", "contexte", "themes"}
 		_, err := tx.Model(&inspection).Column(columns...).WherePK().Update()
 		if err != nil {
 			return err

@@ -59,6 +59,7 @@ type Inspection struct {
 	RapportId            int64                  `json:"-" sql:"on_delete:SET NULL"`
 	ValidationRejetee    bool                   `json:"validation_rejetee,omitempty" sql:",notnull,default:false"`
 	MotifRejetValidation string                 `json:"motif_rejet_validation,omitempty"`
+	PersonnesRencontrees string                 `json:"personnes_rencontrees"`
 
 	Commentaires     []Commentaire     `json:"commentaires,omitempty"`
 	Etablissement    *Etablissement    `json:"etablissement,omitempty"`

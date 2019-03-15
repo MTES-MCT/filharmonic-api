@@ -4218,47 +4218,15 @@
      <table:covered-table-cell/>
     </table:table-row>
     <table:table-row>
-     <table:table-cell table:style-name="Tableau1.A15" table:number-columns-spanned="7" office:value-type="string">
-      <text:p text:style-name="P66">Personne<text:span text:style-name="T41">(</text:span>s<text:span text:style-name="T41">)</text:span> rencontrée<text:span text:style-name="T41">(</text:span>s<text:span text:style-name="T41">)</text:span> et fonction<text:span text:style-name="T41">(</text:span>s<text:span text:style-name="T41">)</text:span></text:p>
+     <table:table-cell table:style-name="Tableau1.A14" table:number-columns-spanned="7" office:value-type="string">
+      <text:p text:style-name="P61">Personne(s) rencontrée(s)</text:p>
+      <text:p text:style-name="P42">{{ .Inspection.PersonnesRencontrees }}</text:p>
      </table:table-cell>
      <table:covered-table-cell/>
      <table:covered-table-cell/>
      <table:covered-table-cell/>
      <table:covered-table-cell/>
      <table:covered-table-cell/>
-     <table:covered-table-cell/>
-    </table:table-row>
-    <table:table-row>
-     <table:table-cell table:style-name="Tableau1.A16" table:number-columns-spanned="3" office:value-type="string">
-      <text:p text:style-name="P62">Nom</text:p>
-     </table:table-cell>
-     <table:covered-table-cell/>
-     <table:covered-table-cell/>
-     <table:table-cell table:style-name="Tableau1.D16" table:number-columns-spanned="2" office:value-type="string">
-      <text:p text:style-name="P65">Société</text:p>
-     </table:table-cell>
-     <table:covered-table-cell/>
-     <table:table-cell table:style-name="Tableau1.F16" table:number-columns-spanned="2" office:value-type="string">
-      <text:p text:style-name="P63">Qualité</text:p>
-     </table:table-cell>
-     <table:covered-table-cell/>
-    </table:table-row>
-    <table:table-row>
-     <table:table-cell table:style-name="Tableau1.A17" table:number-columns-spanned="3" office:value-type="string">
-      <text:p text:style-name="P72">M. <text:span text:style-name="T45">XX</text:span></text:p>
-      <text:p text:style-name="P68">M. <text:span text:style-name="T45">XX</text:span></text:p>
-     </table:table-cell>
-     <table:covered-table-cell/>
-     <table:covered-table-cell/>
-     <table:table-cell table:style-name="Tableau1.D17" table:number-columns-spanned="2" office:value-type="string">
-      <text:p text:style-name="P70">X</text:p>
-      <text:p text:style-name="P71">X</text:p>
-     </table:table-cell>
-     <table:covered-table-cell/>
-     <table:table-cell table:style-name="Tableau1.F17" table:number-columns-spanned="2" office:value-type="string">
-      <text:p text:style-name="P73">Responsable environnement</text:p>
-      <text:p text:style-name="P69">Responsable <text:span text:style-name="T19">d’</text:span>exploitation</text:p>
-     </table:table-cell>
      <table:covered-table-cell/>
     </table:table-row>
     <table:table-row>
