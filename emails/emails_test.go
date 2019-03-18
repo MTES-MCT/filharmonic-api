@@ -1,41 +1,31 @@
 package emails
 
 import (
-	"net/http"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 )
 
-func TestSend(t *testing.T) {
+func TestEmailsToBytes(t *testing.T) {
 	assert := require.New(t)
+	content, err := (&Email{
+		From:    "Fil'harmonic <noreply@filharmonic.beta.gouv.fr>",
+		To:      "sample-user@filharmonic.beta.gouv.fr",
+		Subject: "Fil'Harmonic : Vous avez des nouveaux messages",
+		TextPart: `Bonjour,
 
-	// start a fake MailJet API
-	go func() {
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			_, err := w.Write([]byte(`{"success": true}`))
-			assert.NoError(err)
-		})
-		assert.NoError(http.ListenAndServe(":5100", nil))
-	}()
-	time.Sleep(20 * time.Millisecond)
+		Vous avez des nouveaux messages sur https://filharmonic.beta.gouv.fr
 
-	emailConfig := Config{
-		FromEmail:     "contact@filharmonic.beta.gouv.fr",
-		FromName:      "Fil'Harmonic",
-		APIPublicKey:  "publickey",
-		APIPrivateKey: "privatekey",
-	}
-	emailService := New(emailConfig)
-	emailService.SetBaseURL("http://localhost:5100/")
+		A bientôt sur Fil'Harmonic
+		`,
+		HTMLPart: `<!DOCTYPE html><html><meta charset="UTF-8"><body><h1>Bonjour,</h1>
 
-	err := emailService.Send(Email{
-		Subject:        "Test Email",
-		RecipientEmail: "sample-user@filharmonic.beta.gouv.fr",
-		RecipientName:  "Sample user",
-		TextPart:       "message",
-		HTMLPart:       "<b>message</b>",
-	})
+		<p>Vous avez des nouveaux messages sur <a href="https://filharmonic.beta.gouv.fr">filharmonic.beta.gouv.fr</a></p>
+
+		<p>A bientôt sur Fil'Harmonic</p>
+		</body></html>`,
+	}).ToBytes()
 	assert.NoError(err)
+	assert.Contains(string(content), "Subject: Fil'Harmonic : Vous avez des nouveaux messages")
+	assert.Contains(string(content), "A bient=C3=B4t sur Fil'Harmonic")
 }

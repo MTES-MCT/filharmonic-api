@@ -39,6 +39,7 @@ type Config struct {
 	Templates  templates.Config
 	LogLevel   string  `default:"info"`
 	Mode       ModeEnv `default:"prod"`
+	EnableSmtp bool    `default:"false"`
 }
 
 func LoadConfig() Config {

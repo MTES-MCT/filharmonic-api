@@ -1,77 +1,98 @@
 package emails
 
 import (
-	mailjet "github.com/mailjet/mailjet-apiv3-go"
-	"github.com/rs/zerolog/log"
+	"bytes"
+	"mime/multipart"
+	"mime/quotedprintable"
+	"net/textproto"
+	"time"
+
+	"github.com/gofrs/uuid"
 )
 
-type Config struct {
-	APIPublicKey  string `default:""`
-	APIPrivateKey string `default:""`
-	FromEmail     string `default:"contact@filharmonic.beta.gouv.fr"`
-	FromName      string `default:"Fil'Harmonic"`
-}
-
-type EmailService struct {
-	config Config
-	client *mailjet.Client
-}
-
 type Email struct {
-	RecipientEmail string
-	RecipientName  string
-	Subject        string
-	TextPart       string
-	HTMLPart       string
+	From     string
+	To       string
+	Subject  string
+	TextPart string
+	HTMLPart string
 }
 
-func New(config Config) *EmailService {
-	mailjetClient := mailjet.NewMailjetClient(config.APIPublicKey, config.APIPrivateKey)
-
-	if config.APIPublicKey != "" {
-		_, _, err := mailjetClient.List("metadata", nil)
+func (email *Email) ToBytes() ([]byte, error) {
+	var err error
+	buffer := bytes.NewBuffer([]byte{})
+	write := func(str string) {
 		if err != nil {
-			log.Error().Err(err).Msg("invalid email configuration")
+			return
 		}
+		_, err = buffer.WriteString(str)
+	}
+	write("From: ")
+	write(email.From)
+	write("\r\nTo: ")
+	write(email.To)
+	write("\r\nSubject: ")
+	write(email.Subject)
+	write("\r\nDate: ")
+	write(time.Now().Format(time.RFC1123Z))
+	write("\r\nMessage-Id: <")
+	if err != nil {
+		return nil, err
+	}
+	messageId, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+	write(messageId.String())
+	write("@filharmonic.beta.gouv.fr>")
+	write("\r\nMIME-version: 1.0")
+	if err != nil {
+		return nil, err
 	}
 
-	return &EmailService{
-		config: config,
-		client: mailjetClient,
+	w := multipart.NewWriter(buffer)
+	write("\r\nContent-Type: multipart/alternative; boundary=" + w.Boundary())
+	write("\r\n\r\n")
+	if err != nil {
+		return nil, err
 	}
-}
+	ww, err := w.CreatePart(textproto.MIMEHeader{
+		"Content-Type":              []string{"text/plain; charset=utf-8"},
+		"Content-Transfer-Encoding": []string{"quoted-printable"},
+	})
+	if err != nil {
+		return nil, err
+	}
+	encoder := quotedprintable.NewWriter(ww)
+	_, err = encoder.Write([]byte(email.TextPart))
+	if err != nil {
+		return nil, err
+	}
+	err = encoder.Close()
+	if err != nil {
+		return nil, err
+	}
 
-// See https://dev.mailjet.com/guides/#send-api-v3-1
-func (em *EmailService) Send(email Email) error {
-	if em.config.APIPublicKey == "" {
-		return nil
+	ww, err = w.CreatePart(textproto.MIMEHeader{
+		"Content-Type":              []string{"text/html; charset=utf-8"},
+		"Content-Transfer-Encoding": []string{"quoted-printable"},
+	})
+	if err != nil {
+		return nil, err
 	}
-	log.Info().
-		Str("recipient", email.RecipientEmail).
-		Msg("send email")
-	messagesInfo := []mailjet.InfoMessagesV31{
-		mailjet.InfoMessagesV31{
-			From: &mailjet.RecipientV31{
-				Email: em.config.FromEmail,
-				Name:  em.config.FromName,
-			},
-			To: &mailjet.RecipientsV31{
-				mailjet.RecipientV31{
-					Email: email.RecipientEmail,
-					Name:  email.RecipientName,
-				},
-			},
-			Subject:  email.Subject,
-			TextPart: email.TextPart,
-			HTMLPart: email.HTMLPart,
-		},
+	encoder = quotedprintable.NewWriter(ww)
+	_, err = encoder.Write([]byte(email.HTMLPart))
+	if err != nil {
+		return nil, err
 	}
-	messages := mailjet.MessagesV31{Info: messagesInfo}
-	_, err := em.client.SendMailV31(&messages)
-	return err
-}
+	err = encoder.Close()
+	if err != nil {
+		return nil, err
+	}
+	err = w.Close()
+	if err != nil {
+		return nil, err
+	}
 
-// used in tests
-func (em *EmailService) SetBaseURL(baseURL string) {
-	em.client.SetBaseURL(baseURL)
+	return buffer.Bytes(), nil
 }

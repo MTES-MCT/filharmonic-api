@@ -16,6 +16,10 @@ type User struct {
 	Profile Profil `json:"profile"`
 }
 
+func (user *User) AsRecipient() string {
+	return user.Nom + " <" + user.Email + ">"
+}
+
 type UserToFavori struct {
 	InspectionId int64 `sql:",pk"`
 	UserId       int64 `sql:",pk"`

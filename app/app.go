@@ -96,7 +96,17 @@ func (a *Application) BootstrapServer() error {
 		a.Sso = cerbere.New(a.Config.Sso)
 		a.Sessions = sessions.NewRedis(a.Config.Sessions, a.Redis)
 	}
-	a.EmailService = emails.New(a.Config.Emails)
+
+	if a.Config.EnableSmtp {
+		emailService, err := emails.New(a.Config.Emails)
+		if err != nil {
+			return err
+		}
+		a.EmailService = emailService
+	} else {
+		a.EmailService = emails.NewStub()
+	}
+
 	a.AuthenticationService = authentication.New(a.Repo, a.Sso, a.Sessions)
 	a.TemplateService, err = templates.New(a.Config.Templates)
 	if err != nil {

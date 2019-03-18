@@ -35,11 +35,10 @@ func (s *Service) SendEmailsNouveauxMessages() error {
 		}
 
 		err = s.emailService.Send(emails.Email{
-			Subject:        "Fil'Harmonic : Nouveaux messages",
-			RecipientEmail: nouveauxMessagesUser.Destinataire.Email,
-			RecipientName:  nouveauxMessagesUser.Destinataire.Nom,
-			TextPart:       "",
-			HTMLPart:       htmlPart,
+			To:       nouveauxMessagesUser.Destinataire.AsRecipient(),
+			Subject:  "Fil'Harmonic : Nouveaux messages",
+			TextPart: "",
+			HTMLPart: htmlPart,
 		})
 		if err != nil {
 			log.Error().Err(err).Msg("error while sending email")
@@ -70,11 +69,10 @@ func (s *Service) SendEmailsRecapValidation(idInspection int64) error {
 		}
 
 		err = s.emailService.Send(emails.Email{
-			Subject:        "Fil'Harmonic : Inspection validée",
-			RecipientEmail: recapValidation.Destinataire.Email,
-			RecipientName:  recapValidation.Destinataire.Nom,
-			TextPart:       "",
-			HTMLPart:       htmlPart,
+			To:       recapValidation.Destinataire.AsRecipient(),
+			Subject:  "Fil'Harmonic : Inspection validée",
+			TextPart: "",
+			HTMLPart: htmlPart,
 		})
 		if err != nil {
 			log.Error().Err(err).Msg("error while sending email")
@@ -107,11 +105,10 @@ func (s *Service) SendEmailsExpirationDelais() error {
 		}
 		if inspectionDelaisExpires.InspectionId != previousInspectionId || inspectionDelaisExpires.Destinataire.Email != previousRecipientEmail {
 			err = s.emailService.Send(emails.Email{
-				Subject:        "Fil'Harmonic : Expiration des délais",
-				RecipientEmail: inspectionDelaisExpires.Destinataire.Email,
-				RecipientName:  inspectionDelaisExpires.Destinataire.Nom,
-				TextPart:       "",
-				HTMLPart:       htmlPart,
+				To:       inspectionDelaisExpires.Destinataire.AsRecipient(),
+				Subject:  "Fil'Harmonic : Expiration des délais",
+				TextPart: "",
+				HTMLPart: htmlPart,
 			})
 			if err != nil {
 				log.Error().Err(err).Msg("error while sending email")
@@ -149,11 +146,10 @@ func (s *Service) SendEmailsRappelEcheances() error {
 		}
 		if inspectionEcheancesProches.InspectionId != previousInspectionId {
 			err = s.emailService.Send(emails.Email{
-				Subject:        "Fil'Harmonic : Rappel des échéances",
-				RecipientEmail: inspectionEcheancesProches.Destinataire.Email,
-				RecipientName:  inspectionEcheancesProches.Destinataire.Nom,
-				TextPart:       "",
-				HTMLPart:       htmlPart,
+				To:       inspectionEcheancesProches.Destinataire.AsRecipient(),
+				Subject:  "Fil'Harmonic : Rappel des échéances",
+				TextPart: "",
+				HTMLPart: htmlPart,
 			})
 			if err != nil {
 				log.Error().Err(err).Msg("error while sending email")
