@@ -27,32 +27,40 @@ type EmailService struct {
 }
 
 func New(config Config) (*EmailService, error) {
-	log.Info().Msgf("connecting to SMTP on %s", config.SmtpAddr())
-	client, err := smtp.Dial(config.SmtpAddr())
+	emailService := &EmailService{
+		config: config,
+	}
+	err := emailService.Dial()
 	if err != nil {
 		return nil, err
 	}
+	return emailService, nil
+}
+
+func (em *EmailService) Dial() error {
+	log.Info().Msgf("connecting to SMTP on %s", em.config.SmtpAddr())
+	client, err := smtp.Dial(em.config.SmtpAddr())
+	if err != nil {
+		return err
+	}
 
 	if ok, _ := client.Extension("STARTTLS"); ok {
-		config := &tls.Config{ServerName: config.SmtpHost}
+		config := &tls.Config{ServerName: em.config.SmtpHost}
 		if err = client.StartTLS(config); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	auth := smtp.PlainAuth("", config.SmtpUser, config.SmtpPass, config.SmtpHost)
+	auth := smtp.PlainAuth("", em.config.SmtpUser, em.config.SmtpPass, em.config.SmtpHost)
 	if ok, _ := client.Extension("AUTH"); !ok {
-		return nil, errors.New("smtp: server doesn't support AUTH")
+		return errors.New("smtp: server doesn't support AUTH")
 	}
 	if err = client.Auth(auth); err != nil {
-		return nil, err
+		return err
 	}
 	log.Info().Msg("connected to SMTP")
-
-	return &EmailService{
-		config: config,
-		client: client,
-	}, nil
+	em.client = client
+	return nil
 }
 
 func (em *EmailService) Send(email Email) error {
@@ -60,7 +68,15 @@ func (em *EmailService) Send(email Email) error {
 		Str("recipient", email.To).
 		Msg("send email")
 
-	err := em.client.Mail(em.config.SmtpUser)
+	err := em.client.Noop()
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to reach SMTP. Attempting reconnection...")
+		err := em.Dial()
+		if err != nil {
+			return err
+		}
+	}
+	err = em.client.Mail(em.config.SmtpUser)
 	if err != nil {
 		return err
 	}
