@@ -14,6 +14,11 @@ func (repo *Repository) CreatePointDeControle(ctx *domain.UserContext, idInspect
 		if err != nil {
 			return err
 		}
+		pointDeControle.Order = pointDeControle.Id
+		_, err = tx.Model(&pointDeControle).Column("order").WherePK().Update()
+		if err != nil {
+			return err
+		}
 
 		err = repo.CreateEvenementTx(tx, ctx, models.EvenementCreationPointDeControle, idInspection, map[string]interface{}{
 			"point_de_controle_id": pointDeControle.Id,
@@ -145,4 +150,16 @@ func (repo *Repository) CanUpdatePointDeControle(ctx *domain.UserContext, idPoin
 		return domain.ErrModificationPointDeControleImpossible
 	}
 	return nil
+}
+
+func (repo *Repository) OrderPointsDeControle(ctx *domain.UserContext, idInspection int64, pointsDeControleIds []int64) error {
+	pointsDeControle := []interface{}{}
+	for index, pointDeControleId := range pointsDeControleIds {
+		pointsDeControle = append(pointsDeControle, &models.PointDeControle{
+			Id:    pointDeControleId,
+			Order: int64(index + 1),
+		})
+	}
+	_, err := repo.db.client.Model(pointsDeControle...).Column("order").Update()
+	return err
 }

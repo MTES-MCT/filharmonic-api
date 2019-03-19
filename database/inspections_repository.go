@@ -158,7 +158,7 @@ func (repo *Repository) GetInspectionByID(ctx *domain.UserContext, id int64, fil
 			if ctx.IsExploitant() || filter.OmitPointsDeControleNonPublies {
 				q.Where("publie = TRUE")
 			}
-			return q.Order("id ASC"), nil
+			return q.Order("order ASC"), nil
 		}).
 		Relation("PointsDeControle.Constat").
 		Relation("PointsDeControle.Messages", func(q *orm.Query) (*orm.Query, error) {

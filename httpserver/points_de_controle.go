@@ -46,3 +46,15 @@ func (server *HttpServer) publishPointDeControle(c *gin.Context) error {
 	}
 	return server.service.PublishPointDeControle(server.retrieveUserContext(c), idPointDeControle)
 }
+
+func (server *HttpServer) orderPointsDeControle(c *gin.Context) error {
+	idInspection, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return badInputError(err)
+	}
+	var ids []int64
+	if err = c.ShouldBindJSON(&ids); err != nil {
+		return badInputError(err)
+	}
+	return server.service.OrderPointsDeControle(server.retrieveUserContext(c), idInspection, ids)
+}

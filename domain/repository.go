@@ -58,6 +58,7 @@ type Repository interface {
 	PublishPointDeControle(ctx *UserContext, idPointDeControle int64) error
 	CanCreatePointDeControle(ctx *UserContext, idInspection int64) error
 	CanUpdatePointDeControle(ctx *UserContext, idPointDeControle int64) error
+	OrderPointsDeControle(ctx *UserContext, idInspection int64, pointsDeControleIds []int64) error
 	CreateMessage(ctx *UserContext, idPointDeControle int64, message models.Message) (int64, error)
 	LireMessage(ctx *UserContext, idMessage int64) error
 	CheckUserAllowedMessage(ctx *UserContext, idMessage int64) (bool, error)

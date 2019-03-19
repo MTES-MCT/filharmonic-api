@@ -468,6 +468,7 @@ func SeedsTestDB(db *pg.DB) error {
 			Publie:       true,
 			InspectionId: 4,
 			ConstatId:    3,
+			Order:        1,
 		},
 		&models.PointDeControle{
 			// Id:    6,
@@ -477,6 +478,7 @@ func SeedsTestDB(db *pg.DB) error {
 			},
 			Publie:       true,
 			InspectionId: 4,
+			Order:        2,
 		},
 		&models.PointDeControle{
 			// Id:    7,

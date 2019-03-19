@@ -76,6 +76,7 @@ func (s *HttpServer) Start() (returnErr error) {
 		authorized.PUT("/inspections/:id", returnOk(s.updateInspection))
 		authorized.POST("/inspections/:id/commentaires", returnId(s.addCommentaire))
 		authorized.POST("/inspections/:id/pointsdecontrole", returnId(s.addPointDeControle))
+		authorized.POST("/inspections/:id/pointsdecontrole/ordonner", returnOk(s.orderPointsDeControle))
 		authorized.POST("/inspections/:id/publier", returnOk(s.publishInspection))
 		authorized.POST("/inspections/:id/demandervalidation", returnOk(s.askValidateInspection))
 		authorized.POST("/inspections/:id/valider", returnOk(s.validateInspection))

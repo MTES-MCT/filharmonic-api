@@ -68,3 +68,7 @@ func (s *Service) PublishPointDeControle(ctx *UserContext, idPointDeControle int
 	}
 	return s.repo.PublishPointDeControle(ctx, idPointDeControle)
 }
+
+func (s *Service) OrderPointsDeControle(ctx *UserContext, idInspection int64, pointsDeControleIds []int64) error {
+	return s.repo.OrderPointsDeControle(ctx, idInspection, pointsDeControleIds)
+}

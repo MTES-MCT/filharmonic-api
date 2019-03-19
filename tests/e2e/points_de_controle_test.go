@@ -152,3 +152,26 @@ func TestPublishPointDeControle(t *testing.T) {
 	pointsControle.Length().Equal(3)
 	pointsControle.Last().Object().ValueEqual("publie", true)
 }
+
+func TestOrdonnerPointsDeControle(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	pointsDeControleIds := []int64{
+		int64(6),
+		int64(5),
+	}
+
+	tests.AuthInspecteur(e.POST("/inspections/{id}/pointsdecontrole/ordonner")).WithPath("id", 4).WithJSON(pointsDeControleIds).
+		Expect().
+		Status(http.StatusOK)
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", 4).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	pointsControle := inspection.Value("points_de_controle").Array()
+	pointsControle.Length().Equal(2)
+	pointsControle.First().Object().ValueEqual("id", 6)
+	pointsControle.Last().Object().ValueEqual("id", 5)
+}

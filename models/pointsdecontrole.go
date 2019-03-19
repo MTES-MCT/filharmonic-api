@@ -15,6 +15,7 @@ type PointDeControle struct {
 	InspectionId             int64     `json:"-" sql:",notnull"`
 	DeletedAt                time.Time `json:"-" pg:",soft_delete"`
 	ConstatId                int64     `json:"-" sql:"on_delete:SET NULL"`
+	Order                    int64     `json:"order"`
 
 	Inspection *Inspection `json:"-"`
 	Constat    *Constat    `json:"constat,omitempty"`
