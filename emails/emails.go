@@ -2,7 +2,7 @@ package emails
 
 import (
 	"bytes"
-	"io"
+	"mime"
 	"mime/multipart"
 	"mime/quotedprintable"
 	"net/textproto"
@@ -29,17 +29,11 @@ func (email *Email) ToBytes() ([]byte, error) {
 		_, err = buffer.WriteString(str)
 	}
 	write("From: ")
-	write(email.From)
+	write(encodeHeader(email.From))
 	write("\r\nTo: ")
-	write(email.To)
+	write(encodeHeader(email.To))
 	write("\r\nSubject: ")
-	if err != nil {
-		return nil, err
-	}
-	err = encode(buffer, []byte(email.Subject))
-	if err != nil {
-		return nil, err
-	}
+	write(encodeHeader(email.Subject))
 	write("\r\nDate: ")
 	write(time.Now().Format(time.RFC1123Z))
 	write("\r\nMessage-Id: <")
@@ -104,12 +98,6 @@ func (email *Email) ToBytes() ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-func encode(writer io.Writer, data []byte) error {
-	encoder := quotedprintable.NewWriter(writer)
-	_, err := encoder.Write(data)
-	if err != nil {
-		return err
-	}
-	err = encoder.Close()
-	return err
+func encodeHeader(data string) string {
+	return mime.QEncoding.Encode("utf-8", data)
 }
