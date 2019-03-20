@@ -1,4 +1,5 @@
 *
 !database/migrations/*.sql
-!templates/templates
+!templates/emails
+!templates/odt
 !filharmonic-api
