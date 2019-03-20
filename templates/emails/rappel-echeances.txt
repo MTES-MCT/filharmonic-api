@@ -1,0 +1,10 @@
+{{ define "content" }}Bonjour {{ .Destinataire.Nom }},
+
+L'inspection du {{ .DateInspection }} sur votre établissement {{ .RaisonEtablissement }} sis {{ .AdresseEtablissement }} contient des non-conformités encore non levées.
+Leurs échéances de résolution sont proches. Merci de vous assurer de les respecter.
+
+Si vous rencontrez des difficultés, n'hésiter à en informer votre inspecteur.
+Vous pouvez consulter le détail des échéances sur Fil'Harmonic à l'adresse suivante :
+
+{{ $.BaseURL }}/inspections/{{ .InspectionId }}
+{{ end }}

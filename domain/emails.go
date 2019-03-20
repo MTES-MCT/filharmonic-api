@@ -29,7 +29,7 @@ func (s *Service) SendEmailsNouveauxMessages() error {
 		return err
 	}
 	for _, nouveauxMessagesUser := range nouveauxMessagesUsers {
-		htmlPart, err := s.templateService.RenderHTMLEmailNouveauxMessages(nouveauxMessagesUser)
+		result, err := s.templateService.RenderEmailNouveauxMessages(nouveauxMessagesUser)
 		if err != nil {
 			return err
 		}
@@ -37,8 +37,8 @@ func (s *Service) SendEmailsNouveauxMessages() error {
 		err = s.emailService.Send(emails.Email{
 			To:       nouveauxMessagesUser.Destinataire.AsRecipient(),
 			Subject:  "Fil'Harmonic : Nouveaux messages",
-			TextPart: "",
-			HTMLPart: htmlPart,
+			TextPart: result.Text,
+			HTMLPart: result.HTML,
 		})
 		if err != nil {
 			log.Error().Err(err).Msg("error while sending email")
@@ -63,7 +63,7 @@ func (s *Service) SendEmailsRecapValidation(idInspection int64) error {
 	}
 
 	for _, recapValidation := range recaps {
-		htmlPart, err := s.templateService.RenderHTMLEmailRecapValidation(recapValidation)
+		result, err := s.templateService.RenderEmailRecapValidation(recapValidation)
 		if err != nil {
 			return err
 		}
@@ -71,8 +71,8 @@ func (s *Service) SendEmailsRecapValidation(idInspection int64) error {
 		err = s.emailService.Send(emails.Email{
 			To:       recapValidation.Destinataire.AsRecipient(),
 			Subject:  "Fil'Harmonic : Inspection validée",
-			TextPart: "",
-			HTMLPart: htmlPart,
+			TextPart: result.Text,
+			HTMLPart: result.HTML,
 		})
 		if err != nil {
 			log.Error().Err(err).Msg("error while sending email")
@@ -99,7 +99,7 @@ func (s *Service) SendEmailsExpirationDelais() error {
 	previousInspectionId := int64(0)
 	previousRecipientEmail := ""
 	for _, inspectionDelaisExpires := range inspectionsDelaisExpires {
-		htmlPart, err := s.templateService.RenderHTMLEmailExpirationDelais(inspectionDelaisExpires)
+		result, err := s.templateService.RenderEmailExpirationDelais(inspectionDelaisExpires)
 		if err != nil {
 			return err
 		}
@@ -107,8 +107,8 @@ func (s *Service) SendEmailsExpirationDelais() error {
 			err = s.emailService.Send(emails.Email{
 				To:       inspectionDelaisExpires.Destinataire.AsRecipient(),
 				Subject:  "Fil'Harmonic : Expiration des délais",
-				TextPart: "",
-				HTMLPart: htmlPart,
+				TextPart: result.Text,
+				HTMLPart: result.HTML,
 			})
 			if err != nil {
 				log.Error().Err(err).Msg("error while sending email")
@@ -139,8 +139,7 @@ func (s *Service) SendEmailsRappelEcheances() error {
 	constatsIds := []int64{}
 	previousInspectionId := int64(0)
 	for _, inspectionEcheancesProches := range inspectionsEcheancesProches {
-		var htmlPart string
-		htmlPart, err = s.templateService.RenderHTMLEmailRappelEcheances(inspectionEcheancesProches)
+		result, err := s.templateService.RenderEmailRappelEcheances(inspectionEcheancesProches)
 		if err != nil {
 			return err
 		}
@@ -148,8 +147,8 @@ func (s *Service) SendEmailsRappelEcheances() error {
 			err = s.emailService.Send(emails.Email{
 				To:       inspectionEcheancesProches.Destinataire.AsRecipient(),
 				Subject:  "Fil'Harmonic : Rappel des échéances",
-				TextPart: "",
-				HTMLPart: htmlPart,
+				TextPart: result.Text,
+				HTMLPart: result.HTML,
 			})
 			if err != nil {
 				log.Error().Err(err).Msg("error while sending email")

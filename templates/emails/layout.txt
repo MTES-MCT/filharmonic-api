@@ -1,0 +1,4 @@
+{{ template "content" . }}
+--
+Vous recevez cet email car vous avez un compte sur Fil'Harmonic à l'adresse : {{ $.BaseURL }}
+Pour plus d'informations sur le service Fil'Harmonic et ses ambitions, vous pouvez consulter la page de produit de Fil'Harmonic à l'adresse : https://beta.gouv.fr/startups/filharmonic.html

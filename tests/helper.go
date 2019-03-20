@@ -121,7 +121,7 @@ func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
 	config.Mode = app.ModeTest
 	config.Http.Host = "localhost"
 	config.Http.Logger = false
-	config.Templates.Dir = "../../templates/templates/"
+	config.Templates.Dir = "../../templates/"
 	config.LogLevel = ""
 	util.SetTime(util.Date("2019-04-01").Time)
 	application := app.New(config)

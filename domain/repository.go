@@ -100,11 +100,16 @@ type EmailService interface {
 }
 
 type TemplateService interface {
-	RenderHTMLEmailNouveauxMessages(data interface{}) (string, error)
-	RenderHTMLEmailRecapValidation(data interface{}) (string, error)
-	RenderHTMLEmailExpirationDelais(data interface{}) (string, error)
-	RenderHTMLEmailRappelEcheances(data interface{}) (string, error)
-	RenderLettreAnnonce(data interface{}) (string, error)
-	RenderLettreSuite(data interface{}) (string, error)
-	RenderRapport(data interface{}) (string, error)
+	RenderEmailExpirationDelais(data interface{}) (*models.RenderedTemplate, error)
+	RenderEmailNouveauxMessages(data interface{}) (*models.RenderedTemplate, error)
+	RenderEmailRappelEcheances(data interface{}) (*models.RenderedTemplate, error)
+	RenderEmailRecapValidation(data interface{}) (*models.RenderedTemplate, error)
+	RenderODTLettreAnnonce(data interface{}) (*models.RenderedTemplate, error)
+	RenderODTLettreSuite(data interface{}) (*models.RenderedTemplate, error)
+	RenderODTRapport(data interface{}) (*models.RenderedTemplate, error)
+}
+
+type RenderedTemplate interface {
+	HTML() string
+	Text() string
 }

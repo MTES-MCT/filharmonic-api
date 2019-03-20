@@ -1,0 +1,10 @@
+{{ define "content" }}Bonjour {{ .Destinataire.Nom }},
+
+Le rapport de l'inspection du {{ .DateInspection }} sur votre établissement {{ .RaisonEtablissement }} est disponible.
+Vous pouvez le consulter sur Fil'Harmonic à l'adresse suivante :
+
+{{ $.BaseURL }}/inspections/{{ .InspectionId }}
+
+{{ if .NonConformites }}De plus, l'inspection a fait l'objet de non-conformités. Vous pouvez consulter le détail des constats et leurs échéances de résolution.
+{{ end }}
+{{ end }}

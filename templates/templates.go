@@ -6,213 +6,58 @@ import (
 	text "text/template"
 
 	"github.com/MTES-MCT/filharmonic-api/models"
-	"github.com/fatih/structs"
 )
 
-type Config struct {
-	Dir     string `default:"templates/templates/"`
-	BaseURL string `default:"https://filharmonic.beta.gouv.fr"`
-}
+type TemplateType string
 
-type TemplateService struct {
-	config Config
+const (
+	// Emails
+	TemplateEmailExpirationDelais TemplateType = "expiration-delais"
+	TemplateEmailNouveauxMessages TemplateType = "nouveaux-messages"
+	TemplateEmailRecapValidation  TemplateType = "recap-validation"
+	TemplateEmailRappelEcheances  TemplateType = "rappel-echeances"
 
-	emailNouveauxMessagesTemplate *html.Template
-	emailRecapValidationTemplate  *html.Template
-	emailExpirationDelaisTemplate *html.Template
-	emailRappelEcheancesTemplate  *html.Template
-	lettreAnnonceTemplate         *text.Template
-	lettreSuiteTemplate           *text.Template
-	rapportTemplate               *text.Template
-}
-
-var (
-	templateHelpers = text.FuncMap{
-		"type_suite": func(value models.TypeSuite) string {
-			switch value {
-			case models.TypeSuiteAucune:
-				return "Aucune"
-			case models.TypeSuiteObservation:
-				return "Observation ou non conformités à traiter par courrier"
-			case models.TypeSuitePropositionMiseEnDemeure:
-				return "Proposition de suites administratives"
-			case models.TypeSuitePropositionRenforcement:
-				return "Proposition de renforcement, modification ou mise à jour des prescription"
-			case models.TypeSuiteAutre:
-				return "Autre"
-			default:
-				return string(value)
-			}
-		},
-		"type_constat": func(value models.TypeConstat) string {
-			switch value {
-			case models.TypeConstatConforme:
-				return "Conforme"
-			case models.TypeConstatNonConforme:
-				return "Non conforme"
-			case models.TypeConstatObservation:
-				return "Observation"
-			default:
-				return string(value)
-			}
-		},
-		"type_inspection": func(value models.TypeInspection) string {
-			switch value {
-			case models.TypeApprofondi:
-				return "Approfondi"
-			case models.TypeCourant:
-				return "Courant"
-			case models.TypePonctuel:
-				return "Ponctuel"
-			default:
-				return string(value)
-			}
-		},
-		"ouinon": func(value bool) string {
-			if value {
-				return "Oui"
-			}
-			return "Non"
-		},
-		"origine_inspection": func(value models.OrigineInspection) string {
-			switch value {
-			case models.OrigineCirconstancielle:
-				return "Circonstancielle"
-			case models.OriginePlanControle:
-				return "Plan de contrôle"
-			default:
-				return string(value)
-			}
-		},
-		"circonstance_inspection": func(value models.CirconstanceInspection) string {
-			switch value {
-			case models.CirconstanceAutre:
-				return "Autre"
-			case models.CirconstanceIncident:
-				return "Incident"
-			case models.CirconstancePlainte:
-				return "Plainte"
-			default:
-				return string(value)
-			}
-		},
-		"regime_etablissement": func(value models.RegimeEtablissement) string {
-			switch value {
-			case models.RegimeAucun:
-				return "Aucun"
-			case models.RegimeAutorisation:
-				return "Autorisation"
-			case models.RegimeDeclaration:
-				return "Déclaration"
-			case models.RegimeEnregistrement:
-				return "Enregistrement"
-			default:
-				return string(value)
-			}
-		},
-		"add": func(a int, b int) int {
-			return a + b
-		},
-	}
+	// ODT
+	TemplateODTLettreAnnonce TemplateType = "lettre-annonce"
+	TemplateODTLettreSuite   TemplateType = "lettre-suite"
+	TemplateODTRapport       TemplateType = "rapport"
 )
 
-func New(config Config) (*TemplateService, error) {
-	service := &TemplateService{
-		config: config,
-	}
-	var err error
-	service.emailNouveauxMessagesTemplate, err = html.ParseFiles(config.Dir+"email-layout.html", config.Dir+"email-new-messages.html")
-	if err != nil {
-		return nil, err
-	}
-
-	service.emailRecapValidationTemplate, err = html.ParseFiles(config.Dir+"email-layout.html", config.Dir+"email-recap-validation.html")
-	if err != nil {
-		return nil, err
-	}
-
-	service.emailExpirationDelaisTemplate, err = html.ParseFiles(config.Dir+"email-layout.html", config.Dir+"email-expiration-delais.html")
-	if err != nil {
-		return nil, err
-	}
-
-	service.emailRappelEcheancesTemplate, err = html.ParseFiles(config.Dir+"email-layout.html", config.Dir+"email-rappel-echeances.html")
-	if err != nil {
-		return nil, err
-	}
-
-	service.lettreAnnonceTemplate, err = text.New("modele_de_lettre_annonce_inspection.fodt").
-		Funcs(templateHelpers).
-		ParseFiles(config.Dir + "modele_de_lettre_annonce_inspection.fodt")
-	if err != nil {
-		return nil, err
-	}
-
-	service.lettreSuiteTemplate, err = text.New("modele_de_lettre_suite_inspection.fodt").
-		Funcs(templateHelpers).
-		ParseFiles(config.Dir + "modele_de_lettre_suite_inspection.fodt")
-	if err != nil {
-		return nil, err
-	}
-
-	service.rapportTemplate, err = text.New("modele_de_rapport_inspection.fodt").
-		Funcs(templateHelpers).
-		ParseFiles(config.Dir + "modele_de_rapport_inspection.fodt")
-	if err != nil {
-		return nil, err
-	}
-
-	return service, nil
+var emailTemplates = []TemplateType{
+	TemplateEmailExpirationDelais,
+	TemplateEmailNouveauxMessages,
+	TemplateEmailRecapValidation,
+	TemplateEmailRappelEcheances,
 }
 
-func (s *TemplateService) RenderHTMLEmailNouveauxMessages(data interface{}) (string, error) {
-	return s.renderHTMLTemplate(s.emailNouveauxMessagesTemplate, data)
+var odtTemplates = []TemplateType{
+	TemplateODTLettreAnnonce,
+	TemplateODTLettreSuite,
+	TemplateODTRapport,
 }
 
-func (s *TemplateService) RenderHTMLEmailRecapValidation(data interface{}) (string, error) {
-	return s.renderHTMLTemplate(s.emailRecapValidationTemplate, data)
+type Template struct {
+	HTML *html.Template
+	Text *text.Template
 }
 
-func (s *TemplateService) RenderHTMLEmailExpirationDelais(data interface{}) (string, error) {
-	return s.renderHTMLTemplate(s.emailExpirationDelaisTemplate, data)
-}
-
-func (s *TemplateService) RenderHTMLEmailRappelEcheances(data interface{}) (string, error) {
-	return s.renderHTMLTemplate(s.emailRappelEcheancesTemplate, data)
-}
-
-func (s *TemplateService) RenderLettreAnnonce(data interface{}) (string, error) {
-	return s.renderTextTemplate(s.lettreAnnonceTemplate, data)
-}
-
-func (s *TemplateService) RenderLettreSuite(data interface{}) (string, error) {
-	return s.renderTextTemplate(s.lettreSuiteTemplate, data)
-}
-
-func (s *TemplateService) RenderRapport(data interface{}) (string, error) {
-	return s.renderTextTemplate(s.rapportTemplate, data)
-}
-
-func (s *TemplateService) addCommonVariables(data interface{}) map[string]interface{} {
-	output := structs.Map(data)
-	output["BaseURL"] = s.config.BaseURL
-	return output
-}
-
-func (s *TemplateService) renderHTMLTemplate(tmpl *html.Template, data interface{}) (string, error) {
-	var tpl bytes.Buffer
-	err := tmpl.Execute(&tpl, s.addCommonVariables(data))
-	if err != nil {
-		return "", err
+func (t *Template) Render(data interface{}) (*models.RenderedTemplate, error) {
+	result := &models.RenderedTemplate{}
+	if t.HTML != nil {
+		var tpl bytes.Buffer
+		err := t.HTML.Execute(&tpl, data)
+		if err != nil {
+			return nil, err
+		}
+		result.HTML = tpl.String()
 	}
-	return tpl.String(), nil
-}
-
-func (s *TemplateService) renderTextTemplate(tmpl *text.Template, data interface{}) (string, error) {
-	var tpl bytes.Buffer
-	err := tmpl.Execute(&tpl, s.addCommonVariables(data))
-	if err != nil {
-		return "", err
+	if t.Text != nil {
+		var tpl bytes.Buffer
+		err := t.Text.Execute(&tpl, data)
+		if err != nil {
+			return nil, err
+		}
+		result.Text = tpl.String()
 	}
-	return tpl.String(), nil
+	return result, nil
 }

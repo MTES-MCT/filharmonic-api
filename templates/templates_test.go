@@ -13,7 +13,7 @@ import (
 func initTest(t *testing.T) (*require.Assertions, *TemplateService) {
 	assert := require.New(t)
 	service, err := New(Config{
-		Dir:     "templates/",
+		Dir:     "./",
 		BaseURL: "http://localhost:8080",
 	})
 	assert.NoError(err)
@@ -53,11 +53,12 @@ func TestRenderEmailNouveauxMessages(t *testing.T) {
 		},
 	}
 
-	htmlPart, err := service.RenderHTMLEmailNouveauxMessages(data)
+	result, err := service.RenderEmailNouveauxMessages(data)
 	assert.NoError(err)
-	assert.Contains(htmlPart, "Il faut des photos")
-	assert.Contains(htmlPart, "Il faut des documents")
-	assert.NoError(ioutil.WriteFile("../.tmp/email-new-messages.html", []byte(htmlPart), 0644))
+	assert.Contains(result.HTML, "Il faut des photos")
+	assert.Contains(result.HTML, "Il faut des documents")
+	assert.NoError(ioutil.WriteFile("../.tmp/email-new-messages.html", []byte(result.HTML), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/email-new-messages.txt", []byte(result.Text), 0644))
 }
 
 func TestRenderEmailRecapValidation(t *testing.T) {
@@ -75,11 +76,12 @@ func TestRenderEmailRecapValidation(t *testing.T) {
 		AdresseEtablissement: "1 rue des Fleurs 75000 Paris",
 	}
 
-	htmlPart, err := service.RenderHTMLEmailRecapValidation(data)
+	result, err := service.RenderEmailRecapValidation(data)
 	assert.NoError(err)
-	assert.Contains(htmlPart, data.RaisonEtablissement)
-	assert.Contains(htmlPart, "échéances de résolution")
-	assert.NoError(ioutil.WriteFile("../.tmp/email-recap-validation.html", []byte(htmlPart), 0644))
+	assert.Contains(result.HTML, data.RaisonEtablissement)
+	assert.Contains(result.HTML, "échéances de résolution")
+	assert.NoError(ioutil.WriteFile("../.tmp/email-recap-validation.html", []byte(result.HTML), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/email-recap-validation.txt", []byte(result.Text), 0644))
 }
 
 func TestRenderHTMLEmailExpirationDelais(t *testing.T) {
@@ -96,11 +98,12 @@ func TestRenderHTMLEmailExpirationDelais(t *testing.T) {
 		AdresseEtablissement: "1 rue des Fleurs 75000 Paris",
 	}
 
-	htmlPart, err := service.RenderHTMLEmailExpirationDelais(data)
+	result, err := service.RenderEmailExpirationDelais(data)
 	assert.NoError(err)
-	assert.Contains(htmlPart, "lever vos non-conformités")
-	assert.Contains(htmlPart, data.AdresseEtablissement)
-	assert.NoError(ioutil.WriteFile("../.tmp/email-expiration-delais.html", []byte(htmlPart), 0644))
+	assert.Contains(result.HTML, "lever vos non-conformités")
+	assert.Contains(result.HTML, data.AdresseEtablissement)
+	assert.NoError(ioutil.WriteFile("../.tmp/email-expiration-delais.html", []byte(result.HTML), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/email-expiration-delais.txt", []byte(result.Text), 0644))
 }
 
 func TestRenderHTMLEmailRappelEcheances(t *testing.T) {
@@ -117,11 +120,14 @@ func TestRenderHTMLEmailRappelEcheances(t *testing.T) {
 		AdresseEtablissement: "1 rue des Fleurs 75000 Paris",
 	}
 
-	htmlPart, err := service.RenderHTMLEmailRappelEcheances(data)
+	result, err := service.RenderEmailRappelEcheances(data)
 	assert.NoError(err)
-	assert.Contains(htmlPart, "échéances de résolution sont proches")
-	assert.Contains(htmlPart, data.AdresseEtablissement)
-	assert.NoError(ioutil.WriteFile("../.tmp/email-rappel-echeances.html", []byte(htmlPart), 0644))
+	assert.Contains(result.HTML, "échéances de résolution sont proches")
+	assert.Contains(result.Text, "échéances de résolution sont proches")
+	assert.Contains(result.HTML, data.AdresseEtablissement)
+	assert.Contains(result.Text, data.AdresseEtablissement)
+	assert.NoError(ioutil.WriteFile("../.tmp/email-rappel-echeances.html", []byte(result.HTML), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/email-rappel-echeances.txt", []byte(result.Text), 0644))
 }
 
 func TestRenderLettre(t *testing.T) {
@@ -184,9 +190,9 @@ func TestRenderLettre(t *testing.T) {
 		},
 	}
 
-	data, err := service.RenderLettreAnnonce(domain.NewLettre(inspection))
+	result, err := service.RenderODTLettreAnnonce(domain.NewLettre(inspection))
 	assert.NoError(err)
-	assert.NoError(ioutil.WriteFile("../.tmp/lettre-annonce.fodt", []byte(data), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/lettre-annonce.fodt", []byte(result.Text), 0644))
 }
 
 func TestRenderRapport(t *testing.T) {
@@ -308,9 +314,9 @@ func TestRenderRapport(t *testing.T) {
 		},
 	}
 
-	data, err := service.RenderRapport(domain.NewRapport(inspection))
+	result, err := service.RenderODTRapport(domain.NewRapport(inspection))
 	assert.NoError(err)
-	assert.NoError(ioutil.WriteFile("../.tmp/rapport.fodt", []byte(data), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/rapport.fodt", []byte(result.Text), 0644))
 }
 
 func TestRenderLettreSuite(t *testing.T) {
@@ -378,7 +384,7 @@ func TestRenderLettreSuite(t *testing.T) {
 		},
 	}
 
-	data, err := service.RenderLettreSuite(domain.NewLettre(inspection))
+	result, err := service.RenderODTLettreSuite(domain.NewLettre(inspection))
 	assert.NoError(err)
-	assert.NoError(ioutil.WriteFile("../.tmp/lettre-suite.fodt", []byte(data), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/lettre-suite.fodt", []byte(result.Text), 0644))
 }

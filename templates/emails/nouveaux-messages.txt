@@ -1,0 +1,13 @@
+{{ define "content" }}Bonjour {{ .Destinataire.Nom }},
+
+Vous avez {{ len .Messages }} message(s) non lu(s) sur Fil'Harmonic à l'adresse suivante : {{ $.BaseURL }}
+
+{{ range .Messages }}
+Établissement : {{ .RaisonEtablissement }}
+Inspection du {{ .DateInspection }} ({{ $.BaseURL }}/inspections/{{ .InspectionId }})
+Sujet : {{ .SujetPointDeControle }} ({{ $.BaseURL }}/inspections/{{ .InspectionId }}/#pdc{{ .PointDeControleId }})
+{{ .NomAuteur }}, le {{ .DateMessage }} ({{ $.BaseURL }}/inspections/{{ .InspectionId }}#pdc{{ .PointDeControleId }}-m{{ .MessageId }})
+{{ .Message }}
+
+{{ end }}
+{{ end }}

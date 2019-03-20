@@ -88,10 +88,11 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 		return nil, errors.NewErrForbidden("L'inspection doit être à l'état en cours.")
 	}
 
-	contenuLettre, err := s.templateService.RenderLettreAnnonce(NewLettre(inspection))
+	result, err := s.templateService.RenderODTLettreAnnonce(NewLettre(inspection))
 	if err != nil {
 		return nil, err
 	}
+	contenuLettre := result.Text
 	return &models.File{
 		Nom:     "lettre-annonce.odt",
 		Type:    "application/vnd.oasis.opendocument.text",
@@ -123,10 +124,11 @@ func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*mod
 		return nil, ErrInvalidInput
 	}
 
-	contenuLettre, err := s.templateService.RenderLettreSuite(NewLettre(inspection))
+	result, err := s.templateService.RenderODTLettreSuite(NewLettre(inspection))
 	if err != nil {
 		return nil, err
 	}
+	contenuLettre := result.Text
 	return &models.File{
 		Nom:     "lettre-suite.odt",
 		Type:    "application/vnd.oasis.opendocument.text",
@@ -206,10 +208,11 @@ func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.
 		return nil, errors.NewErrForbidden("L'inspection doit être à l'état en cours.")
 	}
 
-	contenuRapport, err := s.templateService.RenderRapport(NewRapport(inspection))
+	result, err := s.templateService.RenderODTRapport(NewRapport(inspection))
 	if err != nil {
 		return nil, err
 	}
+	contenuRapport := result.Text
 	return &models.File{
 		Nom:     "rapport.odt",
 		Type:    "application/vnd.oasis.opendocument.text",

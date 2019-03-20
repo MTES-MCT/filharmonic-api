@@ -1,0 +1,8 @@
+{{ define "content" }}Bonjour {{ .Destinataire.Nom }},
+
+Des délais de mise en conformités relatifs à l'inspection du {{ .DateInspection }} sur votre établissement {{ .RaisonEtablissement }} sis {{ .AdresseEtablissement }} sont expirés.
+Vous devez rapidement lever vos non-conformités et informer votre inspecteur de l'état d'avancement de vos actions correctives.
+Vous pouvez consulter le détail sur Fil'Harmonic à l'adresse suivante :
+
+{{ $.BaseURL }}/inspections/{{ .InspectionId }}
+{{ end }}
