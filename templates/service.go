@@ -2,6 +2,7 @@ package templates
 
 import (
 	html "html/template"
+	"strings"
 	text "text/template"
 
 	"github.com/MTES-MCT/filharmonic-api/models"
@@ -177,6 +178,9 @@ var (
 		},
 		"add": func(a int, b int) int {
 			return a + b
+		},
+		"split": func(s string) []string {
+			return strings.Split(s, "\n")
 		},
 	}
 )

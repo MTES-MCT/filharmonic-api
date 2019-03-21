@@ -4258,7 +4258,10 @@
    <text:p text:style-name="Text_20_body"/>
 
    <text:p text:style-name="Heading_20_1" text:outline-level="1">Contexte</text:p>
-   <text:p text:style-name="P96">{{ .Inspection.Contexte }}</text:p>
+   {{ $contexte_formate := split .Inspection.Contexte }}
+   {{ range $contexte_formate }}
+      <text:p text:style-name="P96">{{ . }}</text:p>
+   {{ end }}
 
    <text:p text:style-name="Heading_20_1" text:outline-level="1">Points de contrôle</text:p>
    {{ range .Inspection.PointsDeControle }}
@@ -4319,7 +4322,11 @@
           </table:table-row>
           <table:table-row table:style-name="Tableau6.2">
           <table:table-cell table:style-name="Tableau6.B2" table:number-columns-spanned="2" office:value-type="string">
-            <text:p text:style-name="P128">Remarques : {{ .Constat.Remarques }}</text:p>
+          {{ $remarques_splittees := split .Constat.Remarques }}
+            <text:p text:style-name="P128">Remarques :</text:p>
+            {{ range $remarques_splittees }}
+            <text:p text:style-name="P128">{{ . }}</text:p>
+            {{ end }}
           </table:table-cell>
           <table:covered-table-cell/>
           </table:table-row>
@@ -4341,7 +4348,10 @@
         <text:p text:style-name="P105">{{ type_suite .Inspection.Suite.Type }}</text:p>
         {{ if .Inspection.Suite.PenalEngage }}<text:p text:style-name="P105">Suites pénales engagées</text:p>{{ end }}
         <text:p text:style-name="P104">Synthèse des suites :</text:p>
-        <text:p text:style-name="P105">{{ .Inspection.Suite.Synthese }}</text:p>
+          {{ $synthese_splittee := split .Inspection.Suite.Synthese }}
+          {{ range $synthese_splittee }}
+        <text:p text:style-name="P105">{{ . }}</text:p>
+          {{ end }}
         <text:p text:style-name="P33"/>
       </table:table-cell>
       <table:covered-table-cell/>
