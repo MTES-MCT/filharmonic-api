@@ -54,7 +54,7 @@ go test -p 1 -v ./...
 ```
 
 - `DEBUG_HTTP=1` permet d'afficher les requêtes et réponses HTTP et leur body (JSON).
-- `FILHARMONIC_DATABASE_SQL_LOG=1` permet d'afficher les requêtes SQL.
+- `FILHARMONIC_DATABASE_LOGSQL=1` permet d'afficher les requêtes SQL.
 
 
 ### Benchmarks
