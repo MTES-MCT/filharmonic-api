@@ -35,12 +35,14 @@ func NewLettre(inspection *models.Inspection) Lettre {
 	lettre.Inspection = *inspection
 	lettre.DateLettre = util.FormatDate(time.Now())
 	lettre.DateInspection = util.FormatDate(inspection.Date.Time)
-	lettre.Prefet = "PRÉFET DU RHÔNE"
-	lettre.DepartementUnite = "Rhône"
+	if inspection.Etablissement.Departement != nil {
+		lettre.Prefet = "Préfet " + inspection.Etablissement.Departement.AvecCharniere()
+		lettre.DepartementUnite = inspection.Etablissement.Departement.AvecCharniere()
+		lettre.NomDirection = "Direction régionale de l'environnement, de l'aménagement et du logement " + inspection.Etablissement.Departement.Region
+	}
 	lettre.HeureInspection = "9h30"
-	lettre.NomDirection = "DREAL Auvergne-Rhône-Alpes"
-	lettre.URLDirection = "www.auvergne.rhone-alpes.developpement-durable.gouv.fr"
-	lettre.VilleUnite = "Lyon"
+	lettre.URLDirection = "www.developpement-durable.gouv.fr"
+	lettre.VilleUnite = inspection.Etablissement.Commune
 
 	if len(inspection.Inspecteurs) > 0 {
 		lettre.Auteur = Person{
@@ -156,11 +158,13 @@ func NewRapport(inspection *models.Inspection) Rapport {
 	rapport.Inspection = *inspection
 	rapport.DateRapport = util.FormatDate(time.Now())
 	rapport.DateInspection = util.FormatDate(inspection.Date.Time)
-	rapport.Prefet = "PRÉFET DU RHÔNE"
-	rapport.DepartementUnite = "Rhône"
-	rapport.NomDirection = "DREAL Auvergne-Rhône-Alpes"
-	rapport.URLDirection = "www.auvergne.rhone-alpes.developpement-durable.gouv.fr"
-	rapport.VilleUnite = "Lyon"
+	if inspection.Etablissement.Departement != nil {
+		rapport.Prefet = "Préfet " + inspection.Etablissement.Departement.AvecCharniere()
+		rapport.DepartementUnite = inspection.Etablissement.Departement.AvecCharniere()
+		rapport.NomDirection = "Direction régionale de l'environnement, de l'aménagement et du logement " + inspection.Etablissement.Departement.Region
+	}
+	rapport.URLDirection = "www.developpement-durable.gouv.fr"
+	rapport.VilleUnite = inspection.Etablissement.Commune
 
 	if len(inspection.Inspecteurs) > 0 {
 		rapport.Auteur = Person{

@@ -108,50 +108,101 @@ func SeedsTestDB(db *pg.DB) error {
 		return err
 	}
 
+	departements := []interface{}{
+		&models.Departement{
+			// Id: 1
+			CodeInsee:       "75",
+			Nom:             "Paris",
+			Charniere:       "de ",
+			Region:          "Île-de-France",
+			CharniereRegion: "d'",
+		},
+		&models.Departement{
+			// Id: 2
+			CodeInsee:       "44",
+			Nom:             "Loire-Atlantique",
+			Charniere:       "de la ",
+			Region:          "Pays de la Loire",
+			CharniereRegion: "des ",
+		},
+		&models.Departement{
+			// Id: 3
+			CodeInsee:       "69",
+			Nom:             "Rhône",
+			Charniere:       "du ",
+			Region:          "Auvergne-Rhône-Alpes",
+			CharniereRegion: "d'",
+		},
+		&models.Departement{
+			// Id: 4
+			CodeInsee:       "63",
+			Nom:             "Puy-de-Dôme",
+			Charniere:       "du ",
+			Region:          "Auvergne-Rhône-Alpes",
+			CharniereRegion: "d'",
+		},
+		&models.Departement{
+			// Id: 5
+			CodeInsee:       "01",
+			Nom:             "Ain",
+			Charniere:       "de l'",
+			Region:          "Auvergne-Rhône-Alpes",
+			CharniereRegion: "d'",
+		},
+	}
+	err = db.Insert(departements...)
+	if err != nil {
+		return err
+	}
+
 	etablissements := []interface{}{
 		&models.Etablissement{
 			// Id:      1,
-			S3IC:       "1234",
-			Nom:        "Nom 1",
-			Raison:     "Raison sociale",
-			Adresse1:   "1 rue des fleurs",
-			Adresse2:   "",
-			CodePostal: "75000",
-			Commune:    "Paris",
-			Regime:     models.RegimeAutorisation,
+			S3IC:          "1234",
+			Nom:           "Nom 1",
+			Raison:        "Raison sociale",
+			Adresse1:      "1 rue des fleurs",
+			Adresse2:      "",
+			CodePostal:    "75000",
+			Commune:       "Paris",
+			Regime:        models.RegimeAutorisation,
+			DepartementId: 1,
 		},
 		&models.Etablissement{
 			// Id:      2,
-			S3IC:       "451267",
-			Nom:        "Nom 2",
-			Raison:     "Raison sociale 2",
-			Adresse1:   "1 rue des plantes",
-			Adresse2:   "parcelle 207",
-			CodePostal: "44000",
-			Commune:    "Nantes",
-			Regime:     models.RegimeDeclaration,
+			S3IC:          "451267",
+			Nom:           "Nom 2",
+			Raison:        "Raison sociale 2",
+			Adresse1:      "1 rue des plantes",
+			Adresse2:      "parcelle 207",
+			CodePostal:    "44000",
+			Commune:       "Nantes",
+			Regime:        models.RegimeDeclaration,
+			DepartementId: 2,
 		},
 		&models.Etablissement{
 			// Id:      3,
-			S3IC:       "3335655",
-			Nom:        "Nom 3",
-			Raison:     "Raison sociale 3",
-			Adresse1:   "1 rue des cordeliers",
-			Adresse2:   "",
-			CodePostal: "69000",
-			Commune:    "Lyon",
-			Regime:     models.RegimeAucun,
+			S3IC:          "3335655",
+			Nom:           "Nom 3",
+			Raison:        "Raison sociale 3",
+			Adresse1:      "1 rue des cordeliers",
+			Adresse2:      "",
+			CodePostal:    "69000",
+			Commune:       "Lyon",
+			Regime:        models.RegimeAucun,
+			DepartementId: 3,
 		},
 		&models.Etablissement{
 			// Id:      4,
-			S3IC:       "4444213",
-			Nom:        "Nom 4",
-			Raison:     "Raison sociale 4",
-			Adresse1:   "1 place de l'église",
-			Adresse2:   "",
-			CodePostal: "63000",
-			Commune:    "Clermont-Ferrand",
-			Regime:     models.RegimeEnregistrement,
+			S3IC:          "4444213",
+			Nom:           "Nom 4",
+			Raison:        "Raison sociale 4",
+			Adresse1:      "1 place de l'église",
+			Adresse2:      "",
+			CodePostal:    "63000",
+			Commune:       "Clermont-Ferrand",
+			Regime:        models.RegimeEnregistrement,
+			DepartementId: 4,
 		},
 	}
 	err = db.Insert(etablissements...)

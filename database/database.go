@@ -31,6 +31,7 @@ type Database struct {
 }
 
 var tables = []interface{}{
+	&models.Departement{},
 	&models.Etablissement{},
 	&models.User{},
 	&models.EtablissementToExploitant{},

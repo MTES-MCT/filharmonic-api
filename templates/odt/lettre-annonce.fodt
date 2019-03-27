@@ -773,7 +773,7 @@
    </style:header>
    <style:footer>
     <text:p text:style-name="P2"><text:span text:style-name="A0"><text:span text:style-name="T1">{{ .NomDirection }}</text:span></text:span></text:p>
-    <text:p text:style-name="P3"><text:span text:style-name="A0"><text:span text:style-name="T2">Unité départementale du {{ .DepartementUnite }}</text:span></text:span></text:p>
+    <text:p text:style-name="P3"><text:span text:style-name="A0"><text:span text:style-name="T2">Unité départementale {{ .DepartementUnite }}</text:span></text:span></text:p>
     <text:p text:style-name="P4"><text:span text:style-name="A0"><text:span text:style-name="T1">{{ .URLDirection }}</text:span></text:span></text:p>
    </style:footer>
   </style:master-page>
@@ -1562,7 +1562,7 @@
       <text:p text:style-name="P31"/>
       <text:p text:style-name="P34"><text:span text:style-name="T25">{{ .NomDirection }}</text:span></text:p>
       <text:p text:style-name="P35"/>
-      <text:p text:style-name="P36"><text:span text:style-name="T13">Unité départementale du {{ .DepartementUnite }}</text:span></text:p>
+      <text:p text:style-name="P36"><text:span text:style-name="T13">Unité départementale {{ .DepartementUnite }}</text:span></text:p>
       <text:p text:style-name="P25"/>
       <text:p text:style-name="P27">Affaire suivie par <text:span text:style-name="T22">{{ .Auteur.Nom }}</text:span></text:p>
       <text:p text:style-name="P28"><text:span text:style-name="T26">Tél. : {{ .Auteur.Telephone }}</text:span></text:p>

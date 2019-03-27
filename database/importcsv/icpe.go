@@ -8,6 +8,7 @@ import (
 
 	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/rs/zerolog/log"
 )
 
@@ -17,17 +18,20 @@ const (
 
 func LoadEtablissementsCSV(filepath string, db *database.Database) (returnErr error) {
 	indexesEtablissement := map[string]int{
-		"codeBase":   0,
-		"codeEtab":   1,
-		"nom":        2,
-		"codePostal": 6,
-		"activite":   8,
-		"commune":    9,
-		"seveso":     10,
-		"regime":     11,
-		"iedmtd":     13,
-		"adresse1":   15,
-		"adresse2":   16,
+		"codeBase":    0,
+		"codeEtab":    1,
+		"nom":         2,
+		"region":      3,
+		"departement": 4,
+		"codeInsee":   5,
+		"codePostal":  6,
+		"activite":    8,
+		"commune":     9,
+		"seveso":      10,
+		"regime":      11,
+		"iedmtd":      13,
+		"adresse1":    15,
+		"adresse2":    16,
 	}
 	file, err := os.Open(filepath) // #nosec
 	if err != nil {
@@ -55,6 +59,17 @@ func LoadEtablissementsCSV(filepath string, db *database.Database) (returnErr er
 		log.Warn().Msgf("%d établissements importés", nbEtablissementsImportes)
 	}()
 
+	departements := []models.Departement{}
+	err = db.Model(&departements).Column("id", "code_insee").Select()
+	if err != nil {
+		return err
+	}
+
+	codeInseeToDepartementId := make(map[string]int64)
+	for _, departement := range departements {
+		codeInseeToDepartementId[departement.CodeInsee] = departement.Id
+	}
+
 	done := false
 	for !done {
 		iterations := 0
@@ -74,18 +89,25 @@ func LoadEtablissementsCSV(filepath string, db *database.Database) (returnErr er
 				continue
 			}
 
+			codeDepartement := util.GetCodeDepartementFromCodeInseeCommune(line[indexesEtablissement["codeInsee"]])
+			departementId, ok := codeInseeToDepartementId[codeDepartement]
+			if !ok {
+				log.Warn().Msgf("département `%s` non trouvé pour l'établissement `%s`", codeDepartement, line[indexesEtablissement["nom"]])
+			}
+
 			etablissement := models.Etablissement{
-				S3IC:       computeS3IC(line[indexesEtablissement["codeBase"]], line[indexesEtablissement["codeEtab"]]),
-				Nom:        line[indexesEtablissement["nom"]],
-				Raison:     line[indexesEtablissement["nom"]],
-				Activite:   line[indexesEtablissement["activite"]],
-				Seveso:     line[indexesEtablissement["seveso"]],
-				Regime:     regime,
-				Iedmtd:     toBool(line[indexesEtablissement["iedmtd"]]),
-				Adresse1:   line[indexesEtablissement["adresse1"]],
-				Adresse2:   line[indexesEtablissement["adresse2"]],
-				CodePostal: line[indexesEtablissement["codePostal"]],
-				Commune:    line[indexesEtablissement["commune"]],
+				S3IC:          computeS3IC(line[indexesEtablissement["codeBase"]], line[indexesEtablissement["codeEtab"]]),
+				Nom:           line[indexesEtablissement["nom"]],
+				Raison:        line[indexesEtablissement["nom"]],
+				Activite:      line[indexesEtablissement["activite"]],
+				Seveso:        line[indexesEtablissement["seveso"]],
+				Regime:        regime,
+				Iedmtd:        toBool(line[indexesEtablissement["iedmtd"]]),
+				Adresse1:      line[indexesEtablissement["adresse1"]],
+				Adresse2:      line[indexesEtablissement["adresse2"]],
+				CodePostal:    line[indexesEtablissement["codePostal"]],
+				Commune:       line[indexesEtablissement["commune"]],
+				DepartementId: departementId,
 			}
 			etablissements = append(etablissements, etablissement)
 			iterations++

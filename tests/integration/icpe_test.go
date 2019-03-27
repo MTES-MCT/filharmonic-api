@@ -10,6 +10,47 @@ import (
 
 func TestLoadEtablissementsFromCSV(t *testing.T) {
 	assert, application := tests.InitDB(t)
+	assert.NoError(application.DB.Insert(&[]interface{}{
+		&models.Departement{
+			CodeInsee: "06",
+		},
+		&models.Departement{
+			CodeInsee: "13",
+		},
+		&models.Departement{
+			CodeInsee: "14",
+		},
+		&models.Departement{
+			CodeInsee: "21",
+		},
+		&models.Departement{
+			CodeInsee: "2A",
+		},
+		&models.Departement{
+			CodeInsee: "2B",
+		},
+		&models.Departement{
+			CodeInsee: "50",
+		},
+		&models.Departement{
+			CodeInsee: "61",
+		},
+		&models.Departement{
+			CodeInsee: "67",
+		},
+		&models.Departement{
+			CodeInsee: "68",
+		},
+		&models.Departement{
+			CodeInsee: "71",
+		},
+		&models.Departement{
+			CodeInsee: "83",
+		},
+		&models.Departement{
+			CodeInsee: "972",
+		},
+	}))
 	assert.NoError(application.DB.Insert(&models.Etablissement{
 		S3IC:       "0521.00217",
 		Nom:        "FROMAGERIE OLD",
@@ -34,7 +75,7 @@ func TestLoadEtablissementsFromCSV(t *testing.T) {
 	assert.Equal("0521.00217", etablissement.S3IC)
 	assert.Equal("FROMAGERIE BERTHAUT", etablissement.Raison)
 	assert.Equal("FROMAGERIE BERTHAUT", etablissement.Nom)
-	assert.Equal("10\",\"Fabrication de fromage", etablissement.Activite)
+	assert.Equal("Fabrication de fromage", etablissement.Activite)
 	assert.Equal("PLACE DU CHAMP DE FOIRE", etablissement.Adresse1)
 	assert.Equal("BP 5", etablissement.Adresse2)
 	assert.Equal("21460", etablissement.CodePostal)

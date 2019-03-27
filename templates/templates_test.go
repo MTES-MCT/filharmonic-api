@@ -143,6 +143,13 @@ func TestRenderLettre(t *testing.T) {
 			Adresse2:   "",
 			CodePostal: "75000",
 			Commune:    "Paris",
+			Departement: &models.Departement{
+				CodeInsee:       "75",
+				Nom:             "Paris",
+				Charniere:       "de ",
+				Region:          "Île-de-France",
+				CharniereRegion: "d'",
+			},
 			Exploitants: []models.User{
 				models.User{
 					Prenom:  "Michel",
@@ -222,6 +229,13 @@ func TestRenderRapport(t *testing.T) {
 			Regime:     models.RegimeAutorisation,
 			Seveso:     "haut",
 			Iedmtd:     false,
+			Departement: &models.Departement{
+				CodeInsee:       "75",
+				Nom:             "Paris",
+				Charniere:       "de ",
+				Region:          "Île-de-France",
+				CharniereRegion: "d'",
+			},
 			Exploitants: []models.User{
 				models.User{
 					Prenom:  "Michel",
@@ -339,6 +353,13 @@ func TestRenderLettreSuite(t *testing.T) {
 			Adresse2:   "",
 			CodePostal: "75000",
 			Commune:    "Paris",
+			Departement: &models.Departement{
+				CodeInsee:       "75",
+				Nom:             "Paris",
+				Charniere:       "de ",
+				Region:          "Île-de-France",
+				CharniereRegion: "d'",
+			},
 			Exploitants: []models.User{
 				models.User{
 					Prenom:  "Michel",
