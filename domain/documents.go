@@ -86,8 +86,8 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 	if inspection == nil {
 		return nil, ErrInvalidInput
 	}
-	if inspection.Etat != models.EtatEnCours {
-		return nil, errors.NewErrForbidden("L'inspection doit être à l'état en cours.")
+	if inspection.Etat != models.EtatPreparation && inspection.Etat != models.EtatEnCours {
+		return nil, errors.NewErrForbidden("L'inspection doit être en préparation ou en cours.")
 	}
 
 	result, err := s.templateService.RenderODTLettreAnnonce(NewLettre(inspection))
