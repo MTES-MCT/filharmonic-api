@@ -273,6 +273,51 @@ func TestCreateInspectionWithCanevas(t *testing.T) {
 	firstMessage.Value("auteur").Object().ValueEqual("email", "inspecteur1@filharmonic.com")
 }
 
+func TestCreateInspectionWithPreviousInspection(t *testing.T) {
+	e, close := tests.Init(t)
+	defer close()
+
+	inspectionInput := models.Inspection{
+		Date:            util.Date("2019-01-22"),
+		Type:            models.TypeCourant,
+		Annonce:         true,
+		Origine:         models.OriginePlanControle,
+		EtablissementId: 1,
+		Inspecteurs: []models.User{
+			models.User{
+				Id: 3,
+			},
+			models.User{
+				Id: 4,
+			},
+		},
+		Themes: []string{
+			"Incendie",
+			"Produits chimiques",
+		},
+		Contexte:               "Contrôles de début d'année",
+		PrecedenteInspectionId: 5,
+	}
+
+	inspectionId := tests.AuthInspecteur(e.POST("/inspections")).WithJSON(inspectionInput).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().Value("id").Raw()
+
+	inspection := tests.AuthInspecteur(e.GET("/inspections/{id}")).WithPath("id", inspectionId).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
+	pointsDeControle := inspection.Value("points_de_controle").Array()
+	pointsDeControle.Length().Equal(1)
+
+	pointDeControle := pointsDeControle.First().Object()
+	pointDeControle.ValueEqual("sujet", "Rejets Air")
+	pointDeControle.Value("references_reglementaires").Array().Equal([]string{
+		"Article 1 de l'Arrêté ministériel du 28 avril 2015",
+	})
+}
+
 func TestCreateCanevasFromInspection(t *testing.T) {
 	e, close := tests.Init(t)
 	defer close()

@@ -43,6 +43,12 @@ func (s *Service) CreateInspection(ctx *UserContext, inspection models.Inspectio
 	if err != nil {
 		return 0, err
 	}
+	if inspection.PrecedenteInspectionId > 0 {
+		err = s.repo.ImportPointsDeControlesNonConformes(ctx, inspectionId, inspection.PrecedenteInspectionId)
+		if err != nil {
+			return 0, err
+		}
+	}
 	if inspection.CanevasId > 0 {
 		canevas, err := s.repo.GetCanevasByID(inspection.CanevasId)
 		if err != nil {

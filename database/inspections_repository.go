@@ -4,11 +4,16 @@ import (
 	"time"
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
+	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/go-pg/pg/types"
+)
+
+var (
+	ErrBesoinInspecteurAffecte = errors.NewErrForbidden("Il faut être affecté à l'inspection")
 )
 
 func (repo *Repository) ListInspections(ctx *domain.UserContext, filter domain.ListInspectionsFilter) ([]models.Inspection, error) {
@@ -452,5 +457,35 @@ func (repo *Repository) UpdateNotificationEcheanceExpireeEnvoyee(constatIds []in
 		Column("notification_echeance_expiree_envoyee").
 		Where("id in (?)", pg.In(constatIds)).
 		Update()
+	return err
+}
+
+func (repo *Repository) ImportPointsDeControlesNonConformes(ctx *domain.UserContext, inspectionId int64, previousInspectionId int64) error {
+	var precedenteInspection models.Inspection
+	err := repo.db.client.Model(&precedenteInspection).
+		Relation("PointsDeControle").
+		Relation("PointsDeControle.Constat").
+		Join("JOIN inspection_to_inspecteurs AS u").
+		JoinOn("u.inspection_id = inspection.id").
+		JoinOn("u.user_id = ?", ctx.User.Id).
+		Where("id = ?", previousInspectionId).
+		Select()
+	if err == pg.ErrNoRows {
+		return ErrBesoinInspecteurAffecte
+	}
+
+	pointsDeControle := make([]models.PointDeControle, 0)
+	for _, pointDeControle := range precedenteInspection.PointsDeControle {
+		if pointDeControle.Constat != nil && pointDeControle.Constat.Type != models.TypeConstatConforme && pointDeControle.Constat.DateResolution.IsZero() {
+			pointsDeControle = append(pointsDeControle, models.PointDeControle{
+				Sujet:                    pointDeControle.Sujet,
+				ReferencesReglementaires: pointDeControle.ReferencesReglementaires,
+				InspectionId:             inspectionId,
+			})
+		}
+	}
+	if len(pointsDeControle) > 0 {
+		err = repo.db.client.Insert(&pointsDeControle)
+	}
 	return err
 }

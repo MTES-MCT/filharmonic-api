@@ -72,6 +72,7 @@ type Inspection struct {
 	NbMessagesNonLus          int   `json:"nb_messages_non_lus" sql:"-"`
 	NbNonConformitesAResoudre int   `json:"nb_non_conformites_a_resoudre" sql:"-"`
 	CanevasId                 int64 `json:"canevas_id" sql:"-"`
+	PrecedenteInspectionId    int64 `json:"precedente_inspection_id" sql:"-"`
 }
 
 type InspectionToInspecteur struct {

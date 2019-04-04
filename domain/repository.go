@@ -30,6 +30,7 @@ type Repository interface {
 	UpdateInspection(ctx *UserContext, inspection models.Inspection) error
 	GetInspectionByID(ctx *UserContext, id int64, filter InspectionFilter) (*models.Inspection, error)
 	ImportCanevas(ctx *UserContext, inspectionId int64, canevas models.Canevas) error
+	ImportPointsDeControlesNonConformes(ctx *UserContext, inspectionId int64, previousInspectionId int64) error
 	CheckEtatInspection(idInspection int64, etats []models.EtatInspection) (bool, error)
 	GetEtatInspectionByPointDeControleID(idPointDeControle int64) (models.EtatInspection, error)
 	CheckInspectionHasNonConformites(idInspection int64) (bool, error)
