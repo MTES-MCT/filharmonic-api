@@ -43,7 +43,7 @@ func New(config Config) (*TemplateService, error) {
 	dirOdt := config.Dir + "odt/"
 	for _, templateName := range odtTemplates {
 		template := &Template{}
-		template.Text, err = text.New(string(templateName) + ".fodt").
+		template.HTML, err = html.New(string(templateName) + ".fodt").
 			Funcs(templateHelpers).
 			ParseFiles(dirOdt + string(templateName) + ".fodt")
 		if err != nil {
@@ -71,15 +71,25 @@ func (s *TemplateService) RenderEmailRecapValidation(data interface{}) (*models.
 }
 
 func (s *TemplateService) RenderODTLettreAnnonce(data interface{}) (*models.RenderedTemplate, error) {
-	return s.render(TemplateODTLettreAnnonce, data)
+	return s.renderODT(TemplateODTLettreAnnonce, data)
 }
 
 func (s *TemplateService) RenderODTLettreSuite(data interface{}) (*models.RenderedTemplate, error) {
-	return s.render(TemplateODTLettreSuite, data)
+	return s.renderODT(TemplateODTLettreSuite, data)
 }
 
 func (s *TemplateService) RenderODTRapport(data interface{}) (*models.RenderedTemplate, error) {
-	return s.render(TemplateODTRapport, data)
+	return s.renderODT(TemplateODTRapport, data)
+}
+
+func (s *TemplateService) renderODT(template TemplateType, data interface{}) (*models.RenderedTemplate, error) {
+	renderedTemplate, err := s.render(template, data)
+	if err != nil {
+		return nil, err
+	}
+	// le header XML ODT est sorti du template car il est mal échappé par html/template et casse le document
+	renderedTemplate.HTML = `<?xml version="1.0" encoding="UTF-8"?>` + renderedTemplate.HTML
+	return renderedTemplate, nil
 }
 
 func (s *TemplateService) render(template TemplateType, data interface{}) (*models.RenderedTemplate, error) {
@@ -93,7 +103,7 @@ func (s *TemplateService) addCommonVariables(data interface{}) map[string]interf
 }
 
 var (
-	templateHelpers = text.FuncMap{
+	templateHelpers = html.FuncMap{
 		"type_suite": func(value models.TypeSuite) string {
 			switch value {
 			case models.TypeSuiteAucune:

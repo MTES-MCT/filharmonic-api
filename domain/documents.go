@@ -94,7 +94,7 @@ func (s *Service) GenererLettreAnnonce(ctx *UserContext, idInspection int64) (*m
 	if err != nil {
 		return nil, err
 	}
-	contenuLettre := result.Text
+	contenuLettre := result.HTML
 	return &models.File{
 		Nom:     "lettre-annonce.odt",
 		Type:    "application/vnd.oasis.opendocument.text",
@@ -130,7 +130,7 @@ func (s *Service) GenererLettreSuite(ctx *UserContext, idInspection int64) (*mod
 	if err != nil {
 		return nil, err
 	}
-	contenuLettre := result.Text
+	contenuLettre := result.HTML
 	return &models.File{
 		Nom:     "lettre-suite.odt",
 		Type:    "application/vnd.oasis.opendocument.text",
@@ -216,7 +216,7 @@ func (s *Service) GenererRapport(ctx *UserContext, idInspection int64) (*models.
 	if err != nil {
 		return nil, err
 	}
-	contenuRapport := result.Text
+	contenuRapport := result.HTML
 	return &models.File{
 		Nom:     "rapport.odt",
 		Type:    "application/vnd.oasis.opendocument.text",

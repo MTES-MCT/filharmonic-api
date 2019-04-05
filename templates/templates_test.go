@@ -199,7 +199,7 @@ func TestRenderLettre(t *testing.T) {
 
 	result, err := service.RenderODTLettreAnnonce(domain.NewLettre(inspection))
 	assert.NoError(err)
-	assert.NoError(ioutil.WriteFile("../.tmp/lettre-annonce.fodt", []byte(result.Text), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/lettre-annonce.fodt", []byte(result.HTML), 0644))
 }
 
 func TestRenderRapport(t *testing.T) {
@@ -319,10 +319,8 @@ func TestRenderRapport(t *testing.T) {
 					"Article 8.2.1.1. de l'arrêté préfectoral du 28 juin 2017",
 				},
 				Constat: &models.Constat{
-					Type: models.TypeConstatConforme,
-					Remarques: `Sed (saepe enim redeo ad Scipionem, cuius omnis sermo erat de amicitia) querebatur, quod omnibus in rebus homines diligentiores essent; capras et oves quot quisque haberet, dicere posse, amicos quot haberet, non posse dicere et in illis quidem parandis adhibere curam, in amicis eligendis neglegentis esse nec habere quasi signa quaedam et notas, quibus eos qui ad amicitias essent idonei, iudicarent. Sunt igitur firmi et stabiles et constantes eligendi; cuius generis est magna penuria. Et iudicare difficile est sane nisi expertum; experiendum autem est in ipsa amicitia. Ita praecurrit amicitia iudicium tollitque experiendi potestatem.
-					Quis enim aut eum diligat quem metuat, aut eum a quo se metui putet? Coluntur tamen simulatione dumtaxat ad tempus. Quod si forte, ut fit plerumque, ceciderunt, tum intellegitur quam fuerint inopes amicorum. Quod Tarquinium dixisse ferunt, tum exsulantem se intellexisse quos fidos amicos habuisset, quos infidos, cum iam neutris gratiam referre posset.
-					Mensarum enim voragines et varias voluptatum inlecebras, ne longius progrediar, praetermitto illuc transiturus quod quidam per ampla spatia urbis subversasque silices sine periculi metu properantes equos velut publicos signatis quod dicitur calceis agitant, familiarium agmina tamquam praedatorios globos post terga trahentes ne Sannione quidem, ut ait comicus, domi relicto. quos imitatae matronae complures opertis capitibus et basternis per latera civitatis cuncta discurrunt.`,
+					Type:      models.TypeConstatConforme,
+					Remarques: `Les valeurs sont > 2% et < 10%.`,
 				},
 			},
 		},
@@ -337,7 +335,9 @@ func TestRenderRapport(t *testing.T) {
 
 	result, err := service.RenderODTRapport(domain.NewRapport(inspection))
 	assert.NoError(err)
-	assert.NoError(ioutil.WriteFile("../.tmp/rapport.fodt", []byte(result.Text), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/rapport.fodt", []byte(result.HTML), 0644))
+	assert.NotContains(result.HTML, "Les valeurs sont > 2% et < 10%.")
+	assert.Contains(result.HTML, "Les valeurs sont &gt; 2% et &lt; 10%.")
 }
 
 func TestRenderLettreSuite(t *testing.T) {
@@ -414,5 +414,5 @@ func TestRenderLettreSuite(t *testing.T) {
 
 	result, err := service.RenderODTLettreSuite(domain.NewLettre(inspection))
 	assert.NoError(err)
-	assert.NoError(ioutil.WriteFile("../.tmp/lettre-suite.fodt", []byte(result.Text), 0644))
+	assert.NoError(ioutil.WriteFile("../.tmp/lettre-suite.fodt", []byte(result.HTML), 0644))
 }
