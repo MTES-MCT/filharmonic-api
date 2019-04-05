@@ -7,6 +7,10 @@
 
 Application en cours de développement et accessible sur [filharmonic.beta.gouv.fr](https://filharmonic.beta.gouv.fr).
 
+## Développement
+
+Voir le [guide de développement](./DEVELOPMENT.md).
+
 ## Crédits
 
 ### Production
