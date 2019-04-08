@@ -113,7 +113,7 @@ var (
 			case models.TypeSuitePropositionMiseEnDemeure:
 				return "Proposition de suites administratives"
 			case models.TypeSuitePropositionRenforcement:
-				return "Proposition de renforcement, modification ou mise à jour des prescription"
+				return "Proposition de renforcement, modification ou mise à jour des prescriptions"
 			case models.TypeSuiteAutre:
 				return "Autre"
 			default:
