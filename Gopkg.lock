@@ -465,7 +465,7 @@
   revision = "2be51725563103c17124a318f1745b66f2347acb"
 
 [[projects]]
-  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
+  digest = "1:d394a618b079cbf94b982fe032389984520374eec83f24e58653a5c85f49f6b9"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -476,6 +476,7 @@
     "internal/triegen",
     "internal/ucd",
     "language",
+    "runes",
     "secure/bidirule",
     "transform",
     "unicode/bidi",
@@ -542,6 +543,9 @@
     "github.com/rs/zerolog/log",
     "github.com/stretchr/testify/mock",
     "github.com/stretchr/testify/require",
+    "golang.org/x/text/runes",
+    "golang.org/x/text/transform",
+    "golang.org/x/text/unicode/norm",
     "gopkg.in/gavv/httpexpect.v1",
   ]
   solver-name = "gps-cdcl"

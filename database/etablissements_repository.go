@@ -5,6 +5,7 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/errors"
 	"github.com/MTES-MCT/filharmonic-api/models"
+	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 )
@@ -29,15 +30,15 @@ func (repo *Repository) FindEtablissements(ctx *domain.UserContext, filter domai
 		query.Where("s3ic ilike ?", helper.BuildSearchValue(filter.S3IC))
 	}
 	if filter.Nom != "" {
-		query.Where("nom ilike ? OR raison ilike ?", helper.BuildSearchValue(filter.Nom), helper.BuildSearchValue(filter.Nom))
+		query.Where("f_unaccent(nom) ilike ? OR f_unaccent(raison) ilike ?", helper.BuildSearchValue(util.Normalize(filter.Nom)), helper.BuildSearchValue(util.Normalize(filter.Nom)))
 	}
 	if filter.Adresse != "" {
-		adresse := helper.BuildSearchValue(filter.Adresse)
+		adresse := helper.BuildSearchValue(util.Normalize(filter.Adresse))
 		query.WhereGroup(func(q *orm.Query) (*orm.Query, error) {
-			q.WhereOr("adresse1 ilike ?", adresse).
-				WhereOr("adresse2 ilike ?", adresse).
+			q.WhereOr("f_unaccent(adresse1) ilike ?", adresse).
+				WhereOr("f_unaccent(adresse2) ilike ?", adresse).
 				WhereOr("code_postal ilike ?", adresse).
-				WhereOr("commune ilike ?", adresse)
+				WhereOr("f_unaccent(commune) ilike ?", adresse)
 			return q, nil
 		})
 	}
