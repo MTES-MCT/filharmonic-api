@@ -58,6 +58,8 @@ func (a *Application) BootstrapDB() error {
 	} else if a.Config.Mode == ModeTest {
 		a.Config.Database.InitSchema = true
 		a.Config.Database.Seeds = true
+	} else if a.Config.Mode == ModeNoSeeds {
+		a.Config.Database.InitSchema = true
 	}
 
 	db, err := database.New(a.Config.Database)
@@ -66,7 +68,7 @@ func (a *Application) BootstrapDB() error {
 	}
 	a.DB = db
 
-	if a.Config.Mode == ModeTest {
+	if a.Config.Mode == ModeTest || a.Config.Mode == ModeNoSeeds {
 		a.EventsManager = events.NewStub()
 	} else {
 		a.Redis, err = redis.New(a.Config.Redis)
@@ -89,7 +91,7 @@ func (a *Application) BootstrapServer() error {
 	if a.Config.Mode == ModeDev {
 		a.Sso = stubsso.New(a.Repo)
 		a.Sessions = sessions.NewRedis(a.Config.Sessions, a.Redis)
-	} else if a.Config.Mode == ModeTest {
+	} else if a.Config.Mode == ModeTest || a.Config.Mode == ModeNoSeeds {
 		a.Sso = stubsso.New(a.Repo)
 		a.Sessions = sessions.NewMemory()
 	} else {

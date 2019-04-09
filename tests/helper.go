@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 
 	httpexpect "gopkg.in/gavv/httpexpect.v1"
@@ -15,14 +16,15 @@ import (
 	"github.com/MTES-MCT/filharmonic-api/authentication"
 	authmocks "github.com/MTES-MCT/filharmonic-api/authentication/mocks"
 	"github.com/MTES-MCT/filharmonic-api/authentication/sessions"
+	"github.com/MTES-MCT/filharmonic-api/database"
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	domainmocks "github.com/MTES-MCT/filharmonic-api/domain/mocks"
 	"github.com/MTES-MCT/filharmonic-api/emails"
 	"github.com/MTES-MCT/filharmonic-api/events"
 	"github.com/MTES-MCT/filharmonic-api/httpserver"
+	"github.com/MTES-MCT/filharmonic-api/models"
 	"github.com/MTES-MCT/filharmonic-api/storage"
 	"github.com/MTES-MCT/filharmonic-api/templates"
-	"github.com/MTES-MCT/filharmonic-api/util"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 )
@@ -115,15 +117,24 @@ func initSessions(sessionsStorage sessions.Sessions) error {
 	return nil
 }
 
+func InitEmptyDB(t *testing.T) (*require.Assertions, *app.Application) {
+	config := app.LoadConfig()
+	config.Mode = app.ModeNoSeeds
+	return initDB(t, config)
+}
+
 func InitDB(t *testing.T) (*require.Assertions, *app.Application) {
-	assert := require.New(t)
 	config := app.LoadConfig()
 	config.Mode = app.ModeTest
+	return initDB(t, config)
+}
+
+func initDB(t *testing.T, config app.Config) (*require.Assertions, *app.Application) {
+	assert := require.New(t)
 	config.Http.Host = "localhost"
 	config.Http.Logger = false
 	config.Templates.Dir = "../../templates/"
 	config.LogLevel = ""
-	util.SetTime(util.Date("2019-04-01").Time)
 	application := app.New(config)
 	err := application.BootstrapDB()
 	assert.NoError(err)
@@ -145,4 +156,96 @@ func AuthApprobateur(request *httpexpect.Request) *httpexpect.Request {
 
 func AuthUser(request *httpexpect.Request, userId int64) *httpexpect.Request {
 	return request.WithHeader(httpserver.AuthorizationHeader, UserSessions[userId])
+}
+
+func CreateInspection(db *database.Database, inspection *models.Inspection) error {
+	for i := range inspection.Inspecteurs {
+		_, err := db.Model(&inspection.Inspecteurs[i]).
+			OnConflict("(email) DO UPDATE").
+			Insert()
+		if err != nil {
+			return err
+		}
+	}
+
+	for i := range inspection.Etablissement.Exploitants {
+		_, err := db.Model(&inspection.Etablissement.Exploitants[i]).
+			OnConflict("(email) DO UPDATE").
+			Insert()
+		if err != nil {
+			return err
+		}
+	}
+
+	if inspection.Etablissement.Departement != nil {
+		err := db.Insert(&inspection.Etablissement.Departement)
+		if err != nil {
+			return err
+		}
+	}
+
+	err := db.Insert(inspection.Etablissement)
+	if err != nil {
+		return errors.Wrap(err, "erreur insertion etablissement")
+	}
+
+	for _, exploitant := range inspection.Etablissement.Exploitants {
+		err = db.Insert(&models.EtablissementToExploitant{
+			EtablissementId: inspection.Etablissement.Id,
+			UserId:          exploitant.Id,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	if inspection.Suite != nil {
+		err := db.Insert(inspection.Suite)
+		if err != nil {
+			return err
+		}
+		inspection.SuiteId = inspection.Suite.Id
+	}
+
+	inspection.EtablissementId = inspection.Etablissement.Id
+	err = db.Insert(inspection)
+	if err != nil {
+		return errors.Wrap(err, "erreur insertion inspection")
+	}
+
+	for _, inspecteur := range inspection.Inspecteurs {
+		err = db.Insert(&models.InspectionToInspecteur{
+			InspectionId: inspection.Id,
+			UserId:       inspecteur.Id,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	for i := range inspection.PointsDeControle {
+		pointDeControle := &inspection.PointsDeControle[i]
+		if pointDeControle.Constat != nil {
+			err := db.Insert(pointDeControle.Constat)
+			if err != nil {
+				return err
+			}
+			pointDeControle.ConstatId = inspection.Id
+		}
+		pointDeControle.InspectionId = inspection.Id
+		err = db.Insert(pointDeControle)
+		if err != nil {
+			return err
+		}
+		for j := range pointDeControle.Messages {
+			message := &pointDeControle.Messages[j]
+			message.PointDeControleId = pointDeControle.Id
+			message.AuteurId = message.Auteur.Id
+			err = db.Insert(message)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

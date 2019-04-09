@@ -19,9 +19,10 @@ import (
 type ModeEnv string
 
 const (
-	ModeDev  ModeEnv = "dev"
-	ModeTest ModeEnv = "test"
-	ModeProd ModeEnv = "prod"
+	ModeDev     ModeEnv = "dev"
+	ModeTest    ModeEnv = "test"
+	ModeNoSeeds ModeEnv = "noseeds"
+	ModeProd    ModeEnv = "prod"
 )
 
 type Config struct {
