@@ -36,7 +36,15 @@ func Init(t *testing.T) (*httpexpect.Expect, func()) {
 
 func InitService(t *testing.T) (*require.Assertions, *app.Application, func()) {
 	assert, a := InitDB(t)
+	return initService(assert, a, t)
+}
 
+func InitServiceEmptyDB(t *testing.T) (*require.Assertions, *app.Application, func()) {
+	assert, a := InitEmptyDB(t)
+	return initService(assert, a, t)
+}
+
+func initService(assert *require.Assertions, a *app.Application, t *testing.T) (*require.Assertions, *app.Application, func()) {
 	var err error
 	a.Storage, err = storage.New(a.Config.Storage)
 	assert.NoError(err)

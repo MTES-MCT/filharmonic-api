@@ -6,6 +6,7 @@ import (
 
 	"github.com/MTES-MCT/filharmonic-api/domain"
 	"github.com/MTES-MCT/filharmonic-api/util"
+	"github.com/go-pg/pg/types"
 
 	"github.com/MTES-MCT/filharmonic-api/models"
 
@@ -13,7 +14,22 @@ import (
 )
 
 func TestCreateInspectionHasCreatedNotification(t *testing.T) {
-	assert, application := tests.InitDB(t)
+	assert, application := tests.InitEmptyDB(t)
+
+	inspecteur1 := models.User{
+		Email:   "inspecteur1@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	inspecteur2 := models.User{
+		Email:   "inspecteur2@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	assert.NoError(application.DB.Insert(&inspecteur1, &inspecteur2))
+
+	etablissement := models.Etablissement{
+		Nom: "Équipement de pression",
+	}
+	assert.NoError(application.DB.Insert(&etablissement))
 
 	inspection := models.Inspection{
 		Date: util.Date("2019-02-08"),
@@ -25,169 +41,411 @@ func TestCreateInspectionHasCreatedNotification(t *testing.T) {
 		Origine:         models.OriginePlanControle,
 		Etat:            models.EtatEnCours,
 		Contexte:        "Inspection en cours",
-		EtablissementId: 4,
+		EtablissementId: etablissement.Id,
 		Inspecteurs: []models.User{
-			models.User{
-				Id: 3,
-			},
-			models.User{
-				Id: 4,
-			},
+			inspecteur1,
+			inspecteur2,
 		},
 	}
 
-	ctx := &domain.UserContext{
-		User: &models.User{
-			Id: 3,
-		},
+	ctx1 := &domain.UserContext{
+		User: &inspecteur1,
 	}
 	ctx2 := &domain.UserContext{
-		User: &models.User{
-			Id: 4,
-		},
+		User: &inspecteur2,
 	}
 
-	idInspection, err := application.Repo.CreateInspection(ctx, inspection)
+	idInspection, err := application.Repo.CreateInspection(ctx1, inspection)
 	assert.NoError(err)
-	assert.Equal(int64(6), idInspection)
 
 	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
 	assert.Equal(1, len(notifications))
 	notification := notifications[0]
-	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.EvenementCreationInspection, notification.Evenement.Type)
 	assert.Equal(idInspection, notification.Evenement.InspectionId)
-	assert.Equal(int64(3), notification.Evenement.AuteurId)
+	assert.Equal(inspecteur1.Id, notification.Evenement.AuteurId)
 }
 
 func TestUpdateInspectionHasCreatedNotification(t *testing.T) {
-	assert, application := tests.InitDB(t)
+	assert, application := tests.InitEmptyDB(t)
 
-	ctx := &domain.UserContext{
-		User: &models.User{
-			Id: 3,
-		},
+	inspecteur1 := models.User{
+		Email:   "inspecteur1@filharmonic.com",
+		Profile: models.ProfilInspecteur,
 	}
-	ctx2 := &domain.UserContext{
-		User: &models.User{
-			Id: 4,
-		},
+	inspecteur2 := models.User{
+		Email:   "inspecteur2@filharmonic.com",
+		Profile: models.ProfilInspecteur,
 	}
+	assert.NoError(application.DB.Insert(&inspecteur1, &inspecteur2))
 
 	inspection := models.Inspection{
-		Id:       1,
-		Contexte: "test",
+		Date: util.Date("2019-02-08"),
+		Type: models.TypePonctuel,
+		Themes: []string{
+			"Sanitaire",
+		},
+		Annonce:  true,
+		Origine:  models.OriginePlanControle,
+		Etat:     models.EtatEnCours,
+		Contexte: "Inspection en cours",
+		Etablissement: &models.Etablissement{
+			Nom: "Équipement de pression",
+		},
 		Inspecteurs: []models.User{
-			models.User{
-				Id: 3,
-			},
-			models.User{
-				Id: 4,
-			},
+			inspecteur1,
+			inspecteur2,
 		},
 	}
+	assert.NoError(tests.CreateInspection(application.DB, &inspection))
 
-	err := application.Repo.UpdateInspection(ctx, inspection)
+	ctx1 := &domain.UserContext{
+		User: &inspecteur1,
+	}
+	ctx2 := &domain.UserContext{
+		User: &inspecteur2,
+	}
+
+	inspection.Contexte = "test"
+
+	err := application.Repo.UpdateInspection(ctx1, inspection)
 	assert.NoError(err)
 
 	notifications, err := application.Repo.ListNotifications(ctx2, nil)
 	assert.NoError(err)
 	assert.Equal(1, len(notifications))
 	notification := notifications[0]
-	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.EvenementModificationInspection, notification.Evenement.Type)
-	assert.Equal(int64(1), notification.Evenement.InspectionId)
-	assert.Equal(int64(3), notification.Evenement.AuteurId)
+	assert.Equal(inspection.Id, notification.Evenement.InspectionId)
+	assert.Equal(inspecteur1.Id, notification.Evenement.AuteurId)
 }
 
-func TestUpdateEtatInspectionHasCreatedNotification(t *testing.T) {
-	assert, application, close := tests.InitService(t)
+func TestPublishInspectionHasCreatedNotification(t *testing.T) {
+	assert, application, close := tests.InitServiceEmptyDB(t)
 	defer close()
 
-	ctxInspecteur1 := &domain.UserContext{
-		User: &models.User{
-			Id:      3,
-			Profile: models.ProfilInspecteur,
+	inspecteur1 := models.User{
+		Email:   "inspecteur1@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	inspecteur2 := models.User{
+		Email:   "inspecteur2@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	assert.NoError(application.DB.Insert(&inspecteur1, &inspecteur2))
+
+	inspection := models.Inspection{
+		Date: util.Date("2019-02-08"),
+		Etat: models.EtatPreparation,
+		Etablissement: &models.Etablissement{
+			Nom: "Équipement de pression",
 		},
+		Inspecteurs: []models.User{
+			inspecteur1,
+			inspecteur2,
+		},
+	}
+	assert.NoError(tests.CreateInspection(application.DB, &inspection))
+
+	ctxInspecteur1 := &domain.UserContext{
+		User: &inspecteur1,
 	}
 	ctxInspecteur2 := &domain.UserContext{
-		User: &models.User{
-			Id:      5,
-			Profile: models.ProfilInspecteur,
-		},
+		User: &inspecteur2,
 	}
-	ctxApprobateur := &domain.UserContext{
-		User: &models.User{
-			Id:      6,
-			Profile: models.ProfilApprobateur,
-		},
-	}
-
-	inspectionId := int64(2)
-
-	err := application.Service.PublishInspection(ctxInspecteur1, inspectionId)
+	err := application.Service.PublishInspection(ctxInspecteur1, inspection.Id)
 	assert.NoError(err)
 
 	notifications, err := application.Repo.ListNotifications(ctxInspecteur2, nil)
 	assert.NoError(err)
 	assert.Equal(1, len(notifications))
 	notification := notifications[0]
-	assert.Equal(int64(4), notification.Id)
 	assert.Equal(models.EvenementPublicationInspection, notification.Evenement.Type)
-	assert.Equal(inspectionId, notification.Evenement.InspectionId)
-	assert.Equal(int64(3), notification.Evenement.AuteurId)
+	assert.Equal(inspection.Id, notification.Evenement.InspectionId)
+	assert.Equal(inspecteur1.Id, notification.Evenement.AuteurId)
+}
 
-	_, err = application.Service.CreateConstat(ctxInspecteur1, 3, models.Constat{
-		Type: models.TypeConstatConforme,
-	})
-	assert.NoError(err)
-	_, err = application.Service.CreateSuite(ctxInspecteur1, inspectionId, models.Suite{
-		Type: models.TypeSuiteAucune,
-	})
+func TestAskValidateInspectionHasCreatedNotification(t *testing.T) {
+	assert, application, close := tests.InitServiceEmptyDB(t)
+	defer close()
+
+	inspecteur1 := models.User{
+		Email:   "inspecteur1@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	inspecteur2 := models.User{
+		Email:   "inspecteur2@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	approbateur := models.User{
+		Email:   "approbateur1@filharmonic.com",
+		Profile: models.ProfilApprobateur,
+	}
+	assert.NoError(application.DB.Insert(&inspecteur1, &inspecteur2, &approbateur))
+
+	inspection := models.Inspection{
+		Date: util.Date("2019-02-08"),
+		Etat: models.EtatEnCours,
+		Etablissement: &models.Etablissement{
+			Nom: "Équipement de pression",
+		},
+		Inspecteurs: []models.User{
+			inspecteur1,
+			inspecteur2,
+		},
+		PointsDeControle: []models.PointDeControle{
+			models.PointDeControle{
+				Publie: true,
+				Sujet:  "test1",
+				Constat: &models.Constat{
+					Type: models.TypeConstatConforme,
+				},
+			},
+		},
+		Suite: &models.Suite{
+			Type: models.TypeSuiteAucune,
+		},
+	}
+	assert.NoError(tests.CreateInspection(application.DB, &inspection))
+
+	ctxInspecteur1 := &domain.UserContext{
+		User: &inspecteur1,
+	}
+	ctxInspecteur2 := &domain.UserContext{
+		User: &inspecteur2,
+	}
+	ctxApprobateur := &domain.UserContext{
+		User: &approbateur,
+	}
+	err := application.Service.AskValidateInspection(ctxInspecteur1, inspection.Id)
 	assert.NoError(err)
 
-	err = application.Service.AskValidateInspection(ctxInspecteur1, inspectionId)
+	notifications, err := application.Repo.ListNotifications(ctxInspecteur2, nil)
 	assert.NoError(err)
-
-	notifications, err = application.Repo.ListNotifications(ctxInspecteur2, nil)
-	assert.NoError(err)
-	assert.Equal(4, len(notifications))
-	notification = notifications[0]
-	assert.Equal(int64(8), notification.Id)
+	assert.Equal(1, len(notifications))
+	notification := notifications[0]
 	assert.Equal(models.EvenementDemandeValidationInspection, notification.Evenement.Type)
-	assert.Equal(inspectionId, notification.Evenement.InspectionId)
-	assert.Equal(int64(3), notification.Evenement.AuteurId)
+	assert.Equal(inspection.Id, notification.Evenement.InspectionId)
+	assert.Equal(inspecteur1.Id, notification.Evenement.AuteurId)
 
-	err = application.Service.RejectInspection(ctxApprobateur, inspectionId, "motif de rejet")
+	notifications, err = application.Repo.ListNotifications(ctxApprobateur, nil)
 	assert.NoError(err)
+	assert.Equal(1, len(notifications))
+	notification = notifications[0]
+	assert.Equal(models.EvenementDemandeValidationInspection, notification.Evenement.Type)
+	assert.Equal(inspection.Id, notification.Evenement.InspectionId)
+	assert.Equal(inspecteur1.Id, notification.Evenement.AuteurId)
+}
+
+func TestRejectInspectionHasCreatedNotification(t *testing.T) {
+	assert, application, close := tests.InitServiceEmptyDB(t)
+	defer close()
+
+	inspecteur1 := models.User{
+		Email:   "inspecteur1@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	inspecteur2 := models.User{
+		Email:   "inspecteur2@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	approbateur := models.User{
+		Email:   "approbateur1@filharmonic.com",
+		Profile: models.ProfilApprobateur,
+	}
+	assert.NoError(application.DB.Insert(&inspecteur1, &inspecteur2, &approbateur))
+
+	inspection := models.Inspection{
+		Date: util.Date("2019-02-08"),
+		Etat: models.EtatAttenteValidation,
+		Etablissement: &models.Etablissement{
+			Nom: "Équipement de pression",
+		},
+		Inspecteurs: []models.User{
+			inspecteur1,
+			inspecteur2,
+		},
+		PointsDeControle: []models.PointDeControle{
+			models.PointDeControle{
+				Publie: true,
+				Sujet:  "test1",
+				Constat: &models.Constat{
+					Type: models.TypeConstatConforme,
+				},
+			},
+		},
+		Suite: &models.Suite{
+			Type: models.TypeSuiteAucune,
+		},
+	}
+	assert.NoError(tests.CreateInspection(application.DB, &inspection))
+
+	ctxInspecteur1 := &domain.UserContext{
+		User: &inspecteur1,
+	}
+	ctxInspecteur2 := &domain.UserContext{
+		User: &inspecteur2,
+	}
+	ctxApprobateur := &domain.UserContext{
+		User: &approbateur,
+	}
+	err := application.Service.RejectInspection(ctxApprobateur, inspection.Id, "motif de rejet")
+	assert.NoError(err)
+
+	notifications, err := application.Repo.ListNotifications(ctxInspecteur1, nil)
+	assert.NoError(err)
+	assert.Equal(1, len(notifications))
+	notification := notifications[0]
+	assert.Equal(models.EvenementRejetValidationInspection, notification.Evenement.Type)
+	assert.Equal(inspection.Id, notification.Evenement.InspectionId)
+	assert.Equal(approbateur.Id, notification.Evenement.AuteurId)
 
 	notifications, err = application.Repo.ListNotifications(ctxInspecteur2, nil)
 	assert.NoError(err)
-	assert.Equal(5, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification = notifications[0]
-	assert.Equal(int64(12), notification.Id)
 	assert.Equal(models.EvenementRejetValidationInspection, notification.Evenement.Type)
-	assert.Equal(inspectionId, notification.Evenement.InspectionId)
-	assert.Equal(int64(6), notification.Evenement.AuteurId)
+	assert.Equal(inspection.Id, notification.Evenement.InspectionId)
+	assert.Equal(approbateur.Id, notification.Evenement.AuteurId)
+}
 
-	err = application.Service.AskValidateInspection(ctxInspecteur1, inspectionId)
-	assert.NoError(err)
+func TestValidateInspectionHasCreatedNotification(t *testing.T) {
+	assert, application, close := tests.InitServiceEmptyDB(t)
+	defer close()
+
+	inspecteur1 := models.User{
+		Email:   "inspecteur1@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	inspecteur2 := models.User{
+		Email:   "inspecteur2@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	approbateur := models.User{
+		Email:   "approbateur1@filharmonic.com",
+		Profile: models.ProfilApprobateur,
+	}
+	assert.NoError(application.DB.Insert(&inspecteur1, &inspecteur2, &approbateur))
+
+	inspection := models.Inspection{
+		Date: util.Date("2019-02-08"),
+		Etat: models.EtatAttenteValidation,
+		Etablissement: &models.Etablissement{
+			Nom: "Équipement de pression",
+		},
+		Inspecteurs: []models.User{
+			inspecteur1,
+			inspecteur2,
+		},
+		PointsDeControle: []models.PointDeControle{
+			models.PointDeControle{
+				Publie: true,
+				Sujet:  "test1",
+				Constat: &models.Constat{
+					Type: models.TypeConstatConforme,
+				},
+			},
+		},
+		Suite: &models.Suite{
+			Type: models.TypeSuiteAucune,
+		},
+	}
+	assert.NoError(tests.CreateInspection(application.DB, &inspection))
+
+	ctxInspecteur1 := &domain.UserContext{
+		User: &inspecteur1,
+	}
+	ctxInspecteur2 := &domain.UserContext{
+		User: &inspecteur2,
+	}
+	ctxApprobateur := &domain.UserContext{
+		User: &approbateur,
+	}
 	rapportFile := models.File{
 		Content: strings.NewReader("MonContenu"),
 		Type:    "application/pdf",
 		Taille:  int64(len("MonContenu")),
 		Nom:     "test.pdf",
 	}
-	err = application.Service.ValidateInspection(ctxApprobateur, inspectionId, rapportFile)
+	err := application.Service.ValidateInspection(ctxApprobateur, inspection.Id, rapportFile)
 	assert.NoError(err)
+
+	notifications, err := application.Repo.ListNotifications(ctxInspecteur1, nil)
+	assert.NoError(err)
+	assert.Equal(1, len(notifications))
+	notification := notifications[0]
+	assert.Equal(models.EvenementValidationInspection, notification.Evenement.Type)
+	assert.Equal(inspection.Id, notification.Evenement.InspectionId)
+	assert.Equal(approbateur.Id, notification.Evenement.AuteurId)
 
 	notifications, err = application.Repo.ListNotifications(ctxInspecteur2, nil)
 	assert.NoError(err)
-	assert.Equal(7, len(notifications))
+	assert.Equal(1, len(notifications))
 	notification = notifications[0]
-	assert.Equal(int64(17), notification.Id)
 	assert.Equal(models.EvenementValidationInspection, notification.Evenement.Type)
-	assert.Equal(inspectionId, notification.Evenement.InspectionId)
-	assert.Equal(int64(6), notification.Evenement.AuteurId)
+	assert.Equal(inspection.Id, notification.Evenement.InspectionId)
+	assert.Equal(approbateur.Id, notification.Evenement.AuteurId)
+}
+
+func TestCloreInspectionHasCreatedNotification(t *testing.T) {
+	assert, application, close := tests.InitServiceEmptyDB(t)
+	defer close()
+
+	inspecteur1 := models.User{
+		Email:   "inspecteur1@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	inspecteur2 := models.User{
+		Email:   "inspecteur2@filharmonic.com",
+		Profile: models.ProfilInspecteur,
+	}
+	assert.NoError(application.DB.Insert(&inspecteur1, &inspecteur2))
+
+	inspection := models.Inspection{
+		Date: util.Date("2019-02-08"),
+		Etat: models.EtatTraitementNonConformites,
+		Etablissement: &models.Etablissement{
+			Nom: "Équipement de pression",
+		},
+		Inspecteurs: []models.User{
+			inspecteur1,
+			inspecteur2,
+		},
+		DateValidation: types.NullTime{Time: util.Date("2019-03-08").Time},
+		PointsDeControle: []models.PointDeControle{
+			models.PointDeControle{
+				Publie: true,
+				Sujet:  "test1",
+				Constat: &models.Constat{
+					Type:               models.TypeConstatNonConforme,
+					EcheanceResolution: util.Date("2019-04-08"),
+					DateResolution: types.NullTime{
+						Time: util.Date("2019-03-15").Time,
+					},
+				},
+			},
+		},
+		Suite: &models.Suite{
+			Type: models.TypeSuitePropositionRenforcement,
+		},
+	}
+	assert.NoError(tests.CreateInspection(application.DB, &inspection))
+
+	ctxInspecteur1 := &domain.UserContext{
+		User: &inspecteur1,
+	}
+	ctxInspecteur2 := &domain.UserContext{
+		User: &inspecteur2,
+	}
+	err := application.Service.CloreInspection(ctxInspecteur1, inspection.Id)
+	assert.NoError(err)
+
+	notifications, err := application.Repo.ListNotifications(ctxInspecteur2, nil)
+	assert.NoError(err)
+	assert.Equal(1, len(notifications))
+	notification := notifications[0]
+	assert.Equal(models.EvenementClotureInspection, notification.Evenement.Type)
+	assert.Equal(inspection.Id, notification.Evenement.InspectionId)
+	assert.Equal(inspecteur1.Id, notification.Evenement.AuteurId)
 }
